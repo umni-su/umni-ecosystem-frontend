@@ -104,6 +104,7 @@ export default {
     rounded="lg"
     :value="modelValue"
     :class="disabled ? 'opacity-50' : ''"
+    color="primary"
   >
     <template #prepend>
       <VIcon

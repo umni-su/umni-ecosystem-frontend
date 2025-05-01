@@ -28,6 +28,9 @@ export default {
     lastSync() {
       return this.$moment(this.device.last_sync).format(this.format)
     },
+    name() {
+      return this.device.title ? this.device.title : this.device.name
+    }
   },
 }
 </script>
@@ -53,18 +56,19 @@ export default {
           class="opacity-20"
         />
       </template>
-      <VCardTitle>
-        {{ device.name.toUpperCase() }}
-      </VCardTitle>
-      <VCardSubtitle>
+      <template #title>
+        {{ name.toUpperCase() }}
+      </template>
+      <template #append>
         <VChip
+          density="compact"
           color="primary"
-          variant="flat"
+          variant="tonal"
         >
           {{ typeStr }}
         </VChip>
-      </VCardSubtitle>
-      <VCardText>
+      </template>
+      <template #text>
         <DeviceCardCharacteristicItem
           icon="mdi-clock"
           :title="$t('Last sync')"
@@ -82,7 +86,7 @@ export default {
           :title="$t('Sensors')"
           :value="`${device.sensors_count}`"
         />
-      </VCardText>
+      </template>
     </VCard>
   </VCol>
 </template>

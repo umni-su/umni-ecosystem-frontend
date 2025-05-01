@@ -1,20 +1,20 @@
 <script>
 export default {
-    name: "DeviceCardCharacteristicItem",
-    props: {
-        icon: {
-            type: String,
-            default: null
-        },
-        title: {
-            type: String,
-            default: null
-        },
-        value: {
-            type: String,
-            default: null
-        }
+  name: "DeviceCardCharacteristicItem",
+  props: {
+    icon: {
+      type: String,
+      default: null
+    },
+    title: {
+      type: String,
+      default: null
+    },
+    value: {
+      type: String,
+      default: null
     }
+  }
 }
 </script>
 
@@ -31,6 +31,10 @@ export default {
         {{ title }}
       </span>
     </div>
+    <slot
+      v-if="$slots.value"
+      name="value"
+    />
     <div
       v-if="value"
       class="value"
@@ -42,8 +46,8 @@ export default {
 
 <style scoped lang="scss">
 .characteristic {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>

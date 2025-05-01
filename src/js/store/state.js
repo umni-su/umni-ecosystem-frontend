@@ -12,6 +12,7 @@ export default {
     systemNotifications: [],
     devices: [],
     device: null,
+    sensor: null,
     ws: {
         id: null,
         connecting: false,

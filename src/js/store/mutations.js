@@ -14,7 +14,7 @@ export default {
     setUser(state, user) {
         state.user = user
     },
-    setToken(state, token){
+    setToken(state, token) {
         state.token = token
         localStorage.setItem('token', token)
     },
@@ -56,5 +56,8 @@ export default {
     },
     removeDevice(state, device) {
         state.devices = state.devices.filter(d => d.id !== device.id)
+    },
+    setActiveSensor(state, sensor) {
+        state.sensor = sensor
     },
 }

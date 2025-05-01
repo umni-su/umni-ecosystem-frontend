@@ -1,37 +1,37 @@
 <script>
 export default {
-    name: "ModalDialog",
-    props: {
-        title: {
-            type: String,
-            default: null
-        },
-        subtitle: {
-            type: String,
-            default: null
-        },
-        modelValue: {
-            type: Boolean,
-            default: false
-        }
+  name: "ModalDialog",
+  props: {
+    title: {
+      type: String,
+      default: null
     },
-    emits: ['update:model-value'],
-    data() {
-        return {
-            open: false
-        }
+    subtitle: {
+      type: String,
+      default: null
     },
-    watch: {
-        modelValue() {
-            this.open = this.modelValue
-        },
-        open() {
-            this.$emit('update:model-value', this.open)
-        }
-    },
-    created() {
-        this.open = this.modelValue
+    modelValue: {
+      type: Boolean,
+      default: false
     }
+  },
+  emits: ['update:model-value'],
+  data() {
+    return {
+      open: false
+    }
+  },
+  watch: {
+    modelValue() {
+      this.open = this.modelValue
+    },
+    open() {
+      this.$emit('update:model-value', this.open)
+    }
+  },
+  created() {
+    this.open = this.modelValue
+  }
 }
 </script>
 
@@ -50,6 +50,12 @@ export default {
       </template>
       <template #text>
         <slot />
+      </template>
+      <template
+        v-if="$slots.actions"
+        #actions
+      >
+        <slot name="actions" />
       </template>
       <template #append>
         <VBtn

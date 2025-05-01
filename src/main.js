@@ -8,6 +8,7 @@ import router from "./js/router/router.js";
 import store from './js/store/store'
 import {setupI18n, loadLocaleMessages, plural} from './js/i18n'
 import moment from 'moment/min/moment-with-locales';
+import '@vuepic/vue-datepicker/dist/main.css'
 import App from './App.vue'
 import {createApp} from 'vue'
 
@@ -32,6 +33,8 @@ const dark = {
         'secondary-lighten': 'rgba(128,144,152,0.3)'
     },
 }
+
+const defaultLang = 'ru'
 
 const vuetify = createVuetify({
     components,
@@ -74,7 +77,7 @@ const vuetify = createVuetify({
         },
         VContainer: {
             fluid: true
-        }
+        },
     },
     theme: {
         defaultTheme: 'light',
@@ -85,8 +88,6 @@ const vuetify = createVuetify({
     },
 
 })
-
-const defaultLang = 'ru'
 
 const i18n = setupI18n({
     legacy: false, // you must set `false`, to use Composition API

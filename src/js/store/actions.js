@@ -10,7 +10,7 @@ axios.interceptors.response.use(function (response) {
     }
     if (response.headers['refresh-token']) {
         localStorage.setItem('token', response.headers['refresh-token'])
-        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.headers['auth-token']
+        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.headers['refresh-token']
     }
     return response;
 }, function (error) {
@@ -118,6 +118,16 @@ export default {
             commit('setDevice', res.data)
         }
     },
+    async updateDevice({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}devices/${data.id}`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('addDevice', res.data)
+            return res.data
+        }
+    },
     async updateDeviceCover({commit}, data) {
         commit('setLoading', true)
         const res = await axios.post(`${API}devices/${data.id}/cover`, data, {
@@ -139,5 +149,15 @@ export default {
         if (res) {
             return res.data
         }
-    }
+    },
+    /** HISTORY **/
+    async getSensorHistory({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}sensors/${data.id}/history`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
 }

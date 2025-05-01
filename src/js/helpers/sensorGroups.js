@@ -22,3 +22,13 @@ export const SENSOR_GROUP = {
     SENSOR_DS18B20,
     SENSOR_RF433,
 }
+
+export const SENSOR_TEXT = {
+    SENSOR_RELAYS: 'Relay',
+    SENSOR_INPUTS: 'Input',
+    SENSOR_NTC: 'NTC thermistor',
+    SENSOR_ADC: 'Analog sensor',
+    SENSOR_OPENTHERM: 'OpenTherm',
+    SENSOR_DS18B20: 'Temperature',
+    SENSOR_RF433: 'Wireless sensor',
+}

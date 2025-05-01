@@ -40,5 +40,8 @@ export default {
     },
     getDateTimeFormat(state) {
         return `${state.dateFormat} ${state.timeFormat}`
+    },
+    getActiveSensor(state) {
+        return state.sensor
     }
 }
