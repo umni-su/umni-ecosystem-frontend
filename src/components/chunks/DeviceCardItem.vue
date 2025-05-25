@@ -15,7 +15,15 @@ export default {
       required: true
     }
   },
+  data() {
+    return {
+      src: null
+    }
+  },
   computed: {
+    online() {
+      return this.device.online
+    },
     deviceCount() {
       return this.$store.getters['getDevices'].length
     },
@@ -32,6 +40,16 @@ export default {
       return this.device.title ? this.device.title : this.device.name
     }
   },
+  created() {
+    if (this.device.photo !== null) {
+      this.getCover()
+    }
+  },
+  methods: {
+    async getCover() {
+      this.src = await this.$store.dispatch('getDeviceCover', this.device.id)
+    }
+  }
 }
 </script>
 
@@ -44,22 +62,18 @@ export default {
       variant="elevated"
       hover
     >
-      <template
-        v-if="device.cover"
-        #image
-      >
-        <VImg
-          rounded="0"
-          :src="`/panel/devices/${device.id}/cover/${device.cover}`"
-          cover
-          height="200"
-          class="opacity-20"
-        />
-      </template>
       <template #title>
         {{ name.toUpperCase() }}
       </template>
       <template #append>
+        <VChip
+          class="mr-2"
+          density="compact"
+          :color="online ? 'green' : 'red'"
+          variant="tonal"
+          :prepend-icon="online ? 'mdi-eye' : 'mdi-eye-off'"
+          :text="online ? $t('Online') : $t('Offline')"
+        />
         <VChip
           density="compact"
           color="primary"
@@ -67,6 +81,16 @@ export default {
         >
           {{ typeStr }}
         </VChip>
+        <VImg
+          v-if="device.photo"
+          rounded="pill"
+          inline
+          class="ml-2"
+          cover
+          :src="src"
+          width="40"
+          height="40"
+        />
       </template>
       <template #text>
         <DeviceCardCharacteristicItem

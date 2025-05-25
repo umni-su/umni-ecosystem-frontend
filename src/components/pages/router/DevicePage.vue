@@ -3,10 +3,12 @@ import DeviceInfoCard from "../../chunks/device/DeviceInfoCard.vue";
 import DeviceNetworkInfoCard from "../../chunks/device/DeviceNetworkInfoCard.vue";
 import DeviceInfoSensorsCard from "../../chunks/device/DeviceInfoSensorsCard.vue";
 import DeviceActiveSensor from "../../chunks/device/DeviceActiveSensor.vue";
+import DeviceUptimeCard from "../../chunks/DeviceUptimeCard.vue";
 
 export default {
   name: "DevicePage",
   components: {
+    DeviceUptimeCard,
     DeviceActiveSensor,
     DeviceInfoSensorsCard,
     DeviceNetworkInfoCard,
@@ -21,6 +23,8 @@ export default {
   data() {
     return {
       cover: null,
+      handler: null,
+      deviceModel: undefined
     }
   },
   computed: {
@@ -33,10 +37,33 @@ export default {
     type() {
       return this.device.type
     },
+    online() {
+      return this.device.online
+    },
+    interval() {
+      return this.$store.getters['getInterval']
+    }
   },
-  async mounted() {
+  watch: {
+    device: {
+      deep: true,
+      handler(newVal) {
+        if (newVal !== null && newVal !== undefined) {
+          this.deviceModel = this.device
+        }
+      }
+    }
+  },
+  async created() {
     await this.getDevice()
     this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
+    this.handler = setInterval(async () => {
+      await this.getDevice()
+    }, this.interval)
+  },
+  unmounted() {
+    clearInterval(this.handler)
+    this.$store.commit('setDevice', null)
   },
   methods: {
     async getDevice() {
@@ -49,7 +76,7 @@ export default {
 
 <template>
   <VSheet
-    v-if="device"
+    v-if="deviceModel"
     class="ma-auto"
     max-width="1200"
     color="transparent"
@@ -60,14 +87,22 @@ export default {
           cols="12"
           md="6"
         >
-          <DeviceInfoCard />
-          <DeviceNetworkInfoCard />
+          <VAlert
+            v-if="!online"
+            color="error"
+            variant="tonal"
+            class="mb-4"
+            :text="$t('This device is probably disabled. Please check his condition.')"
+          />
+          <DeviceInfoCard :device="deviceModel" />
+          <DeviceNetworkInfoCard :device="deviceModel" />
         </VCol>
         <VCol
           cols="12"
           md="6"
         >
-          <DeviceInfoSensorsCard />
+          <DeviceUptimeCard />
+          <DeviceInfoSensorsCard :device="deviceModel" />
         </VCol>
       </VRow>
     </VContainer>

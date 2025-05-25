@@ -8,21 +8,28 @@ export default {
     SimpleBar,
     DeviceListItemSensor
   },
-  data() {
-    return {
-      showMore: false
+  props: {
+    device: {
+      type: Object,
+      default: null
     }
   },
-  computed: {
-    device() {
-      return this.$store.getters['getDevice']
-    },
+  data() {
+    return {
+      showMore: false,
+      sensors: []
+    }
+  },
+  created() {
+    if (this.device?.sensors !== null && this.device?.sensors !== undefined) {
+      this.sensors = this.device?.sensors
+    }
   }
 }
 </script>
 
 <template>
-  <VCard>
+  <VCard v-if="device !== null && device !== undefined">
     <template #title>
       {{ $t('Sensors') }}
     </template>
@@ -31,11 +38,11 @@ export default {
         class="hidden-list"
         :class="{more:showMore}"
       >
-        <VList>
+        <VList v-if="sensors.length > 0">
           <DeviceListItemSensor
-            v-for="(sensor, key) in device.sensors"
+            v-for="(sensor, key) in sensors"
             :key="key"
-            v-model="device.sensors[key]"
+            v-model="sensors[key]"
             @click="$store.commit('setActiveSensor', sensor)"
           />
         </VList>

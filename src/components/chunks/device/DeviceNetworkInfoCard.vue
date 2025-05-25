@@ -6,10 +6,13 @@ export default {
   components: {
     DeviceCardCharacteristicItem
   },
+  props: {
+    device: {
+      type: Object,
+      required: true
+    }
+  },
   computed: {
-    device() {
-      return this.$store.getters['getDevice']
-    },
     network() {
       return this.device.network_interfaces
     },
@@ -23,7 +26,10 @@ export default {
 </script>
 
 <template>
-  <VCard class="mt-8">
+  <VCard
+    v-if="device"
+    class="mt-8"
+  >
     <template #title>
       {{ $t('Network interfaces') }}
     </template>

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import {getBase64Image} from "../helpers/resToBase64.js";
 
 window.axios = axios
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
@@ -97,7 +98,7 @@ export default {
             return res.data
         }
     },
-    /** DEVICES **/
+
     async getDevices({commit, state}) {
         commit('setLoading', true)
         console.log(state.token)
@@ -116,6 +117,7 @@ export default {
         })
         if (res) {
             commit('setDevice', res.data)
+            return res.data
         }
     },
     async updateDevice({commit}, data) {
@@ -128,7 +130,8 @@ export default {
             return res.data
         }
     },
-    async updateDeviceCover({commit}, data) {
+    async updateDeviceCover({commit, state}, data) {
+        const device = state.device
         commit('setLoading', true)
         const res = await axios.post(`${API}devices/${data.id}/cover`, data, {
             headers: {
@@ -138,8 +141,19 @@ export default {
             commit('setLoading', false)
         })
         if (res) {
-            commit('setDevice', res.data)
+            commit('setDevice', {...device, ...res.data})
+            return res.data
         }
+    },
+    async getDeviceCover({state}, id) {
+        const res = await fetch(
+            `/api/devices/${id}/cover/500`,
+            {
+                headers: {
+                    Authorization: `Bearer ${state.token}`,
+                }
+            })
+        return await getBase64Image(res)
     },
     async setRelayState({commit}, data) {
         commit('setLoading', true)
@@ -159,5 +173,46 @@ export default {
         if (res) {
             return res.data
         }
+    },
+    /** SETTINGS **/
+    async getBaseSettings({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.get(`${API}configuration`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+    async saveBaseSetting({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}configuration/${data.id}`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+    /** SENSORS */
+    async updateSensor({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}sensors/${data.id}`, data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).finally(() => {
+            commit('setLoading', false)
+        })
+        return res.data
+    },
+    async getDeviceSensorCover({state}, {id, width}) {
+        const res = await fetch(
+            `/api/sensors/${id}/cover/${width}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${state.token}`,
+                }
+            })
+        return await getBase64Image(res)
     },
 }

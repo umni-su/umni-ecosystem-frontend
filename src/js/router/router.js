@@ -2,6 +2,10 @@ import {createRouter, createWebHashHistory} from 'vue-router'
 import DashboardPage from '../../components/pages/router/DashboardPage.vue'
 import DevicesPage from '../../components/pages/router/DevicesPage.vue'
 import DevicePage from '../../components/pages/router/DevicePage.vue'
+import SettingsPage from '../../components/pages/router/SettingsPage.vue'
+import BaseSettings from "../../components/pages/router/settings/BaseSettings.vue";
+import NotificationSettings from "../../components/pages/router/settings/NotificationSettings.vue";
+import BackupSettings from "../../components/pages/router/settings/BackupSettings.vue";
 
 const routes = [
     {
@@ -26,6 +30,27 @@ const routes = [
                         ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
                     }
                 }
+            }
+        ]
+    },
+    {
+        path: '/settings',
+        component: SettingsPage,
+        children: [
+            {
+                path: 'base',
+                name: 'settings',
+                component: BaseSettings
+            },
+            {
+                path: 'notifications',
+                name: 'notifications',
+                component: NotificationSettings
+            },
+            {
+                path: 'backup',
+                name: 'backup',
+                component: BackupSettings
             }
         ]
     }

@@ -38,35 +38,40 @@ export default {
     class="login"
     :class="theme ==='light' ?'bg-primary' : 'bg-primary-darken'"
   >
-    <VSheet
+    <VCard
       width="300"
-      class="pa-6"
-      color="primary-darken"
     >
-      <UmniLogo class="d-block ma-auto mb-4" />
-      <VTextField
-        v-model="username"
-        :label="$t('Username')"
-        class="mb-4"
-        prepend-inner-icon="mdi-account"
-      />
-      <VTextField
-        v-model="password"
-        :label="$t('Password')"
-        type="password"
-        class="mb-4"
-        prepend-inner-icon="mdi-key"
-      />
-      <VBtn
-        :loading="loading"
-        :disabled="loading"
-        class="w-100"
-        :text="$t('Login')"
-        prepend-icon="mdi-send"
-        color="primary-darken"
-        @click="login"
-      />
-    </VSheet>
+      <template #text>
+        <UmniLogo
+          :short="false"
+          width="250"
+          class="d-block ma-auto mb-2"
+          color="#0486c2"
+        />
+        <VTextField
+          v-model="username"
+          :label="$t('Username')"
+          class="mb-4"
+          prepend-inner-icon="mdi-account"
+        />
+        <VTextField
+          v-model="password"
+          :label="$t('Password')"
+          type="password"
+          class="mb-4"
+          prepend-inner-icon="mdi-key"
+        />
+        <VBtn
+          :loading="loading"
+          :disabled="loading"
+          class="w-100"
+          :text="$t('Login')"
+          prepend-icon="mdi-send"
+          color="primary-darken"
+          @click="login"
+        />
+      </template>
+    </VCard>
     <div class="mini-slog">
       {{ $t('Prostoy. Dostupniy. Umni.') }}
     </div>

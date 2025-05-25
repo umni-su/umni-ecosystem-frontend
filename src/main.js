@@ -48,6 +48,11 @@ const vuetify = createVuetify({
             variant: 'outlined',
             hideDetails: true,
         },
+        VFileInput: {
+            density: 'compact',
+            variant: 'outlined',
+            hideDetails: true,
+        },
         VSheet: {
             color: 'transparent'
         },

@@ -6,32 +6,45 @@ import {createSuccessNotification} from "../../../js/helpers/notificationHelper.
 export default {
   name: "DeviceInfoCard",
   components: {ModalDialog},
+  props: {
+    device: {
+      type: Object,
+      required: true,
+    }
+  },
   data() {
     return {
       showForm: false,
+      src: null
     }
   },
   computed: {
+    token() {
+      return this.$store.state.token;
+    },
     lastSyncFromNow() {
       return this.$moment(this.device.last_sync).fromNow()
     },
     typeStr() {
       return this.$t(mapType(this.device.type))
     },
-    device() {
-      return this.$store.getters['getDevice']
-    },
     name() {
       return this.device.title ? this.device.title.toUpperCase() : this.device.name.toUpperCase()
     },
   },
+  async created() {
+    await this.getImage()
+  },
   methods: {
     async setCover(e) {
       this.cover = e.target.files[0]
-      await this.$store.dispatch('updateDeviceCover', {
-        id: this.id,
+      const ok = await this.$store.dispatch('updateDeviceCover', {
+        id: this.device.id,
         cover: this.cover
       })
+      if (ok) {
+        await this.getImage()
+      }
     },
     openEditModal() {
       this.showForm = !this.showForm
@@ -44,6 +57,11 @@ export default {
       if (res) {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
       }
+    },
+    async getImage() {
+      if (this.device) {
+        this.src = await this.$store.dispatch('getDeviceCover', this.device.id)
+      }
     }
   }
 }
@@ -51,6 +69,7 @@ export default {
 
 <template>
   <VCard
+    v-if="device"
     width="100%"
   >
     <template #title>
@@ -60,6 +79,16 @@ export default {
       {{ $t('Last update') }}: {{ lastSyncFromNow }}
     </template>
     <template #text>
+      <VSheet
+        v-if="device.photo !== null && src !== null"
+        class="mb-2"
+      >
+        <VImg
+          height="120"
+          cover
+          :src="src"
+        />
+      </VSheet>
       <VEmptyState
         v-if="device.location_id === null"
         class="text-center border-md border-dashed rounded-lg"

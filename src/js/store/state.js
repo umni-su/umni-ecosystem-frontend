@@ -1,5 +1,6 @@
 export default {
     loading: false,
+    interval: 10000,
     authenticated: false,
     installed: false,
     user: null,

@@ -31,12 +31,16 @@ export default {
         {{ title }}
       </span>
     </div>
-    <slot
-      v-if="$slots.value"
-      name="value"
-    />
     <div
-      v-if="value"
+      v-if="$slots.value"
+      class="value w-50 text-right"
+    >
+      <slot
+        name="value"
+      />
+    </div>
+    <div
+      v-else
       class="value"
     >
       {{ value }}

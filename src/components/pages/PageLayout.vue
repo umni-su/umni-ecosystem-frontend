@@ -30,21 +30,6 @@ export default {
       return this.$store.getters['getTheme']
     }
   },
-  mounted() {
-    //this.calcHeight()
-    //window.addEventListener("resize", this.calcHeight);
-  },
-  unmounted() {
-    //window.removeEventListener("resize", this.calcHeight);
-  },
-  methods: {
-    calcHeight() {
-      const bounds = this.$refs.page.$el.getBoundingClientRect()
-      const height = document.documentElement.clientHeight
-      console.log(bounds, height)
-      this.$refs.page.$el.style.height = `${height - bounds.x - 10}px`
-    }
-  }
 }
 </script>
 
@@ -74,7 +59,7 @@ export default {
           :active="false"
           @click="rail = !rail"
         >
-          <UmniLogo :size="32" />
+          <UmniLogo :width="44" />
         </VBtn>
       </template>
       <template #append>
@@ -83,6 +68,7 @@ export default {
             block
             prepend-icon="mdi-cog"
             :title="$t('Settings')"
+            :to="{name: 'settings'}"
           />
         </VList>
       </template>
@@ -117,10 +103,10 @@ export default {
       <VSheet
         ref="page"
         rounded="0"
-        class="overflow-hidden position-relative"
+        class="overflow-hidden fill-height position-relative"
         full-height
       >
-        <VSheet class="pa-4">
+        <VSheet class="pa-4 fill-height">
           <RouterView />
         </VSheet>
       </VSheet>

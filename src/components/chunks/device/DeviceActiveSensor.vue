@@ -4,14 +4,21 @@ import {markRaw} from 'vue';
 import SensorDateRangeFilter from "../SensorDateRangeFilter.vue";
 import {createErrorNotification} from "../../../js/helpers/notificationHelper.js";
 import {SENSOR_GROUP, SENSOR_TEXT} from "../../../js/helpers/sensorGroups.js";
+import ModalDialog from "../ModalDialog.vue";
 
 export default {
   name: "DeviceActiveSensor",
-  components: {SensorDateRangeFilter},
+  components: {
+    ModalDialog,
+    SensorDateRangeFilter,
+  },
   data() {
     return {
       activeSensor: null,
+      src: null,
+      cover: null,
       open: false,
+      edit: false,
       chart: null,
       filter: {
         range: null
@@ -38,7 +45,6 @@ export default {
         },
         xAxis: {
           type: 'time',
-          //data: ['Data one', 'Data two'],
         },
         yAxis: {
           type: 'value',
@@ -101,7 +107,11 @@ export default {
     open() {
       if (!this.open) {
         this.$store.commit('setActiveSensor', null);
+        this.src = null
       } else {
+        if (this.sensor.photo !== null) {
+          this.src = this.getCover()
+        }
         this.$nextTick(() => {
           this.chart = markRaw(echarts.init(this.$refs.chart.$el))
           window.addEventListener('resize', this.resize)
@@ -120,7 +130,7 @@ export default {
       this.chart.resize();
     },
     async getSensorHistory() {
-      const series = await this.$store.dispatch('getSensorHistory',
+      this.options.series = await this.$store.dispatch('getSensorHistory',
           {
             ...{
               id: this.sensor.id,
@@ -130,7 +140,6 @@ export default {
       ).catch(e => {
         this.$store.commit('addNotification', createErrorNotification(e.response.data.message));
       })
-      this.options.series = series
       this.chart.setOption(this.options)
     },
     async onUpdateRange(e) {
@@ -140,6 +149,19 @@ export default {
           await this.getSensorHistory();
         }
       }
+    },
+    async saveSensor() {
+      const data = {
+        id: this.activeSensor.id,
+        name: this.activeSensor.visible_name,
+        cover: this.cover
+      }
+      if (await this.$store.dispatch('updateSensor', data)) {
+        this.edit = false
+      }
+    },
+    async getCover() {
+      this.src = await this.$store.dispatch('getDeviceSensorCover', {id: this.sensor.id, width: 200})
     }
   }
 }
@@ -173,16 +195,29 @@ export default {
         </div>
       </VCardTitle>
       <VCardTitle class="d-flex align-center justify-space-between overflow-visible">
-        <SensorDateRangeFilter
-          v-if="chart"
-          @on-update-range="onUpdateRange"
-        />
+        <div class="d-flex align-center justify-space-between">
+          <VImg
+            v-if="src !== null"
+            rounded="pill"
+            class="mr-2"
+            :src="src"
+            cover
+            :width="40"
+            :height="40"
+            inline
+          />
+          <SensorDateRangeFilter
+            v-if="chart"
+            @on-update-range="onUpdateRange"
+          />
+        </div>
         <VBtnGroup
           variant="plain"
           density="comfortable"
         >
           <VBtn
             icon="mdi-pencil"
+            @click="edit = true"
           />
           <VBtn
             icon="mdi-trash-can"
@@ -196,9 +231,31 @@ export default {
           class="mt-6"
           height="400"
         />
-        <!--        {{ sensor }}-->
       </VCardText>
     </VCard>
+    <ModalDialog
+      v-model="edit"
+      :title="$t('Sensor editing')"
+    >
+      <VTextField
+        v-model="activeSensor.visible_name"
+        :label="$t('Name')"
+      />
+      <VFileInput
+        v-model="cover"
+        class="mt-4"
+        prepend-inner-icon="mdi-image"
+        prepend-icon=""
+        :label="$t('Upload cover')"
+      />
+      <template #actions>
+        <VBtn
+          :text="$t('Save')"
+          prepend-icon="mdi-content-save"
+          @click="saveSensor"
+        />
+      </template>
+    </ModalDialog>
   </VBottomSheet>
 </template>
 

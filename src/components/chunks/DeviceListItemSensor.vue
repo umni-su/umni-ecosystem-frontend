@@ -17,31 +17,30 @@ export default {
   data() {
     return {
       group: SENSOR_GROUP,
-      sensor: null
+      sensor: null,
+      src: null
     }
   },
   computed: {
     icon() {
-      let icon = this.sensor.icon
-      if (!icon) {
-        switch (this.sensor.type) {
-          case SENSOR_GROUP.SENSOR_RELAYS:
-            icon = 'mdi-lightbulb';
-            break
-          case SENSOR_GROUP.SENSOR_INPUTS:
-            icon = 'mdi-bell';
-            break
-          case SENSOR_GROUP.SENSOR_NTC :
-          case SENSOR_GROUP.SENSOR_DS18B20:
-            icon = 'mdi-thermometer'
-            break
-          case SENSOR_GROUP.SENSOR_ADC:
-            icon = 'mdi-square-wave'
-            break
-          case SENSOR_GROUP.SENSOR_RF433:
-            icon = 'mdi-access-point'
-            break
-        }
+      let icon = 'mdi-help-circle'
+      switch (this.sensor.type) {
+        case SENSOR_GROUP.SENSOR_RELAYS:
+          icon = 'mdi-lightbulb';
+          break
+        case SENSOR_GROUP.SENSOR_INPUTS:
+          icon = 'mdi-bell';
+          break
+        case SENSOR_GROUP.SENSOR_NTC :
+        case SENSOR_GROUP.SENSOR_DS18B20:
+          icon = 'mdi-thermometer'
+          break
+        case SENSOR_GROUP.SENSOR_ADC:
+          icon = 'mdi-square-wave'
+          break
+        case SENSOR_GROUP.SENSOR_RF433:
+          icon = 'mdi-access-point'
+          break
       }
       return icon
     },
@@ -63,27 +62,29 @@ export default {
       }
       return 'default'
     },
-    message() {
-      return this.$store.getters['getWsLastMessage']
+    hasCover() {
+      return this.sensor.photo !== null
+    },
+    name() {
+      if (this.sensor.visible_name !== null) {
+        return this.sensor.visible_name
+      } else {
+        return this.sensor?.name !== null ? this.sensor?.name : this.$t('No name')
+      }
     }
   },
   watch: {
     sensor() {
       this.$emit('update:model-value', this.sensor)
     },
-    message() {
-      if (this.message.type.startsWith('sensor.')) {
-        if (this.message.message.id === this.sensor.id) {
-          this.sensor = this.message.message
-          console.log(this.message.message.value)
-        }
-      }
-    }
   },
-  created() {
+  async mounted() {
     this.sensor = this.modelValue
     if (this.modelValue.type === SENSOR_GROUP.SENSOR_INPUTS || this.modelValue.type === SENSOR_GROUP.SENSOR_RELAYS) {
       this.sensor.value = parseInt(this.modelValue.value)
+    }
+    if (this.hasCover) {
+      await this.getCover()
     }
   },
   methods: {
@@ -92,6 +93,9 @@ export default {
         id: this.sensor.id,
         value: e.target.checked ? 1 : 0
       })
+    },
+    async getCover() {
+      this.src = await this.$store.dispatch('getDeviceSensorCover', {id: this.sensor.id, width: 200})
     }
   }
 }
@@ -99,6 +103,7 @@ export default {
 
 <template>
   <VListItem
+    v-if="sensor"
     density="compact"
     variant="text"
     rounded="lg"
@@ -107,16 +112,24 @@ export default {
     color="primary"
   >
     <template #prepend>
-      <VIcon
+      <VAvatar
+        v-if="src !== null"
+        :image="src"
+        rounded="pill"
+      />
+      <VAvatar
+        v-else
+        variant="tonal"
+        rounded="pill"
+        color="primary"
         :icon="icon"
-        size="large"
       />
     </template>
     <template
       #title
     >
       <div class="text-subtitle-2">
-        {{ sensor.name !== null ? sensor.name : $t('No name') }}
+        {{ name }}
       </div>
     </template>
     <template #subtitle>
@@ -132,13 +145,14 @@ export default {
         value="1"
         :true-value="1"
         :false-value="0"
-        @click="changeRelayState"
+        @click.stop="changeRelayState"
       />
       <VBtn
         v-else
         readonly
         class="text-center"
-        variant="tonal"
+        variant="text"
+        color="default"
         :text="value"
       />
     </template>

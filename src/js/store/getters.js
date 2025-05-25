@@ -11,6 +11,9 @@ export default {
     getUser(state) {
         return state.user
     },
+    getInterval(state) {
+        return state.interval
+    },
     getTheme(state) {
         return state.theme
     },

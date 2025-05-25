@@ -5,6 +5,9 @@ export default {
     setTitle(state, title) {
         state.title = title
     },
+    setInterval(state, interval) {
+        state.interval = interval
+    },
     setAuthenticated(state, authenticated) {
         state.authenticated = authenticated
     },
@@ -44,7 +47,13 @@ export default {
         state.devices = devices
     },
     setDevice(state, device) {
-        state.device = device
+        state.device = Object.create(device)
+    },
+    setOnline(state, {id, online}) {
+        const index = state.devices.findIndex(d => d.id === id)
+        if (index > -1) {
+            state.devices[index].online = online
+        }
     },
     addDevice(state, device) {
         const index = state.devices.findIndex(d => d.id === device.id)
