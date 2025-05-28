@@ -6,6 +6,8 @@ import SettingsPage from '../../components/pages/router/SettingsPage.vue'
 import BaseSettings from "../../components/pages/router/settings/BaseSettings.vue";
 import NotificationSettings from "../../components/pages/router/settings/NotificationSettings.vue";
 import BackupSettings from "../../components/pages/router/settings/BackupSettings.vue";
+import ServicesSettings from "../../components/pages/router/settings/ServicesSettings.vue";
+import StorageSettings from "../../components/pages/router/settings/StorageSettings.vue";
 
 const routes = [
     {
@@ -41,6 +43,16 @@ const routes = [
                 path: 'base',
                 name: 'settings',
                 component: BaseSettings
+            },
+            {
+                path: 'services',
+                name: 'services',
+                component: ServicesSettings
+            },
+            {
+                path: 'storages',
+                name: 'storages',
+                component: StorageSettings
             },
             {
                 path: 'notifications',

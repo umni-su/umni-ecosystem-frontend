@@ -12,6 +12,7 @@ export default {
     timeFormat: 'HH:mm',
     systemNotifications: [],
     devices: [],
+    services: [],
     device: null,
     sensor: null,
     ws: {

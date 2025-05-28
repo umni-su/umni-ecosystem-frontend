@@ -35,6 +35,9 @@ export default {
     v-if="configuration"
     class="mt-3"
   >
+    <template #title>
+      {{ $t('System settings') }}
+    </template>
     <template #text>
       <VSheet
         v-for="conf in configuration"

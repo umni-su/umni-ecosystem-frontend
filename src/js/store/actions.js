@@ -215,4 +215,18 @@ export default {
             })
         return await getBase64Image(res)
     },
+
+    /**
+     * SERVICES
+     */
+    async getServices({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.get(`${API}services`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('setServices', res.data)
+            return res.data
+        }
+    },
 }

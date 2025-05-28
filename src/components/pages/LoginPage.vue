@@ -44,7 +44,7 @@ export default {
       <template #text>
         <UmniLogo
           :short="false"
-          width="250"
+          :width="250"
           class="d-block ma-auto mb-2"
           color="#0486c2"
         />

@@ -69,4 +69,7 @@ export default {
     setActiveSensor(state, sensor) {
         state.sensor = sensor
     },
+    setServices(state, services) {
+        state.services = services
+    },
 }

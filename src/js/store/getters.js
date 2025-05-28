@@ -46,5 +46,8 @@ export default {
     },
     getActiveSensor(state) {
         return state.sensor
+    },
+    getServices(state) {
+        return state.services
     }
 }

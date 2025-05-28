@@ -41,6 +41,16 @@ export default {
           :to="{name: 'settings'}"
         />
         <VListItem
+          :title="$t('Services')"
+          prepend-icon="mdi-play"
+          :to="{name: 'services'}"
+        />
+        <VListItem
+          :title="$t('Storages')"
+          prepend-icon="mdi-harddisk"
+          :to="{name: 'storages'}"
+        />
+        <VListItem
           :title="$t('Notifications settings')"
           prepend-icon="mdi-bell"
           :to="{name: 'notifications'}"
