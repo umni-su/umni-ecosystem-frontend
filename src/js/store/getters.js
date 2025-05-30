@@ -49,5 +49,8 @@ export default {
     },
     getServices(state) {
         return state.services
+    },
+    getStorages(state) {
+        return state.storages
     }
 }

@@ -72,4 +72,18 @@ export default {
     setServices(state, services) {
         state.services = services
     },
+    setStorages(state, storages) {
+        state.storages = storages
+    },
+    addStorage(state, storage) {
+        const index = state.storages.findIndex(d => d.id === storage.id)
+        if (index > -1) {
+            state.storages[index] = storage
+        } else {
+            state.storages.push(storage)
+        }
+    },
+    removeStorage(state, id) {
+        state.storages = state.storages.filter(d => d.id !== id)
+    }
 }

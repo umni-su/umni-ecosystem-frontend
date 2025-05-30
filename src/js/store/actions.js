@@ -23,7 +23,7 @@ axios.interceptors.response.use(function (response) {
 const API = '/api/'
 
 export default {
-    async init({commit}) {
+    async init({_}) {
         const url = `${API}init`
         const res = await axios.get(url)
         return res.data
@@ -226,6 +226,77 @@ export default {
         })
         if (res) {
             commit('setServices', res.data)
+            return res.data
+        }
+    },
+    async stopService({commit}, name) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}services/${name}/stop`).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+    async startService({commit}, name) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}services/${name}/start`).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+    async restartService({commit}, name) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}services/${name}/restart`).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+
+    /**
+     * STORAGES
+     */
+    async getStorages({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.get(`${API}storages`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('setStorages', res.data)
+            return res.data
+        }
+    },
+    async addStorage({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}storages`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('addStorage', res.data)
+            return res.data
+        }
+    },
+    async updateStorage({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.put(`${API}storages/${data.id}`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('addStorage', res.data)
+            return res.data
+        }
+    },
+    async deleteStorage({commit}, id) {
+        commit('setLoading', true)
+        const res = await axios.delete(`${API}storages/${id}`).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('removeStorage', id)
             return res.data
         }
     },

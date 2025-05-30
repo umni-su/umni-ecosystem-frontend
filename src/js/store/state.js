@@ -13,8 +13,13 @@ export default {
     systemNotifications: [],
     devices: [],
     services: [],
+    storages: [],
     device: null,
     sensor: null,
+    confirmation: {
+        show: false,
+        options: {}
+    },
     ws: {
         id: null,
         connecting: false,
