@@ -22,6 +22,7 @@ export default {
       :title="$t('Video surveillance')"
       class="py-4"
       prepend-icon="mdi-video"
+      :to="{name: 'cameras'}"
     />
     <VListItem
       :title="$t('Access control')"

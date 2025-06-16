@@ -58,8 +58,8 @@ const vuetify = createVuetify({
         },
         VSelect: {
             variant: 'outlined',
+            density: 'compact',
             hideDetails: true,
-            class: 'mb-4'
         },
         VCheckbox: {
             hideDetails: true,
@@ -77,6 +77,7 @@ const vuetify = createVuetify({
             }
         },
         VSwitch: {
+            density: 'comfortable',
             hideDetails: true,
             color: 'primary'
         },
@@ -97,7 +98,7 @@ const vuetify = createVuetify({
 const i18n = setupI18n({
     legacy: false, // you must set `false`, to use Composition API
     locale: defaultLang,
-    pluralizationRules: {
+    pluralRules: {
         ru: plural
     }
 })

@@ -56,7 +56,6 @@ export default {
   },
   async created() {
     await this.getDevice()
-    this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
     this.handler = setInterval(async () => {
       await this.getDevice()
     }, this.interval)
@@ -68,7 +67,7 @@ export default {
   methods: {
     async getDevice() {
       await this.$store.dispatch('getDevice', this.id)
-      this.$store.commit('setTitle', this.$t('Devices'))
+      this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
     },
   }
 }

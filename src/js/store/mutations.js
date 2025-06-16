@@ -85,5 +85,19 @@ export default {
     },
     removeStorage(state, id) {
         state.storages = state.storages.filter(d => d.id !== id)
+    },
+    setCameras(state, cameras) {
+        state.cameras = cameras
+    },
+    addCamera(state, camera) {
+        const index = state.cameras.findIndex(d => d.id === camera.id)
+        if (index > -1) {
+            state.cameras[index] = camera
+        } else {
+            state.cameras.push(camera)
+        }
+    },
+    removeCamera(state, id) {
+        state.cameras = state.cameras.filter(d => d.id !== id)
     }
 }

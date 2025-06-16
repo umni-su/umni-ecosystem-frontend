@@ -5,13 +5,13 @@ window.axios = axios
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token')
 axios.interceptors.response.use(function (response) {
-    if (response.headers['auth-token']) {
-        localStorage.setItem('token', response.headers['auth-token'])
-        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.headers['auth-token']
+    if (response.headers['x-auth-token']) {
+        localStorage.setItem('token', response.headers['x-auth-token'])
+        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.headers['x-auth-token']
     }
-    if (response.headers['refresh-token']) {
-        localStorage.setItem('token', response.headers['refresh-token'])
-        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.headers['refresh-token']
+    if (response.headers['x-refresh-token']) {
+        localStorage.setItem('token', response.headers['x-refresh-token'])
+        window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.headers['x-refresh-token']
     }
     return response;
 }, function (error) {
@@ -48,10 +48,12 @@ export default {
     /** AUTHENTICATION **/
     async checkAuth({commit}) {
         const url = `${API}auth/check`
-        const res = await axios.get(url).catch(() => {
-            commit('setAuthenticated', false)
-            commit('setUser', null)
-        })
+        const res = await axios.get(url)
+            .catch(() => {
+                commit('setAuthenticated', false)
+                commit('setUser', null)
+                commit('setToken', null)
+            })
         if (res) {
             if (!res.data?.installed) {
                 commit('setAuthenticated', false)
@@ -72,7 +74,7 @@ export default {
         })
         if (res) {
             commit('setAuthenticated', true)
-            commit('setToken', res.data.token)
+            commit('setToken', res.data.access_token)
             commit('setUser', res.data.user)
         }
     },
@@ -260,9 +262,9 @@ export default {
     /**
      * STORAGES
      */
-    async getStorages({commit}, data) {
+    async getStorages({commit}) {
         commit('setLoading', true)
-        const res = await axios.get(`${API}storages`, data).finally(() => {
+        const res = await axios.get(`${API}storages`).finally(() => {
             commit('setLoading', false)
         })
         if (res) {
@@ -299,5 +301,78 @@ export default {
             commit('removeStorage', id)
             return res.data
         }
+    },
+    /**
+     * CAMERAS
+     */
+    async getCameras({commit}) {
+        commit('setLoading', true)
+        const res = await axios.get(`${API}cameras`).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('setCameras', res.data)
+            return res.data
+        }
+    },
+    async getCamera({commit}, id) {
+        commit('setLoading', true)
+        const res = await axios.get(`${API}cameras/${id}`).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+    async addCamera({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.post(`${API}cameras`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('addCamera', res.data)
+            return res.data
+        }
+    },
+    async updateCamera({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.put(`${API}cameras/${data.id}`, data).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('addCamera', res.data)
+            return res.data
+        }
+    },
+    async deleteCamera({commit}, id) {
+        commit('setLoading', true)
+        const res = await axios.delete(`${API}cameras/${id}`).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            commit('removeCamera', id)
+            return res.data
+        }
+    },
+    async getCameraStream({state}, id) {
+        const res = await axios.get(
+            `/api/cameras/${id}/stream/primary`,
+            {
+                headers: {
+                    Authorization: `Bearer ${state.token}`,
+                }
+            })
+        return res.data
+        //return await getBase64Image(res)
+    },
+    async getCameraCover({state}, {id, w}) {
+        const res = await fetch(
+            `/api/cameras/${id}/cover/${w}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${state.token}`,
+                }
+            })
+        return await getBase64Image(res)
     },
 }

@@ -1,4 +1,7 @@
 export default {
+    getToken(state) {
+        return state.token
+    },
     isLoading(state) {
         return state.loading
     },
@@ -52,5 +55,8 @@ export default {
     },
     getStorages(state) {
         return state.storages
+    },
+    getCameras(state) {
+        return state.cameras
     }
 }

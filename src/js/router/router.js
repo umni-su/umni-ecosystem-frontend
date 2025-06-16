@@ -8,6 +8,8 @@ import NotificationSettings from "../../components/pages/router/settings/Notific
 import BackupSettings from "../../components/pages/router/settings/BackupSettings.vue";
 import ServicesSettings from "../../components/pages/router/settings/ServicesSettings.vue";
 import StorageSettings from "../../components/pages/router/settings/StorageSettings.vue";
+import CamerasPage from "../../components/pages/router/CamerasPage.vue";
+import CameraPage from "../../components/pages/router/CameraPage.vue";
 
 const routes = [
     {
@@ -33,6 +35,36 @@ const routes = [
                     }
                 }
             }
+        ]
+    },
+    {
+        path: '/cameras',
+        children: [
+            {
+                path: '',
+                component: CamerasPage,
+                name: 'cameras'
+            },
+            {
+                path: ':id(\\d+)',
+                component: CameraPage,
+                name: 'camera',
+                props: (route) => {
+                    return {
+                        ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
+                    }
+                }
+            }
+            // {
+            //     path: ':id(\\d+)',
+            //     component: DevicePage,
+            //     name: 'device',
+            //     props: (route) => {
+            //         return {
+            //             ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
+            //         }
+            //     }
+            // }
         ]
     },
     {

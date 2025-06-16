@@ -14,6 +14,7 @@ export default {
     devices: [],
     services: [],
     storages: [],
+    cameras: [],
     device: null,
     sensor: null,
     confirmation: {

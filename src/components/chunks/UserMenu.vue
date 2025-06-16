@@ -6,10 +6,10 @@ export default {
       return this.$store.getters['getUser']
     },
     initials() {
-      return `${this.user.first_name[0]}${this.user.last_name[0]}`
+      return `${this.user.firstname[0]}${this.user.lastname[0]}`
     },
     fullName() {
-      return `${this.user.first_name} ${this.user.last_name}`
+      return `${this.user.firstname} ${this.user.lastname}`
     }
   },
   methods: {

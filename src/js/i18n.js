@@ -1,8 +1,10 @@
-import { createI18n } from 'vue-i18n'
+import {createI18n} from 'vue-i18n'
 
-export const SUPPORT_LOCALES = [ 'ru' ]
+export const SUPPORT_LOCALES = ['ru']
 
-export function setupI18n(options = { locale: 'ru' }) {
+export function setupI18n(options = {
+    locale: 'ru',
+}) {
     const i18n = createI18n(options)
     setI18nLanguage(i18n, options.locale)
     return i18n

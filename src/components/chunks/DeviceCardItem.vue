@@ -108,7 +108,7 @@ export default {
           class="mt-2"
           icon="mdi-dip-switch"
           :title="$t('Sensors')"
-          :value="`${device.sensors_count}`"
+          :value="`${device.sensors.length}`"
         />
       </template>
     </VCard>
