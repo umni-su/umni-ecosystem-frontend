@@ -124,7 +124,7 @@ export default {
     },
     async updateDevice({commit}, data) {
         commit('setLoading', true)
-        const res = await axios.post(`${API}devices/${data.id}`, data).finally(() => {
+        const res = await axios.patch(`${API}devices/${data.id}`, data).finally(() => {
             commit('setLoading', false)
         })
         if (res) {
