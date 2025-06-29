@@ -5,10 +5,12 @@ import CameraDeleteAfterSelect from "./CameraDeleteAfterSelect.vue";
 import CameraRecordDurationSelect from "./CameraRecordDurationSelect.vue";
 import StorageSelect from "../storage/StorageSelect.vue";
 import {createManyNotifications, createSuccessNotification} from "../../../js/helpers/notificationHelper.js";
+import CameraRecordModeSelect from "./CameraRecordModeSelect.vue";
 
 export default {
   name: "CameraModal",
   components: {
+    CameraRecordModeSelect,
     StorageSelect,
     CameraRecordDurationSelect,
     CameraDeleteAfterSelect,
@@ -86,6 +88,10 @@ export default {
           active: true
         }
       }
+    },
+    resetRecordValues() {
+      this.model.record_mode = null
+      this.model.record_duration = null
     },
     updateLink() {
       const ipReg = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+/
@@ -186,9 +192,15 @@ export default {
       :label="$t('Record')"
       :true-value="true"
       :false-value="false"
+      @update:model-value="resetRecordValues"
+    />
+    <CameraRecordModeSelect
+      v-if="model.record"
+      v-model.number="model.record_mode"
+      class="mb-4"
     />
     <CameraRecordDurationSelect
-      v-if="model.record"
+      v-if="[1,2].indexOf(model.record_mode) > -1"
       v-model="model.record_duration"
     />
     <CameraDeleteAfterSelect
