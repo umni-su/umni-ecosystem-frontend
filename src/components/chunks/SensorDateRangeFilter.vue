@@ -23,8 +23,8 @@ export default {
   },
   created() {
     this.range = [
-      this.$moment(Date.now()).add(-4, 'hour').toDate(),
-      this.$moment(Date.now()).toDate(),
+      this.$moment(Date.now()).add(-4, 'hour').local().format('YYYY-MM-DD HH:mm:ss'),
+      this.$moment(Date.now()).local().format('YYYY-MM-DD HH:mm:ss'),
     ]
   },
   methods: {
@@ -33,11 +33,11 @@ export default {
         this.range[0] = this.$moment(this.range[0])
             .add(days, 'days')
             .add(hours, 'hour')
-            .toDate();
+            .local().format('YYYY-MM-DD HH:mm:ss');
         this.range[1] = this.$moment(this.range[1])
             .add(days, 'days')
             .add(hours, 'hour')
-            .toDate();
+            .local().format('YYYY-MM-DD HH:mm:ss');
       }
     },
     onUpdateRange() {

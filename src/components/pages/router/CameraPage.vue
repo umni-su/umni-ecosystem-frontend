@@ -1,10 +1,10 @@
 <script>
-import Hls from "hls.js"
 import CameraRecordDot from "../../chunks/camera/CameraRecordDot.vue";
+import CameraModal from "../../chunks/camera/CameraModal.vue";
 
 export default {
   name: "CameraPage",
-  components: {CameraRecordDot},
+  components: {CameraModal, CameraRecordDot},
   props: {
     id: {
       type: Number,
@@ -13,10 +13,15 @@ export default {
   },
   data() {
     return {
+      alert: true,
       camera: null,
-      playing: false
+      playing: false,
+      url: null,
+      src: null,
+      open: false
     }
   },
+
   computed: {
     token() {
       return this.$store.getters['getToken']
@@ -24,8 +29,8 @@ export default {
     loading() {
       return this.$store.getters['isLoading']
     },
-    src() {
-      return `/api/cameras/${this.camera.id}/stream/index.m3u8`
+    lastMessage() {
+      return this.$store.getters['getWsLastMessage']
     }
   },
   watch: {
@@ -33,48 +38,55 @@ export default {
       if (typeof this.id === "number") {
         await this.getCamera()
       }
+    },
+    lastMessage: {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal.camera_id === this.camera.id) {
+          switch (newVal.topic) {
+            case 'detection.start':
+              this.alert = true
+              break
+            case 'detection.end':
+              this.alert = false
+              break
+          }
+        }
+      }
     }
   },
-  async created() {
+  async mounted() {
     await this.getCamera()
-    this.$store.commit('setTitle', this.$t('Camera: {name}', {name: this.camera.name}))
-
+    this.createUrl()
+    await this.getCameraCover()
+    this.playing = true
+  },
+  beforeUnmount() {
+    this.url = null
+    window.stop()
   },
   methods: {
-    play() {
+    createUrl() {
+      this.url = `/api/cameras/${this.camera.id}/stream?token=${this.token}`
+    },
+    async getCameraCover() {
+      this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700});
+    },
+    async play() {
+      this.createUrl()
+      await this.getCameraCover()
       this.playing = true
-      this.$refs.video.play()
     },
     pause() {
       this.playing = false
-      this.$refs.video.pause()
+      this.url = this.src
+      window.stop()
     },
     async getCamera() {
       this.camera = await this.$store.dispatch('getCamera', this.id)
-      await Promise.resolve(
-          this.$nextTick(() => {
-            if (this.$refs.video.canPlayType('application/vnd.apple.mpegurl')) {
-              this.$refs.video.src = this.src;
-              //
-              // If no native HLS support, check if HLS.js is supported
-              //
-            } else if (Hls.isSupported()) {
-              const hls = new Hls({
-                maxLiveSyncPlaybackRate: 1.5,
-                xhrSetup: xhr => {
-                  xhr.setRequestHeader("Authorization", `Bearer ${this.token}`);
-                },
-              });
-              hls.loadSource(this.src);
-              hls.attachMedia(this.$refs.video);
-              hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-                this.$refs.video.muted = true;
-                this.play()
-              });
-            }
-            // this.$refs.video.src = this.src
-          })
-      )
+    },
+    openModal() {
+      this.open = true
     }
   }
 }
@@ -87,11 +99,22 @@ export default {
     max-width="1000"
     width="100%"
   >
-    <video
-      ref="video"
-      class="bg-grey-darken-1 rounded-lg"
-      controls
-    />
+    <VSheet
+      :color="alert ? 'error' : 'grey-lighten-2'"
+      class="border-lg overflow-hidden position-relative mx-auto d-flex align-center justify-center"
+    >
+      <VSheet
+        class="overflow position-absolute"
+        :style="`background-image:url(${src})`"
+      />
+      <img
+        ref="image"
+        class="d-block video"
+        width="600"
+        :src="url"
+      >
+    </VSheet>
+
     <VSheet
       class="actions text-center pa-2"
     >
@@ -147,16 +170,39 @@ export default {
         density="compact"
         class="mr-4"
       />
+      <VBtn
+        icon="mdi-pencil"
+        color="default"
+        variant="plain"
+        density="compact"
+        class="mr-4"
+        @click="openModal()"
+      />
     </VSheet>
     {{ camera }}
+    <CameraModal
+      v-model="open"
+      :camera-model="camera"
+    />
   </VSheet>
 </template>
 
 <style lang="scss" scoped>
-.video-wrapper {
-  video {
-    max-height: 640px;
-    width: 100%;
-  }
+.overflow {
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index: 0;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  filter: blur(10px);
+  opacity: 0.7;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.video {
+  position: relative;
+  z-index: 10
 }
 </style>

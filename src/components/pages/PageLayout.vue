@@ -19,7 +19,7 @@ export default {
   data() {
     return {
       opened: true,
-      rail: true,
+      rail: true
     }
   },
   computed: {
@@ -28,8 +28,25 @@ export default {
     },
     theme() {
       return this.$store.getters['getTheme']
+    },
+    lastMessage() {
+      return this.$store.getters['getWsLastMessage']
     }
   },
+  watch: {
+    lastMessage: {
+      handler() {
+        console.log(this.lastMessage);
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    this.$store.dispatch('wsConnect')
+  },
+  unmounted() {
+    this.$store.dispatch('wsDisconnect')
+  }
 }
 </script>
 
@@ -106,7 +123,10 @@ export default {
         class="overflow-hidden fill-height position-relative"
         full-height
       >
-        <VSheet class="pa-4 fill-height">
+        <VSheet
+          max-width="1200"
+          class="mx-auto pa-4 fill-height"
+        >
           <RouterView />
         </VSheet>
       </VSheet>

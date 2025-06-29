@@ -13,6 +13,7 @@ export default {
 
 <template>
   <VListItem
+    :class="{'opacity-50':!storage.active}"
     :title="storage.name"
     :subtitle="storage.path"
     @click="$emit('on-click',storage)"

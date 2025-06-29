@@ -8,6 +8,9 @@ export default {
     setInterval(state, interval) {
         state.interval = interval
     },
+    setSystemInfo(state, systemInfo) {
+        state.systemInfo = systemInfo
+    },
     setAuthenticated(state, authenticated) {
         state.authenticated = authenticated
     },

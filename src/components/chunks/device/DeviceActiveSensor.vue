@@ -130,6 +130,9 @@ export default {
       this.chart.resize();
     },
     async getSensorHistory() {
+      if (this.filter.range === null) {
+        return false
+      }
       this.options.series = await this.$store.dispatch('getSensorHistory',
           {
             ...{

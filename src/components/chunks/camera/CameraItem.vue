@@ -12,16 +12,51 @@ export default {
   },
   data() {
     return {
+      alert: false,
       src: null,
-      height: 0
+      height: 200
+    }
+  },
+  computed: {
+    lastMessage() {
+      return this.$store.getters['getWsLastMessage']
+    }
+  },
+  watch: {
+    lastMessage: {
+      deep: true,
+      handler(newVal, oldVal) {
+        if (newVal.camera_id === this.camera.id) {
+          switch (newVal.topic) {
+            case 'detection.start':
+              this.alert = true
+              break
+            case 'detection.end':
+              this.alert = false
+              break
+          }
+        }
+      }
+    },
+    camera: {
+      deep: true,
+      async handler(newVal, oldVal) {
+        if (newVal.cover !== null) {
+          this.src = await this.$store.dispatch('getCameraCover', {id: newVal.id, w: 400})
+        } else {
+          this.src = null
+        }
+      }
     }
   },
   async created() {
-    this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 400})
-    this.height = this.$refs.card.$el.clientWidth / 4 * 3
-    window.addEventListener("resize", () => {
-      this.height = this.$refs.card.$el.clientWidth / 4 * 3
-    })
+    if (this.camera.cover !== null) {
+      this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 400})
+    }
+    // this.height = this.$refs.card.$el.clientWidth / 4 * 3
+    // window.addEventListener("resize", () => {
+    //   this.height = this.$refs.card.$el.clientWidth / 4 * 3
+    // })
   }
 }
 </script>
@@ -33,6 +68,7 @@ export default {
   >
     <VCard
       ref="card"
+      :color="alert ? 'error' : null"
       :class="{'opacity-50': !camera.active}"
       hover
       :height="height"
@@ -45,7 +81,11 @@ export default {
           cover
           :src="src"
         />
-        <VSkeletonLoader v-else />
+        <VSkeletonLoader
+          v-else
+          width="100%"
+          :height="height"
+        />
       </template>
       <template #text>
         <div class="overflow text-white pa-4">

@@ -11,6 +11,9 @@ export default {
     isInstalled(state) {
         return state.installed
     },
+    getSystemInfo(state) {
+        return state.systemInfo
+    },
     getUser(state) {
         return state.user
     },
@@ -28,6 +31,15 @@ export default {
     },
     getSystemNotifications(state) {
         return state.systemNotifications
+    },
+    getWsServer(state) {
+        return state.ws.server
+    },
+    isWsConnecting(state) {
+        return state.ws.connecting
+    },
+    isWsConnected(state) {
+        return state.ws.connected
     },
     getWsLastMessage(state) {
         return state.ws.lastMessage

@@ -54,7 +54,7 @@ export default {
     async saveStorage() {
       const method = this.model.hasOwnProperty('id') ? 'updateStorage' : 'addStorage'
       const res = await this.$store.dispatch(method, this.model).catch(e => {
-        this.$store.commit('addNotification', createManyNotifications('error', e.response.data.error))
+        this.$store.commit('addNotification', createManyNotifications('error', e.response.data.detail))
       })
       if (res) {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))

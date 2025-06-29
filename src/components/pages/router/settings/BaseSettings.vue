@@ -44,16 +44,9 @@ export default {
         :key="conf.id"
         class="mb-4"
       >
-        <VSelect
-          v-if="conf.key === 'app.locale'"
-          v-model="conf.value"
-          :label="conf.translation"
-          density="compact"
-        />
         <VTextField
-          v-else
           v-model="conf.value"
-          :label="conf.translation"
+          :label="conf.key"
         >
           <template #append-inner>
             <VBtn

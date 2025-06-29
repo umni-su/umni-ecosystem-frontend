@@ -10,6 +10,7 @@ export default {
     notifications: [],
     dateFormat: 'DD.MM.YYYY',
     timeFormat: 'HH:mm',
+    systemInfo: null,
     systemNotifications: [],
     devices: [],
     services: [],
@@ -23,6 +24,7 @@ export default {
     },
     ws: {
         id: null,
+        server: null,
         connecting: false,
         connected: true,
         lastMessage: null

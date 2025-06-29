@@ -10,9 +10,6 @@ export default {
     theme() {
       return this.$store.getters['getTheme']
     },
-    lastMessage() {
-      return this.$store.getters['getWsLastMessage']
-    },
     systemNotifications() {
       return this.$store.getters['getSystemNotifications']?.map(n => n.data)
     }
@@ -22,7 +19,7 @@ export default {
   },
   methods: {
     async getNotifications() {
-      await this.$store.dispatch('getNotifications')
+      //await this.$store.dispatch('getNotifications')
     }
   },
 }

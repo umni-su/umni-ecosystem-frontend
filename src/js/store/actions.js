@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {getBase64Image} from "../helpers/resToBase64.js";
+import state from "./state.js";
 
 window.axios = axios
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
@@ -45,6 +46,15 @@ export default {
             return res.data
         }
     },
+
+    async getSystemInfo({commit}) {
+        const res = await axios.get(`${API}systeminfo`)
+        if (res) {
+            commit('setSystemInfo', res.data)
+            return res.data
+        }
+    },
+
     /** AUTHENTICATION **/
     async checkAuth({commit}) {
         const url = `${API}auth/check`
@@ -69,7 +79,12 @@ export default {
     },
     async logIn({commit}, {username, password, remember}) {
         commit('setLoading', true)
-        const res = await axios.post(`${API}auth/login`, {username, password, remember}).finally(() => {
+        const params = new URLSearchParams();
+        params.append('username', username);
+        params.append('password', password);
+        const res = await axios.post(`${API}auth/login`, params, {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }).finally(() => {
             commit('setLoading', false)
         })
         if (res) {
@@ -87,6 +102,40 @@ export default {
             commit('setAuthenticated', false)
             commit('setUser', null)
             commit('setToken', null)
+        }
+    },
+    /** WEBSOCKETS**/
+    wsConnect({commit, state}) {
+        if (state.ws.server === null) {
+            const token = state.token
+            const url = `${document.location.protocol}//${document.location.host}/api/ws/notifications?token=${token}`
+            state.ws.server = new WebSocket(url)
+            state.ws.server.onopen = (ws) => {
+                console.log('Connection opened')
+            }
+            state.ws.server.onerror = ws => {
+                console.log('Error raised', ws)
+            }
+            state.ws.server.onmessage = (message) => {
+                try {
+                    message = JSON.parse(message.data)
+                } catch (e) {
+                    message = message.data
+                    console.error(e)
+                }
+                commit('setWsLastMessage', message)
+            }
+            state.ws.server.onclose = (e) => {
+                console.log('Connection was closed', e)
+            }
+        }
+    },
+    wsDisconnect({commit}) {
+        if (state.ws.server !== null) {
+            state.ws.server.close()
+            state.ws.connecting = false
+            state.ws.connected = false
+            state.ws.lastMessage = null
         }
     },
     /** NOTIFICATIONS **/
@@ -149,7 +198,7 @@ export default {
     },
     async getDeviceCover({state}, id) {
         const res = await fetch(
-            `/api/devices/${id}/cover/500`,
+            `/api/devices/${id}/cover/600`,
             {
                 headers: {
                     Authorization: `Bearer ${state.token}`,
@@ -198,7 +247,7 @@ export default {
     /** SENSORS */
     async updateSensor({commit}, data) {
         commit('setLoading', true)
-        const res = await axios.post(`${API}sensors/${data.id}`, data, {
+        const res = await axios.patch(`${API}sensors/${data.id}`, data, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -354,17 +403,6 @@ export default {
             return res.data
         }
     },
-    async getCameraStream({state}, id) {
-        const res = await axios.get(
-            `/api/cameras/${id}/stream/primary`,
-            {
-                headers: {
-                    Authorization: `Bearer ${state.token}`,
-                }
-            })
-        return res.data
-        //return await getBase64Image(res)
-    },
     async getCameraCover({state}, {id, w}) {
         const res = await fetch(
             `/api/cameras/${id}/cover/${w}`,
@@ -375,4 +413,5 @@ export default {
             })
         return await getBase64Image(res)
     },
+
 }
