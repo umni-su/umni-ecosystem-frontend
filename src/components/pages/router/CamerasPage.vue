@@ -17,13 +17,9 @@ export default {
     }
   },
   computed: {
-
     cameras() {
       return this.$store.getters['getCameras'];
     },
-    title() {
-      return this.model.id ? this.$t('Edit camera') : this.$t('Add camera')
-    }
   },
   async created() {
     this.$store.commit('setTitle', this.$t('Cameras'))
@@ -79,7 +75,6 @@ export default {
         <CameraModal
           v-model="open"
           :camera-model="model"
-          :title="title"
         />
       </VCol>
     </VRow>

@@ -25,10 +25,6 @@ export default {
     cameraModel: {
       type: Object,
       required: true
-    },
-    title: {
-      type: String,
-      default: null
     }
   },
   emits: ['on-update-model', 'update:model-value'],
@@ -52,6 +48,9 @@ export default {
     loading() {
       return this.$store.getters['isLoading'];
     },
+    title() {
+      return this.model.id ? this.$t('Edit camera') : this.$t('Add camera')
+    }
   },
   watch: {
     model: {
@@ -60,15 +59,22 @@ export default {
         this.$emit('on-update-model', newVal);
       }
     },
-    modelValue() {
-      this.open = this.modelValue;
+    modelValue: {
+      deep: true,
+      handler(newVal, oldVal) {
+        this.open = this.modelValue
+        this.model = this.cameraModel
+      }
     },
     open() {
       this.$emit('update:model-value', this.open)
     },
   },
   created() {
-    this.model = this.cameraModel;
+    this.model = this.cameraModel
+    if (this.model?.username?.length > 0 && this.model?.password?.length > 0) {
+      this.auth = true
+    }
     this.open = this.modelValue
   },
   methods: {
@@ -169,6 +175,10 @@ export default {
       <VSwitch
         v-model="model.active"
         :label="$t('Active')"
+      />
+      <VSwitch
+        v-model="model.alerts"
+        :label="$t('Alerts')"
       />
       <VSwitch
         v-model="auth"

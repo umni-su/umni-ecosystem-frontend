@@ -13,7 +13,7 @@ export default {
   },
   data() {
     return {
-      alert: true,
+      alert: false,
       camera: null,
       playing: false,
       url: null,
@@ -84,6 +84,7 @@ export default {
     },
     async getCamera() {
       this.camera = await this.$store.dispatch('getCamera', this.id)
+      this.$store.commit('setTitle', this.camera.name)
     },
     openModal() {
       this.open = true

@@ -6,17 +6,26 @@ export default {
       type: Object,
       required: true
     }
+  },
+  computed: {
+    hasRecord() {
+      return this.camera.record && this.camera.record_mode !== null
+    },
+    hasDetection() {
+      return this.camera.record && [3, 4].indexOf(this.camera.record_mode) > -1
+    },
   }
 }
 </script>
 
 <template>
   <VIcon
-    :color="camera.record ? 'red' : 'white'"
-    icon="mdi-record"
+    v-if="hasRecord"
+    :color="hasRecord ? 'red' : 'white'"
+    :icon="hasDetection ? 'mdi-motion-sensor' : 'mdi-record'"
     class="record"
     size="large"
-    :class="{'pulse':camera.record}"
+    :class="{'pulse':hasRecord && !hasDetection}"
   />
 </template>
 
