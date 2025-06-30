@@ -59,6 +59,7 @@ export default {
     <VNavigationDrawer
       v-model="opened"
       border="0"
+      :permanent="rail"
       rail-width="60"
       :rail="rail"
       rounded="0"

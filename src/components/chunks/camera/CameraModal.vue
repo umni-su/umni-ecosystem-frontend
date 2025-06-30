@@ -53,6 +53,10 @@ export default {
     }
   },
   watch: {
+    auth() {
+      this.model.username = null
+      this.model.password = null
+    },
     model: {
       deep: true,
       handler(newVal, oldVal) {
@@ -187,11 +191,13 @@ export default {
       <VTextField
         v-if="auth"
         v-model="model.username"
+        clearable
         :label="$t('Username')"
       />
       <VTextField
         v-if="auth"
         v-model="model.password"
+        clearable
         class="mt-4"
         :label="$t('Password')"
         type="password"

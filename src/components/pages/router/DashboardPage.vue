@@ -92,7 +92,7 @@ export default {
           <VCard
             elevation="0"
             color="rgba(0,0,0,0.05)"
-            height="240"
+            height="200"
             variant="elevated"
             :title="$t('Disks usage')"
           >

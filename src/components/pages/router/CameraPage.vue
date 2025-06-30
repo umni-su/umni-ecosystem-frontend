@@ -70,7 +70,9 @@ export default {
       this.url = `/api/cameras/${this.camera.id}/stream?token=${this.token}`
     },
     async getCameraCover() {
-      this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700});
+      if (this.camera.cover !== null) {
+        this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700});
+      }
     },
     async play() {
       this.createUrl()
@@ -105,13 +107,14 @@ export default {
       class="border-lg overflow-hidden position-relative mx-auto d-flex align-center justify-center"
     >
       <VSheet
+        height="400"
         class="overflow position-absolute"
         :style="`background-image:url(${src})`"
       />
       <img
         ref="image"
         class="d-block video"
-        width="600"
+        height="400"
         :src="url"
       >
     </VSheet>
