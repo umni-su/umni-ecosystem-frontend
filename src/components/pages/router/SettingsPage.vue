@@ -6,6 +6,11 @@ export default {
       opened: true
     }
   },
+  computed: {
+    isMobile() {
+      return this.$vuetify.display.width < 1000
+    }
+  },
   created() {
     if (this.$route.fullPath === '/settings') {
       this.$router.push({name: 'settings'})
@@ -22,6 +27,7 @@ export default {
       width="300"
       disable-resize-watcher
       rounded="0"
+      :permanent="!isMobile"
     >
       <VBtn
         density="comfortable"
