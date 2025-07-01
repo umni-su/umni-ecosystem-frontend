@@ -1,6 +1,12 @@
 <script>
 export default {
   name: "UserMenu",
+  props: {
+    color: {
+      type: String,
+      default: "primary"
+    }
+  },
   computed: {
     user() {
       return this.$store.getters['getUser']
@@ -27,7 +33,7 @@ export default {
         variant="tonal"
         v-bind="props"
         :text="initials"
-        color="primary"
+        :color="color"
       />
     </template>
     <VList class="pa-0">

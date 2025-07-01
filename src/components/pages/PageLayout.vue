@@ -31,6 +31,12 @@ export default {
     },
     lastMessage() {
       return this.$store.getters['getWsLastMessage']
+    },
+    appBarColor() {
+      if (!this.opened) {
+        return 'primary'
+      }
+      return this.theme === 'light' ? 'white' : 'grey-darken-4'
     }
   },
   watch: {
@@ -96,7 +102,7 @@ export default {
       class="px-2 border-b"
       rounded="0"
       height="80"
-      :color="theme === 'light' ? 'white' : 'grey-darken-4'"
+      :color="appBarColor"
     >
       <template #prepend>
         <VBtn
@@ -114,7 +120,7 @@ export default {
           density="comfortable"
           class="mr-2"
         />
-        <UserMenu />
+        <UserMenu :color="opened ? 'primary' : 'white'" />
       </template>
     </VAppBar>
     <VMain class="fill-height">
