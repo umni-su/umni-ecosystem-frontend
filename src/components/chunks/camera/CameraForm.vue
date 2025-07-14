@@ -117,7 +117,10 @@ export default {
 
 <template>
   <VSheet>
-    <VTabs v-model="tab">
+    <VTabs
+      v-model="tab"
+      align-tabs="center"
+    >
       <VTab
         v-for="t in tabs"
         :key="t"

@@ -430,8 +430,8 @@ export class ImageClickTracker {
         // Контур полигона
         this.ctx.strokeStyle = isSelected ?
             this.adjustAlpha(polygon.color, 0.9) :
-            this.adjustAlpha(polygon.color, 0.7);
-        this.ctx.lineWidth = isSelected ? 3 : 2;
+            this.adjustAlpha(polygon.color, 0.5);
+        this.ctx.lineWidth = isSelected ? 4 : 2;
         this.ctx.beginPath();
         this.ctx.moveTo(
             polygon.points[0].x * this.scaleX(),

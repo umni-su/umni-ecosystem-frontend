@@ -72,7 +72,7 @@ export default {
     <template #activator="{props}">
       <VBtn
         icon
-        :color="selected?.color"
+        :color="`${selected?.color}`"
         v-bind="props"
         density="compact"
         variant="flat"
@@ -97,7 +97,7 @@ export default {
               readonly
               variant="flat"
               icon
-              :color="value"
+              :color="pr.color"
               density="compact"
               class="mr-2"
             />

@@ -94,16 +94,16 @@ export default {
   >
     <VSheet
       :color="alert ? 'error' : 'grey-lighten-2'"
-      class="border-lg position-relative mx-auto d-flex align-center justify-center"
+      class="border-lg overflow-hidden position-relative mx-auto d-flex align-center justify-center"
     >
+      <VSheet
+        height="600"
+        class="overflow position-absolute"
+        :style="`background-image:url(${$refs.stream?.src});`"
+      />
       <CameraRootArea
         ref="stream"
         :camera="camera"
-      />
-      <VSheet
-        height="500"
-        class="overflow position-absolute"
-        :style="`background-image:url(${src});`"
       />
     </VSheet>
 
@@ -172,7 +172,6 @@ export default {
         @click="openModal"
       />
     </VSheet>
-    {{ camera }}
     <SidebarPanel
       v-model="open"
       :title="title"
