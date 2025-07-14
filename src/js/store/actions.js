@@ -77,7 +77,7 @@ export default {
 
         }
     },
-    async logIn({commit}, {username, password, remember}) {
+    async logIn({commit}, {username, password}) {
         commit('setLoading', true)
         const params = new URLSearchParams();
         params.append('username', username);

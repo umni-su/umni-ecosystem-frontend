@@ -28,7 +28,8 @@ export default {
         this.$refs.image,
         this.$refs.output,
         this.$refs.draw
-    );
+    )
+    this.tracker.importFromJSON(this.camera.areas)
     this.$store.commit('setTracker', this.tracker)
   },
   methods: {

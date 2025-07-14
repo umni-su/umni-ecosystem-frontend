@@ -535,6 +535,7 @@ export class ImageClickTracker {
             name: polygon.name,
             active: polygon.active,
             points: polygon.points.map(p => ({x: Math.round(p.x), y: Math.round(p.y)})),
+            priority: polygon.priority,
             isClosed: polygon.isClosed,
             color: polygon.color
         }))
@@ -547,6 +548,7 @@ export class ImageClickTracker {
                 active: polygon.active,
                 name: polygon.name,
                 points: polygon.points,
+                priority: polygon.priority,
                 isClosed: true, //fix
                 color: polygon.color || this.getRandomColor()
             }));

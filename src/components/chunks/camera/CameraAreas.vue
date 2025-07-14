@@ -42,7 +42,7 @@ export default {
       immediate: true,
       handler(val) {
         this.polygons = val
-        this.tracker.importFromJSON(val)
+
       }
     }
   },
@@ -96,6 +96,7 @@ export default {
       if (res) {
         this.polygons = res
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
+        this.tracker.importFromJSON(res)
       }
     }
   }
@@ -147,7 +148,7 @@ export default {
               />
             </template>
             <template #append>
-              <PriorityMenu v-model="poly.priority" />
+              <PriorityMenu v-model.number="poly.priority" />
               <VBtn
                 icon="mdi-trash-can"
                 variant="plain"

@@ -7,6 +7,7 @@ export default {
       default: 2
     }
   },
+  emits: ['update:model-value'],
   data() {
     return {
       value: 1,
@@ -42,6 +43,14 @@ export default {
   computed: {
     selected() {
       return this.priorities.find(p => p?.value === this.value)
+    }
+  },
+  watch: {
+    modelValue() {
+      this.value = this.modelValue
+    },
+    value(val) {
+      this.$emit('update:model-value', val)
     }
   },
   created() {
@@ -88,7 +97,7 @@ export default {
               readonly
               variant="flat"
               icon
-              :color="pr.color"
+              :color="value"
               density="compact"
               class="mr-2"
             />
