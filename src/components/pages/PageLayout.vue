@@ -78,7 +78,7 @@ export default {
           width="100%"
           block
           rounded="0"
-          class="mb-4 mt-5"
+          class="mb-4 mt-4"
           color="transparent"
           :active="false"
           @click="rail = !rail"
@@ -101,7 +101,7 @@ export default {
       scroll-behavior="elevate"
       class="px-2 border-b"
       rounded="0"
-      height="80"
+      height="70"
       :color="appBarColor"
     >
       <template #prepend>

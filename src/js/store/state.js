@@ -18,6 +18,7 @@ export default {
     cameras: [],
     device: null,
     sensor: null,
+    tracker: null,
     confirmation: {
         show: false,
         options: {}

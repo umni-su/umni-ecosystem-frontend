@@ -102,5 +102,15 @@ export default {
     },
     removeCamera(state, id) {
         state.cameras = state.cameras.filter(d => d.id !== id)
+    },
+    setTracker(state, tracker) {
+        if (tracker === null || tracker === undefined) {
+            console.error('Tracker must be instance of ImageClickTracker')
+        } else {
+            state.tracker = tracker
+        }
+    },
+    destroyTracker(state) {
+        state.tracker = null
     }
 }

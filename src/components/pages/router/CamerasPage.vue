@@ -1,11 +1,13 @@
 <script>
 import CameraItem from "../../chunks/camera/CameraItem.vue";
-import CameraModal from "../../chunks/camera/CameraModal.vue";
+import CameraForm from "../../chunks/camera/CameraForm.vue";
+import SidebarPanel from "../../chunks/SidebarPanel.vue";
 
 export default {
   name: "CamerasPage",
   components: {
-    CameraModal,
+    SidebarPanel,
+    CameraForm,
     CameraItem
   },
   data() {
@@ -27,13 +29,17 @@ export default {
   },
   methods: {
     openModal() {
-      this.open = true
+      this.open = !this.open
     },
-
     async getCameras() {
       await this.$store.dispatch('getCameras')
     },
-
+    onCameraSave() {
+      this.open = false
+      this.model = {
+        active: true
+      }
+    }
   }
 }
 </script>
@@ -72,10 +78,12 @@ export default {
             </VContainer>
           </template>
         </VCard>
-        <CameraModal
-          v-model="open"
-          :camera-model="model"
-        />
+        <SidebarPanel v-model="open">
+          <CameraForm
+            :camera-model="model"
+            @on-camera-save="onCameraSave"
+          />
+        </SidebarPanel>
       </VCol>
     </VRow>
   </VContainer>

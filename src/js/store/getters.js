@@ -70,5 +70,8 @@ export default {
     },
     getCameras(state) {
         return state.cameras
+    },
+    getTracker(state) {
+        return state.tracker
     }
 }

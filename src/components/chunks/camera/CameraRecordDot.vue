@@ -32,8 +32,8 @@ export default {
 <style lang="scss" scoped>
 .record {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 30px;
+  right: 30px;
   z-index: 10;
 
   &.pulse {

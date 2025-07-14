@@ -405,7 +405,7 @@ export default {
     },
     async getCameraCover({state}, {id, w}) {
         const res = await fetch(
-            `/api/cameras/${id}/cover/${w}`,
+            `/api/cameras/${id}/cover`,
             {
                 headers: {
                     Authorization: `Bearer ${state.token}`,
@@ -413,5 +413,15 @@ export default {
             })
         return await getBase64Image(res)
     },
+
+    async saveCameraAreas({commit}, data) {
+        const res = await axios.post(
+            `/api/cameras/${data.id}/areas`,
+            data.areas
+        )
+        if (res) {
+            return res.data
+        }
+    }
 
 }

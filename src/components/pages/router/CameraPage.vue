@@ -1,10 +1,12 @@
 <script>
 import CameraRecordDot from "../../chunks/camera/CameraRecordDot.vue";
-import CameraModal from "../../chunks/camera/CameraModal.vue";
+import CameraForm from "../../chunks/camera/CameraForm.vue";
+import SidebarPanel from "../../chunks/SidebarPanel.vue";
+import CameraRootArea from "../../chunks/camera/CameraRootArea.vue";
 
 export default {
   name: "CameraPage",
-  components: {CameraModal, CameraRecordDot},
+  components: {CameraRootArea, SidebarPanel, CameraForm, CameraRecordDot},
   props: {
     id: {
       type: Number,
@@ -18,7 +20,7 @@ export default {
       playing: false,
       url: null,
       src: null,
-      open: false
+      open: true,
     }
   },
 
@@ -26,11 +28,11 @@ export default {
     token() {
       return this.$store.getters['getToken']
     },
-    loading() {
-      return this.$store.getters['isLoading']
-    },
     lastMessage() {
       return this.$store.getters['getWsLastMessage']
+    },
+    title() {
+      return this.camera?.id ? this.$t('Edit camera') : this.$t('Add camera')
     }
   },
   watch: {
@@ -57,39 +59,27 @@ export default {
   },
   async mounted() {
     await this.getCamera()
-    this.createUrl()
-    await this.getCameraCover()
     this.playing = true
   },
   beforeUnmount() {
-    this.url = null
+    this.$refs.stream.stop()
     window.stop()
   },
   methods: {
-    createUrl() {
-      this.url = `/api/cameras/${this.camera.id}/stream?token=${this.token}`
-    },
-    async getCameraCover() {
-      if (this.camera.cover !== null) {
-        this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700});
-      }
-    },
     async play() {
-      this.createUrl()
-      await this.getCameraCover()
+      await this.$refs.stream.start()
       this.playing = true
     },
     pause() {
       this.playing = false
-      this.url = this.src
-      window.stop()
+      this.$refs.stream.stop()
     },
     async getCamera() {
       this.camera = await this.$store.dispatch('getCamera', this.id)
       this.$store.commit('setTitle', this.camera.name)
     },
     openModal() {
-      this.open = true
+      this.open = !this.open
     }
   }
 }
@@ -98,25 +88,23 @@ export default {
 <template>
   <VSheet
     v-if="camera"
-    class="ma-auto video-wrapper position-relative"
-    max-width="1000"
+    class="ma-auto pa-4 video-wrapper position-relative fill-height"
+    color="white"
     width="100%"
   >
     <VSheet
       :color="alert ? 'error' : 'grey-lighten-2'"
-      class="border-lg overflow-hidden position-relative mx-auto d-flex align-center justify-center"
+      class="border-lg position-relative mx-auto d-flex align-center justify-center"
     >
-      <VSheet
-        height="400"
-        class="overflow position-absolute"
-        :style="`background-image:url(${src})`"
+      <CameraRootArea
+        ref="stream"
+        :camera="camera"
       />
-      <img
-        ref="image"
-        class="d-block video"
-        height="400"
-        :src="url"
-      >
+      <VSheet
+        height="500"
+        class="overflow position-absolute"
+        :style="`background-image:url(${src});`"
+      />
     </VSheet>
 
     <VSheet
@@ -127,67 +115,71 @@ export default {
       <VBtn
         v-if="!playing"
         icon="mdi-play"
-        color="default"
-        variant="plain"
-        density="compact"
-        class="mr-4"
+        color="orange"
+        variant="tonal"
+        density="comfortable"
+        class="mr-2"
         @click="play()"
       />
       <VBtn
         v-else
         icon="mdi-pause"
-        color="default"
-        variant="plain"
-        density="compact"
-        class="mr-4"
+        color="secondary"
+        variant="tonal"
+        density="comfortable"
+        class="mr-2"
         @click="pause()"
       />
       <VBtn
         readonly
         icon="mdi-file-refresh"
-        color="default"
-        variant="plain"
-        density="compact"
-        class="mr-4"
+        color="secondary"
+        variant="tonal"
+        density="comfortable"
+        class="mr-2"
       />
       <VBtn
         readonly
         icon="mdi-cloud-upload"
-        color="default"
-        variant="plain"
-        density="compact"
-        class="mr-4"
+        color="secondary"
+        variant="tonal"
+        density="comfortable"
+        class="mr-2"
       />
       <VBtn
         readonly
         icon="mdi-folder-play"
-        color="default"
-        variant="plain"
-        density="compact"
-        class="mr-4"
+        color="secondary"
+        variant="tonal"
+        density="comfortable"
+        class="mr-2"
       />
       <VBtn
         readonly
         icon="mdi-folder-multiple-image"
-        color="default"
-        variant="plain"
-        density="compact"
-        class="mr-4"
+        color="secondary"
+        variant="tonal"
+        density="comfortable"
+        class="mr-2"
       />
       <VBtn
-        icon="mdi-pencil"
-        color="default"
-        variant="plain"
-        density="compact"
-        class="mr-4"
-        @click="openModal()"
+        icon="mdi-cog"
+        color="primary"
+        density="comfortable"
+        variant="tonal"
+        class="mr-2"
+        :text="$t('Settings')"
+        @click="openModal"
       />
     </VSheet>
     {{ camera }}
-    <CameraModal
+    <SidebarPanel
       v-model="open"
+      :title="title"
       :camera-model="camera"
-    />
+    >
+      <CameraForm :camera-model="camera" />
+    </SidebarPanel>
   </VSheet>
 </template>
 
