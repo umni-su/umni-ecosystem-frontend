@@ -76,7 +76,6 @@ export default {
       this.tracker.removePolygon(i)
     },
     selectPolygon(i) {
-      console.log('Select Polygon', i);
       this.tracker.selectedPolygonIndex = i
       this.tracker.currentPolygon = this.tracker.polygons[i]
       this.tracker.updateUI()

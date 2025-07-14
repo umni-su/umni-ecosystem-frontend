@@ -43,6 +43,7 @@ export default {
     >
       <VColorPicker
         v-model="color"
+        mode="hexa"
       />
     </VSheet>
   </VMenu>
