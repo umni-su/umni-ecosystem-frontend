@@ -43,7 +43,7 @@ export default {
     },
     lastMessage: {
       deep: true,
-      handler(newVal, oldVal) {
+      handler(newVal) {
         if (newVal.camera_id === this.camera.id) {
           switch (newVal.topic) {
             case 'detection.start':
