@@ -6,9 +6,9 @@ export class ImageClickTracker {
         this.ctx = this.canvas.getContext('2d');
         this.output = output
 
-        this.modeIndicator = document.getElementById('modeIndicator');
-        this.polygonsContainer = document.getElementById('polygonsContainer');
-        this.polygonCountElement = document.getElementById('polygonCount');
+        // this.modeIndicator = document.getElementById('modeIndicator');
+        // this.polygonsContainer = document.getElementById('polygonsContainer');
+        // this.polygonCountElement = document.getElementById('polygonCount');
 
         this.polygons = [];
         this.currentPolygon = null;
@@ -32,11 +32,11 @@ export class ImageClickTracker {
         window.addEventListener('resize', this.resizeCanvas.bind(this));
 
         // Кнопки управления
-        document.getElementById('toggleModeBtn').addEventListener('click', () => this.toggleMode());
-        document.getElementById('closePolygonBtn').addEventListener('click', () => this.closeCurrentPolygon());
-        document.getElementById('newPolygonBtn').addEventListener('click', () => this.startNewPolygon());
-        document.getElementById('exportBtn').addEventListener('click', () => this.exportToJSON());
-        document.getElementById('importBtn').addEventListener('click', () => this.importFromJSON());
+        // document.getElementById('toggleModeBtn').addEventListener('click', () => this.toggleMode());
+        // document.getElementById('closePolygonBtn').addEventListener('click', () => this.closeCurrentPolygon());
+        // document.getElementById('newPolygonBtn').addEventListener('click', () => this.startNewPolygon());
+        // document.getElementById('exportBtn').addEventListener('click', () => this.exportToJSON());
+        // document.getElementById('importBtn').addEventListener('click', () => this.importFromJSON());
 
         //this.startNewPolygon();
         this.updateUI();
@@ -498,34 +498,34 @@ export class ImageClickTracker {
     }
 
     updateUI() {
-        this.modeIndicator.textContent = this.isDrawingMode ? 'Рисование' : 'Выбор';
-        document.getElementById('toggleModeBtn').textContent =
-            this.isDrawingMode ? 'Переключить в режим выбора' : 'Переключить в режим рисования';
+        //this.modeIndicator.textContent = this.isDrawingMode ? 'Рисование' : 'Выбор';
+        // document.getElementById('toggleModeBtn').textContent =
+        //     this.isDrawingMode ? 'Переключить в режим выбора' : 'Переключить в режим рисования';
 
         // Обновляем список полигонов
-        this.polygonsContainer.innerHTML = '';
-        this.polygons.forEach((polygon, index) => {
-            const polygonElement = document.createElement('div');
-            polygonElement.className = `polygon-item ${index === this.selectedPolygonIndex ? 'selected' : ''}`;
-            polygonElement.innerHTML = `
-        <span style="color:${polygon.color}">■</span>
-        Полигон ${index + 1}: ${polygon.points.length} точек
-        ${polygon.isClosed ? '✓' : ''}
-      `;
-            polygonElement.addEventListener('click', () => {
-                this.selectedPolygonIndex = index;
-                this.currentPolygon = polygon;
-                this.updateUI();
-                this.redraw();
-            });
-            this.polygonsContainer.appendChild(polygonElement);
-        });
-
-        this.polygonCountElement.textContent = this.polygons.length;
+        //this.polygonsContainer.innerHTML = '';
+        //   this.polygons.forEach((polygon, index) => {
+        //       const polygonElement = document.createElement('div');
+        //       polygonElement.className = `polygon-item ${index === this.selectedPolygonIndex ? 'selected' : ''}`;
+        //       polygonElement.innerHTML = `
+        //   <span style="color:${polygon.color}">■</span>
+        //   Полигон ${index + 1}: ${polygon.points.length} точек
+        //   ${polygon.isClosed ? '✓' : ''}
+        // `;
+        //       polygonElement.addEventListener('click', () => {
+        //           this.selectedPolygonIndex = index;
+        //           this.currentPolygon = polygon;
+        //           this.updateUI();
+        //           this.redraw();
+        //       });
+        //       this.polygonsContainer.appendChild(polygonElement);
+        //   });
+        //
+        //   this.polygonCountElement.textContent = this.polygons.length;
     }
 
     updateOutput(message) {
-        this.output.textContent = message;
+        //this.output.textContent = message;
     }
 
     // Импорт/экспорт

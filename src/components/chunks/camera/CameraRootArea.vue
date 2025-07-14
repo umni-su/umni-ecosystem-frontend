@@ -73,38 +73,6 @@ export default {
       id="canvas"
       ref="draw"
     />
-    <div
-
-      class="controls"
-    >
-      <div>
-        <p id="output">
-          Режим: <span id="modeIndicator">Рисование</span>
-        </p>
-        <VBtn
-          id="toggleModeBtn"
-        >
-          Переключить в режим выбора
-        </VBtn>
-        <VBtn id="closePolygonBtn">
-          Замкнуть полигон
-        </VBtn>
-        <VBtn id="newPolygonBtn">
-          Новый полигон
-        </VBtn>
-        <VBtn id="exportBtn">
-          Экспорт в JSON
-        </VBtn>
-        <VBtn id="importBtn">
-          Импорт из JSON
-        </VBtn>
-      </div>
-      <div class="polygon-list">
-        <h3>Полигоны (<span id="polygonCount">0</span>)</h3>
-        <div id="polygonsContainer" />
-      </div>
-    </div>
-    <div ref="output" />
   </VSheet>
 </template>
 
