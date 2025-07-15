@@ -4,13 +4,13 @@ export default {
   props: {
     modelValue: {
       type: String,
-      default: '#fff'
+      default: '#ffffff'
     }
   },
   emits: ['update:model-value', 'update:on-click'],
   data() {
     return {
-      color: '#fff'
+      color: '#ffffff'
     }
   },
   watch: {
