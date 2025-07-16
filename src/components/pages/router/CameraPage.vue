@@ -15,6 +15,7 @@ export default {
   },
   data() {
     return {
+      hideDrawings: false,
       alert: false,
       camera: null,
       playing: false,
@@ -38,7 +39,9 @@ export default {
   watch: {
     async id() {
       if (typeof this.id === "number") {
+        this.pause()
         await this.getCamera()
+        this.play()
       }
     },
     lastMessage: {
@@ -103,6 +106,7 @@ export default {
       />
       <CameraRootArea
         ref="stream"
+        :hide-drawings="hideDrawings"
         :camera="camera"
       />
     </VSheet>
@@ -112,6 +116,14 @@ export default {
     >
       <CameraRecordDot :camera="camera" />
 
+      <VBtn
+        icon="mdi-image"
+        color="orange"
+        variant="tonal"
+        density="comfortable"
+        class="mr-2"
+        @click="hideDrawings = !hideDrawings"
+      />
       <VBtn
         v-if="!playing"
         icon="mdi-play"

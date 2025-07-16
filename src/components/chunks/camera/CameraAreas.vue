@@ -51,6 +51,7 @@ export default {
       this.polygons = e.detail
       this.updateDisabled()
     })
+    this.tracker.redraw()
   },
   methods: {
     updateDisabled() {
@@ -78,7 +79,6 @@ export default {
     selectPolygon(i) {
       this.tracker.selectedPolygonIndex = i
       this.tracker.currentPolygon = this.tracker.polygons[i]
-      this.tracker.updateUI()
       this.tracker.redraw()
     },
     updateName(name) {
@@ -97,6 +97,9 @@ export default {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
         this.tracker.importFromJSON(res)
       }
+    },
+    openAreaSettings(poly) {
+      console.log(poly)
     }
   }
 }
@@ -146,6 +149,14 @@ export default {
                 @update:model-value="updateColor(i,poly.color)"
               />
             </template>
+            <template #append-inner>
+              <VBtn
+                icon="mdi-cog"
+                variant="plain"
+                density="compact"
+                @click="openAreaSettings(poly)"
+              />
+            </template>
             <template #append>
               <PriorityMenu v-model.number="poly.priority" />
               <VBtn
@@ -157,6 +168,7 @@ export default {
               />
             </template>
           </VTextField>
+          {{ poly.options }}
         </VListItem>
       </VList>
     </VSheet>

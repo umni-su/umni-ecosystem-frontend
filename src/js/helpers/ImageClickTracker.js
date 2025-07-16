@@ -30,16 +30,6 @@ export class ImageClickTracker {
         this.canvas.addEventListener('contextmenu', this.handleContextMenu.bind(this));
         this.canvas.addEventListener('dblclick', this.handleDoubleClick.bind(this));
         window.addEventListener('resize', this.resizeCanvas.bind(this));
-
-        // Кнопки управления
-        // document.getElementById('toggleModeBtn').addEventListener('click', () => this.toggleMode());
-        // document.getElementById('closePolygonBtn').addEventListener('click', () => this.closeCurrentPolygon());
-        // document.getElementById('newPolygonBtn').addEventListener('click', () => this.startNewPolygon());
-        // document.getElementById('exportBtn').addEventListener('click', () => this.exportToJSON());
-        // document.getElementById('importBtn').addEventListener('click', () => this.importFromJSON());
-
-        //this.startNewPolygon();
-        this.updateUI();
     }
 
     setColor(color) {
@@ -49,14 +39,14 @@ export class ImageClickTracker {
     // Основные методы
     toggleMode() {
         this.isDrawingMode = !this.isDrawingMode;
-        this.updateUI();
+
         this.redraw();
     }
 
     enableDrawing() {
         this.isDrawingMode = true
         this.startNewPolygon();
-        this.updateUI();
+
         this.redraw();
     }
 
@@ -70,12 +60,12 @@ export class ImageClickTracker {
             priority: 3,
             active: true,
             points: [],
+            options: null,
             isClosed: false,
             color: this.color ?? this.getRandomColor()
         };
         this.polygons.push(this.currentPolygon);
         this.selectedPolygonIndex = this.polygons.length - 1;
-        this.updateUI()
         this.redraw()
         this.fireData()
     }
@@ -84,15 +74,6 @@ export class ImageClickTracker {
         if (this.currentPolygon && this.currentPolygon.points.length >= 3) {
             this.currentPolygon.isClosed = true;
             this.updateOutput(`Полигон ${this.polygons.length} замкнут`);
-
-            // this.isDrawingMode = false;
-            // const event = new CustomEvent('on-drawing-mode-changed', {
-            //     bubbles: true,
-            //     detail: this.isDrawingMode
-            // })
-            // this.canvas.dispatchEvent(event)
-
-            this.updateUI();
             this.redraw();
             this.fireData();
         }
@@ -104,10 +85,6 @@ export class ImageClickTracker {
 
         if (event.button === 0) { // ЛКМ
             if (!this.isDrawingMode) {
-                // Режим выбора
-                //this.selectedPolygonIndex = this.findPolygonIndex(pos.x, pos.y);
-                //this.currentPolygon = this.polygons[this.selectedPolygonIndex] || null;
-
                 // Начинаем перемещение полигона
                 if (this.currentPolygon) {
                     this.draggedPolygon = {
@@ -116,8 +93,6 @@ export class ImageClickTracker {
                         startPos: pos
                     };
                 }
-
-                this.updateUI();
                 this.redraw();
                 return;
             }
@@ -150,10 +125,13 @@ export class ImageClickTracker {
             const dx = pos.x - this.draggedPolygon.startPos.x;
             const dy = pos.y - this.draggedPolygon.startPos.y;
 
-            this.draggedPolygon.polygon.points = this.draggedPolygon.startPoints.map(point => ({
-                x: point.x + dx,
-                y: point.y + dy
-            }));
+            this.draggedPolygon.polygon.points = this.draggedPolygon.startPoints.map(point => {
+                return [
+                    Math.round(point[0] + dx),
+                    Math.round(point[1] + dy)
+                ]
+            });
+            console.log(this.draggedPolygon.polygon.points)
 
             this.redraw();
             return;
@@ -161,8 +139,8 @@ export class ImageClickTracker {
 
         // Перетаскивание точки
         if (this.draggedPoint) {
-            this.draggedPoint.point.x = pos.x;
-            this.draggedPoint.point.y = pos.y;
+            this.draggedPoint.point[0] = Math.round(pos.x)
+            this.draggedPoint.point[1] = Math.round(pos.y)
             this.redraw();
             return;
         }
@@ -227,7 +205,7 @@ export class ImageClickTracker {
             const polygon = this.polygons[pIdx];
             for (let i = 0; i < polygon.points.length; i++) {
                 const point = polygon.points[i];
-                const distance = Math.sqrt(Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2));
+                const distance = Math.sqrt(Math.pow(point[0] - x, 2) + Math.pow(point[1] - y, 2));
                 if (distance < threshold) {
                     return {
                         polygon,
@@ -255,7 +233,7 @@ export class ImageClickTracker {
                 // Пропускаем последний сегмент, если полигон не замкнут
                 if (!polygon.isClosed && i === polygon.points.length - 1) break;
 
-                const d = this.distanceToSegmentSquared(x, y, p1.x, p1.y, p2.x, p2.y);
+                const d = this.distanceToSegmentSquared(x, y, p1[0], p1[1], p2[0], p2[1]);
                 if (d < thresholdSq) {
                     return {
                         polygon,
@@ -279,14 +257,14 @@ export class ImageClickTracker {
             this.ctx.save();
             this.ctx.beginPath();
             this.ctx.moveTo(
-                polygon.points[0].x * this.scaleX(),
-                polygon.points[0].y * this.scaleY()
+                polygon.points[0][0] * this.scaleX(),
+                polygon.points[0][1] * this.scaleY()
             );
 
             for (let j = 1; j < polygon.points.length; j++) {
                 this.ctx.lineTo(
-                    polygon.points[j].x * this.scaleX(),
-                    polygon.points[j].y * this.scaleY()
+                    polygon.points[j][0] * this.scaleX(),
+                    polygon.points[j][1] * this.scaleY()
                 );
             }
 
@@ -315,28 +293,28 @@ export class ImageClickTracker {
 
     // Методы работы с точками
     addPoint(polygon, x, y) {
-        polygon.points.push({x, y});
+        polygon.points.push([Math.round(x), Math.round(y)]);
         polygon.isClosed = false;
         this.redraw();
         this.updateOutput(`Добавлена точка: (${Math.round(x)}, ${Math.round(y)})`);
-        this.updateUI();
+
         this.fireData()
     }
 
     insertPoint(polygon, index, x, y) {
-        polygon.points.splice(index, 0, {x, y});
+        polygon.points.splice(index, 0, [Math.round(x), Math.round(y)]);
         polygon.isClosed = false;
         this.redraw();
         this.updateOutput(`Вставлена точка между ${index - 1} и ${index}`);
-        this.updateUI();
+
     }
 
     removePoint(polygon, index) {
         const removedPoint = polygon.points.splice(index, 1)[0];
         polygon.isClosed = false;
         this.redraw();
-        this.updateOutput(`Удалена точка: (${Math.round(removedPoint.x)}, ${Math.round(removedPoint.y)})`);
-        this.updateUI();
+        this.updateOutput(`Удалена точка: (${Math.round(removedPoint[0])}, ${Math.round(removedPoint[1])})`);
+
     }
 
     removePolygon(index) {
@@ -347,7 +325,7 @@ export class ImageClickTracker {
         }
         this.redraw();
         this.updateOutput(`Удален полигон с ${removed.points.length} точками`);
-        this.updateUI();
+
         this.fireData()
     }
 
@@ -375,15 +353,15 @@ export class ImageClickTracker {
             this.ctx.strokeStyle = 'rgba(255, 150, 0, 0.7)';
             this.ctx.lineWidth = 3;
             this.ctx.beginPath();
-            this.ctx.moveTo(p1.x * this.scaleX(), p1.y * this.scaleY());
-            this.ctx.lineTo(p2.x * this.scaleX(), p2.y * this.scaleY());
+            this.ctx.moveTo(p1[0] * this.scaleX(), p1[1] * this.scaleY());
+            this.ctx.lineTo(p2[0] * this.scaleX(), p2[1] * this.scaleY());
             this.ctx.stroke();
         }
 
         // Рисуем hovered точку
         if (this.hoveredPoint && (this.isDrawingMode || this.hoveredPoint.polygon === this.currentPolygon)) {
-            const x = this.hoveredPoint.point.x * this.scaleX();
-            const y = this.hoveredPoint.point.y * this.scaleY();
+            const x = this.hoveredPoint.point[0] * this.scaleX();
+            const y = this.hoveredPoint.point[1] * this.scaleY();
 
             this.ctx.fillStyle = 'rgba(103,0,0,0.66)';
             this.ctx.beginPath();
@@ -412,14 +390,14 @@ export class ImageClickTracker {
             this.ctx.fillStyle = this.adjustAlpha(polygon.color, 0.3);
             this.ctx.beginPath();
             this.ctx.moveTo(
-                polygon.points[0].x * this.scaleX(),
-                polygon.points[0].y * this.scaleY()
+                polygon.points[0][0] * this.scaleX(),
+                polygon.points[0][1] * this.scaleY()
             );
 
             for (let i = 1; i < polygon.points.length; i++) {
                 this.ctx.lineTo(
-                    polygon.points[i].x * this.scaleX(),
-                    polygon.points[i].y * this.scaleY()
+                    polygon.points[i][0] * this.scaleX(),
+                    polygon.points[i][1] * this.scaleY()
                 );
             }
 
@@ -434,14 +412,14 @@ export class ImageClickTracker {
         this.ctx.lineWidth = isSelected ? 4 : 2;
         this.ctx.beginPath();
         this.ctx.moveTo(
-            polygon.points[0].x * this.scaleX(),
-            polygon.points[0].y * this.scaleY()
+            polygon.points[0][0] * this.scaleX(),
+            polygon.points[0][1] * this.scaleY()
         );
 
         for (let i = 1; i < polygon.points.length; i++) {
             this.ctx.lineTo(
-                polygon.points[i].x * this.scaleX(),
-                polygon.points[i].y * this.scaleY()
+                polygon.points[i][0] * this.scaleX(),
+                polygon.points[i][1] * this.scaleY()
             );
         }
 
@@ -452,8 +430,8 @@ export class ImageClickTracker {
 
         // Точки полигона
         polygon.points.forEach(point => {
-            const x = point.x * this.scaleX();
-            const y = point.y * this.scaleY();
+            const x = point[0] * this.scaleX();
+            const y = point[1] * this.scaleY();
 
             this.ctx.fillStyle = polygon === this.currentPolygon ? '#ff0000' : '#aa0000';
             this.ctx.beginPath();
@@ -471,7 +449,7 @@ export class ImageClickTracker {
         if (this.currentPolygon) {
             this.polygons[i].color = color;
             this.redraw();
-            this.updateUI();
+
         }
     }
 
@@ -497,33 +475,6 @@ export class ImageClickTracker {
         this.redraw();
     }
 
-    updateUI() {
-        //this.modeIndicator.textContent = this.isDrawingMode ? 'Рисование' : 'Выбор';
-        // document.getElementById('toggleModeBtn').textContent =
-        //     this.isDrawingMode ? 'Переключить в режим выбора' : 'Переключить в режим рисования';
-
-        // Обновляем список полигонов
-        //this.polygonsContainer.innerHTML = '';
-        //   this.polygons.forEach((polygon, index) => {
-        //       const polygonElement = document.createElement('div');
-        //       polygonElement.className = `polygon-item ${index === this.selectedPolygonIndex ? 'selected' : ''}`;
-        //       polygonElement.innerHTML = `
-        //   <span style="color:${polygon.color}">■</span>
-        //   Полигон ${index + 1}: ${polygon.points.length} точек
-        //   ${polygon.isClosed ? '✓' : ''}
-        // `;
-        //       polygonElement.addEventListener('click', () => {
-        //           this.selectedPolygonIndex = index;
-        //           this.currentPolygon = polygon;
-        //           this.updateUI();
-        //           this.redraw();
-        //       });
-        //       this.polygonsContainer.appendChild(polygonElement);
-        //   });
-        //
-        //   this.polygonCountElement.textContent = this.polygons.length;
-    }
-
     updateOutput(message) {
         //this.output.textContent = message;
     }
@@ -534,7 +485,8 @@ export class ImageClickTracker {
             id: polygon?.id,
             name: polygon.name,
             active: polygon.active,
-            points: polygon.points.map(p => ({x: Math.round(p.x), y: Math.round(p.y)})),
+            points: polygon.points,
+            options: polygon.options,
             priority: polygon.priority,
             isClosed: polygon.isClosed,
             color: polygon.color
@@ -548,6 +500,7 @@ export class ImageClickTracker {
                 active: polygon.active,
                 name: polygon.name,
                 points: polygon.points,
+                options: polygon.options,
                 priority: polygon.priority,
                 isClosed: true, //fix
                 color: polygon.color || this.getRandomColor()
@@ -556,7 +509,6 @@ export class ImageClickTracker {
             this.currentPolygon = this.polygons[this.polygons.length - 1] || null;
             this.selectedPolygonIndex = this.polygons.length - 1;
             this.updateOutput(`Импортировано ${this.polygons.length} полигонов`);
-            this.updateUI();
             this.redraw();
             this.fireData()
         } catch (e) {
@@ -566,7 +518,7 @@ export class ImageClickTracker {
 
     // Вспомогательные
     getRandomColor() {
-        return `hsl(${Math.random() * 360}, 70%, 50%)`;
+        return `#2192D143`;
     }
 
     adjustAlpha(color, alpha) {

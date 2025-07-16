@@ -4,13 +4,13 @@ export default {
   props: {
     modelValue: {
       type: String,
-      default: '#ffffff'
+      default: '#ffffff43'
     }
   },
   emits: ['update:model-value', 'update:on-click'],
   data() {
     return {
-      color: '#ffffff'
+      color: '#ffffff43'
     }
   },
   watch: {
@@ -43,7 +43,6 @@ export default {
     >
       <VColorPicker
         v-model="color"
-        mode="hexa"
       />
     </VSheet>
   </VMenu>

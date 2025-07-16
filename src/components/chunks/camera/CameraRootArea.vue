@@ -7,6 +7,10 @@ export default {
     camera: {
       type: Object,
       required: true
+    },
+    hideDrawings: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -24,15 +28,22 @@ export default {
   async mounted() {
     this.createUrl()
     await this.getCameraCover()
-    this.tracker = new ImageClickTracker(
-        this.$refs.image,
-        this.$refs.output,
-        this.$refs.draw
-    )
-    this.tracker.importFromJSON(this.camera.areas)
-    this.$store.commit('setTracker', this.tracker)
+    this.$store.commit('destroyTracker')
+    setTimeout(() => {
+      this.createTracker(this.camera)
+      this.tracker.redraw()
+    }, 200)
   },
   methods: {
+    createTracker(camera) {
+      this.tracker = new ImageClickTracker(
+          this.$refs.image,
+          this.$refs.output,
+          this.$refs.draw
+      )
+      this.tracker.importFromJSON(camera.areas)
+      this.$store.commit('setTracker', this.tracker)
+    },
     stop() {
       //this.url = null
       window.stop()
@@ -72,6 +83,7 @@ export default {
     <canvas
       id="canvas"
       ref="draw"
+      :class="hideDrawings?'d-none':'d-block'"
     />
   </VSheet>
 </template>
