@@ -112,5 +112,9 @@ export default {
     },
     destroyTracker(state) {
         state.tracker = null
+    },
+    updatePlayback(state, {date, seconds}) {
+        state.playback.date = date
+        state.playback.seconds = seconds
     }
 }

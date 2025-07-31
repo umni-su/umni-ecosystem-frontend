@@ -66,16 +66,15 @@ export default {
 
 <template>
   <VMenu
-    open-on-hover
     :close-on-content-click="false"
   >
     <template #activator="{props}">
       <VBtn
-        icon
-        :color="`${selected?.color}`"
+        icon="mdi-bell"
+        :color="selected?.color"
         v-bind="props"
         density="compact"
-        variant="flat"
+        variant="text"
       />
     </template>
     <VSheet>

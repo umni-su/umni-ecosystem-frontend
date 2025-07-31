@@ -2,10 +2,11 @@
 import ColorPicker from "../ColorPicker.vue";
 import PriorityMenu from "../PriorityMenu.vue";
 import {createSuccessNotification} from "../../../js/helpers/notificationHelper.js";
+import ConfirmationDialog from "../ConfirmationDialog.vue";
 
 export default {
   name: "CameraAreas",
-  components: {PriorityMenu, ColorPicker},
+  components: {ConfirmationDialog, PriorityMenu, ColorPicker},
   props: {
     camera: {
       type: Object,
@@ -16,6 +17,7 @@ export default {
     return {
       disabled: false,
       polygons: [],
+      selected: null
     }
   },
   computed: {
@@ -41,11 +43,22 @@ export default {
       deep: true,
       immediate: true,
       handler(val) {
-        this.polygons = val
-
+        this.polygons = val.map(polygon => {
+          if (polygon.options === null) {
+            polygon.options = {
+              enabled: true,
+              sensitivity: 1.0,
+              min_area: 10,
+              min_aspect_ratio: 0.5,
+              max_aspect_ratio: 2.0
+            }
+          }
+          return polygon
+        })
       }
     }
   },
+
   created() {
     document.addEventListener('on-redraw', e => {
       this.polygons = e.detail
@@ -67,16 +80,26 @@ export default {
       })
       this.disabled = ok
     },
-    addNewArea() {
-      this.tracker.startNewPolygon()
-    },
-    toggleDrawingMode() {
-      this.tracker.toggleMode()
-    },
-    deleteArea(i) {
-      this.tracker.removePolygon(i)
+    async deleteArea(i) {
+      const ok = await this.$refs.confirm.show({
+        title: this.$t('Delete area'),
+        message: this.$t('Area will be deleted'),
+        okText: this.$t('Delete'),
+        okIcon: 'mdi-trash-can'
+      })
+      if (ok) {
+        if (this.polygons[i]?.id) {
+          const areas = await this.$store.dispatch('deleteCameraArea', {
+            area_id: this.polygons[i].id,
+            camera_id: this.camera.id
+          })
+          //this.tracker.importFromJSON(areas)
+        }
+        this.tracker.removePolygon(i)
+      }
     },
     selectPolygon(i) {
+      this.selected = i
       this.tracker.selectedPolygonIndex = i
       this.tracker.currentPolygon = this.tracker.polygons[i]
       this.tracker.redraw()
@@ -93,9 +116,9 @@ export default {
         areas: this.polygons
       })
       if (res) {
-        this.polygons = res
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
         this.tracker.importFromJSON(res)
+        //this.tracker.redraw()
       }
     },
     openAreaSettings(poly) {
@@ -107,57 +130,116 @@ export default {
 
 <template>
   <VSheet>
-    <VBtn
-      v-tooltip="drawingMode ? $t('Switch to selection mode'): $t('Switch to drawing mode')"
-      variant="tonal"
-      density="compact"
-      :icon="!drawingMode ? 'mdi-pencil' : 'mdi-cursor-pointer'"
-      :color="drawingMode ? 'primary' : 'secondary'"
-      class="mx-2"
-      @click="toggleDrawingMode"
-    />
-    <VBtn
-      v-if="drawingMode"
-      v-tooltip="$t('New zone')"
-      variant="tonal"
-      density="compact"
-      icon="mdi-plus"
-      class="mr-2"
-      @click="addNewArea"
-    />
     <VSheet class="mt-4">
       <VList
+        v-model="selected"
         selectable
       >
         <VListItem
           v-for="(poly,i) in polygons"
           :key="poly"
+          :active="i === selected"
+          :class="{'opacity-50':!polygons[i].options.enabled}"
+          density="compact"
+          variant="tonal"
+          base-color="primary"
+          rounded="lg"
           :value="i"
-          class="py-2"
+          class="mb-2"
           @click="selectPolygon(i)"
         >
-          <VTextField
-            v-model="poly.name"
-            single-line
-            :label="$t('Name')"
-            density="compact"
-            @update:model-value="updateName"
-          >
-            <template #prepend>
-              <ColorPicker
-                v-model="poly.color"
-                @update:model-value="updateColor(i,poly.color)"
-              />
-            </template>
-            <template #append-inner>
-              <VBtn
-                icon="mdi-cog"
-                variant="plain"
-                density="compact"
-                @click="openAreaSettings(poly)"
-              />
-            </template>
-            <template #append>
+          <template #prepend>
+            <VSwitch
+              v-model="polygons[i].options.enabled"
+              v-tooltip="$t('Area is enabled')"
+              density="compact"
+            />
+          </template>
+          <template #title>
+            <VSheet class="ml-4">
+              {{ poly.name ?? $t('No name') }}
+            </VSheet>
+          </template>
+          <template #append>
+            <div v-if="i === selected">
+              <VMenu
+                :close-on-content-click="false"
+                width="600"
+              >
+                <template #activator="{props}">
+                  <VBtn
+                    v-bind="props"
+                    icon="mdi-cog"
+                    variant="plain"
+                    density="compact"
+                    @click="openAreaSettings(poly)"
+                  />
+                </template>
+                <VSheet>
+                  <VCard>
+                    <template #append>
+                      <VSwitch
+                        v-model="polygons[i].options.enabled"
+                        v-tooltip="$t('Area is enabled')"
+                      />
+                    </template>
+                    <template #title>
+                      {{ poly.name }}
+                    </template>
+                    <template #subtitle>
+                      {{ $t('Extended area settings') }}
+                    </template>
+                    <template #text>
+                      <VTextField
+                        v-model="poly.name"
+                        class="ma-2"
+                        :label="$t('Name')"
+                        density="compact"
+                        @update:model-value="updateName"
+                      >
+                        <template #prepend>
+                          <ColorPicker
+                            v-model="poly.color"
+                            @update:model-value="updateColor(i,poly.color)"
+                          />
+                        </template>
+                      </VTextField>
+                      <VSlider
+                        v-model="polygons[i].options.sensitivity"
+                        thumb-label
+                        :label="$t('Sensitivity')"
+                        :step="0.1"
+                        :min="0.1"
+                        :max="5"
+                      />
+                      <VSlider
+                        v-model="polygons[i].options.min_area"
+                        thumb-label
+                        :label="$t('Min area')"
+                        :step="1"
+                        :min="10"
+                        :max="2000"
+                      />
+                      <VSlider
+                        v-model="polygons[i].options.min_aspect_ratio"
+                        thumb-label
+                        :label="$t('Min aspect ratio')"
+                        :step="0.1"
+                        :min="0.1"
+                        :max="5"
+                      />
+                      <VSlider
+                        v-model="polygons[i].options.max_aspect_ratio"
+                        thumb-label
+                        :label="$t('Max aspect ratio')"
+                        :step="0.1"
+                        :min="0.1"
+                        :max="5"
+                      />
+                    </template>
+                  </VCard>
+                </VSheet>
+              </VMenu>
               <PriorityMenu v-model.number="poly.priority" />
               <VBtn
                 icon="mdi-trash-can"
@@ -166,9 +248,8 @@ export default {
                 density="compact"
                 @click="deleteArea(i)"
               />
-            </template>
-          </VTextField>
-          {{ poly.options }}
+            </div>
+          </template>
         </VListItem>
       </VList>
     </VSheet>
@@ -178,6 +259,7 @@ export default {
       prepend-icon="mdi-content-save"
       @click="saveAreas"
     />
+    <ConfirmationDialog ref="confirm" />
   </VSheet>
 </template>
 

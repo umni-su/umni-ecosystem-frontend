@@ -5,6 +5,7 @@ import state from "./state.js";
 window.axios = axios
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token')
+
 axios.interceptors.response.use(function (response) {
     if (response.headers['x-auth-token']) {
         localStorage.setItem('token', response.headers['x-auth-token'])
@@ -87,10 +88,11 @@ export default {
         }).finally(() => {
             commit('setLoading', false)
         })
-        if (res) {
+        if (res.status === 200) {
             commit('setAuthenticated', true)
             commit('setToken', res.data.access_token)
             commit('setUser', res.data.user)
+            return res.data
         }
     },
     async logOut({commit}) {
@@ -422,6 +424,72 @@ export default {
         if (res) {
             return res.data
         }
+    },
+
+    async deleteCameraArea({commit}, data) {
+        const res = await axios.delete(`/api/cameras/${data.camera_id}/areas/${data.area_id}`)
+        if (res) {
+            return res.data
+        }
+    },
+
+    async getCameraEvent({commit}, id) {
+        commit('setLoading', true)
+        const res = await axios.get(`/api/events/${id}`).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+    async getCameraEvents({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.post(
+            `/api/cameras/${data.id}/events`,
+            data
+        ).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+
+    async getCameraTimeline({commit}, data) {
+        commit('setLoading', true)
+        const res = await axios.post(
+            `/api/cameras/${data.id}/timeline`,
+            data
+        ).finally(() => {
+            commit('setLoading', false)
+        })
+        if (res) {
+            return res.data
+        }
+    },
+
+    async getCameraEventScreenshot({state}, id) {
+        const res = await fetch(
+            `/api/cameras/events/${id}/preview`,
+            {
+                headers: {
+                    Authorization: `Bearer ${state.token}`,
+                }
+            })
+        return await getBase64Image(res)
+    },
+
+    async getEventStream({commit, state}, id) {
+        const response = await axios.get(`/api/events/${id}/play`, {
+            headers: {
+                'Authorization': `Bearer ${state.token}`
+            },
+            responseType: 'blob'
+        });
+        if (response) {
+            return response.data
+        }
     }
+
 
 }

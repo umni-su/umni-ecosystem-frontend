@@ -23,7 +23,7 @@ export default {
       required: true
     }
   },
-  emits: ['on-camera-save'],
+  emits: ['on-camera-save', 'on-show-areas'],
   data() {
     return {
       tab: 'connection',
@@ -43,6 +43,7 @@ export default {
       auth: false,
       link: null,
       model: null,
+      showDrawings: false
     }
   },
   computed: {
@@ -62,6 +63,10 @@ export default {
     auth() {
       this.model.username = null
       this.model.password = null
+    },
+    tab() {
+      this.showDrawings = this.tab === 'detection'
+      this.$emit('on-show-areas', this.showDrawings)
     },
   },
   unmounted() {

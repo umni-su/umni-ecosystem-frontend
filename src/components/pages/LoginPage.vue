@@ -25,7 +25,7 @@ export default {
         username: this.username,
         password: this.password
       }).catch(e => {
-        this.$store.commit('addNotification', createErrorNotification(this.$t(e.response.data.message)))
+        this.$store.commit('addNotification', createErrorNotification(this.$t(e.response.data.detail)))
       })
     }
   }
@@ -39,23 +39,27 @@ export default {
     :class="theme ==='light' ?'bg-primary' : 'bg-primary-darken'"
   >
     <VCard
-      width="300"
+      width="390"
+      class="pa-6"
     >
       <template #text>
         <UmniLogo
           :short="false"
           :width="250"
+          :height="80"
           class="d-block ma-auto mb-2"
-          color="#0486c2"
+          color="#008dd2"
         />
         <VTextField
           v-model="username"
           :label="$t('Username')"
           class="mb-4"
+          autocomplete="off"
           prepend-inner-icon="mdi-account"
         />
         <VTextField
           v-model="password"
+          autocomplete="off"
           :label="$t('Password')"
           type="password"
           class="mb-4"
@@ -68,6 +72,7 @@ export default {
           :text="$t('Login')"
           prepend-icon="mdi-send"
           color="primary-darken"
+          size="large"
           @click="login"
         />
       </template>
@@ -79,6 +84,7 @@ export default {
 </template>
 
 <style scoped>
+
 .login {
   display: flex;
   align-items: center;

@@ -15,13 +15,14 @@ export default {
   },
   data() {
     return {
-      hideDrawings: false,
+      hideDrawings: true,
       alert: false,
       camera: null,
       playing: false,
       url: null,
       src: null,
       open: true,
+      openMotions: false,
     }
   },
 
@@ -34,6 +35,9 @@ export default {
     },
     title() {
       return this.camera?.id ? this.$t('Edit camera') : this.$t('Add camera')
+    },
+    tracker() {
+      return this.$store.getters['getTracker']
     }
   },
   watch: {
@@ -41,7 +45,7 @@ export default {
       if (typeof this.id === "number") {
         this.pause()
         await this.getCamera()
-        this.play()
+        await this.play()
       }
     },
     lastMessage: {
@@ -83,7 +87,13 @@ export default {
     },
     openModal() {
       this.open = !this.open
-    }
+    },
+    toggleTrackerMode() {
+      if (this.tracker !== null) {
+        this.tracker.toggleMode()
+      }
+    },
+
   }
 }
 </script>
@@ -92,7 +102,7 @@ export default {
   <VSheet
     v-if="camera"
     class="ma-auto pa-4 video-wrapper position-relative fill-height"
-    color="white"
+    color="default"
     width="100%"
   >
     <VSheet
@@ -117,8 +127,8 @@ export default {
       <CameraRecordDot :camera="camera" />
 
       <VBtn
-        icon="mdi-image"
-        color="orange"
+        :icon="!hideDrawings ? 'mdi-image' : 'mdi-image-off'"
+        :color="!hideDrawings ? 'orange' : 'secondary'"
         variant="tonal"
         density="comfortable"
         class="mr-2"
@@ -143,32 +153,16 @@ export default {
         @click="pause()"
       />
       <VBtn
-        readonly
-        icon="mdi-file-refresh"
-        color="secondary"
+        icon="mdi-folder-play"
+        color="purple"
         variant="tonal"
         density="comfortable"
         class="mr-2"
+        @click="$router.push({name:'camera-events',params:{id:camera.id}})"
       />
       <VBtn
         readonly
         icon="mdi-cloud-upload"
-        color="secondary"
-        variant="tonal"
-        density="comfortable"
-        class="mr-2"
-      />
-      <VBtn
-        readonly
-        icon="mdi-folder-play"
-        color="secondary"
-        variant="tonal"
-        density="comfortable"
-        class="mr-2"
-      />
-      <VBtn
-        readonly
-        icon="mdi-folder-multiple-image"
         color="secondary"
         variant="tonal"
         density="comfortable"
@@ -189,7 +183,28 @@ export default {
       :title="title"
       :camera-model="camera"
     >
-      <CameraForm :camera-model="camera" />
+      <template #prepend>
+        <VBtn
+          v-if="tracker"
+          variant="text"
+          density="comfortable"
+          :icon="tracker.isDrawingMode ? 'mdi-pencil' : 'mdi-cursor-move'"
+          @click="toggleTrackerMode"
+        />
+        <VBtn
+          v-if="tracker && tracker.isDrawingMode"
+          v-tooltip="$t('New zone')"
+          variant="text"
+          density="comfortable"
+          icon="mdi-plus"
+          class="mr-2"
+          @click="tracker.startNewPolygon()"
+        />
+      </template>
+      <CameraForm
+        :camera-model="camera"
+        @on-show-areas="hideDrawings = !$event"
+      />
     </SidebarPanel>
   </VSheet>
 </template>

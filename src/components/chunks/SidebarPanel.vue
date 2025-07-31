@@ -43,8 +43,11 @@ export default {
   >
     <template #default>
       <VSheet class="pa-4">
-        <div class="text-h6 mb-4">
-          {{ title }}
+        <div class="text-h6 mb-4 d-flex justify-space-between">
+          <div>{{ title }}</div>
+          <div>
+            <slot name="prepend" />
+          </div>
         </div>
         <slot />
       </VSheet>

@@ -60,7 +60,7 @@ export class ImageClickTracker {
             priority: 3,
             active: true,
             points: [],
-            options: null,
+            options: {},
             isClosed: false,
             color: this.color ?? this.getRandomColor()
         };
@@ -447,9 +447,9 @@ export class ImageClickTracker {
     // Вспомогательные методы
     changePolygonColor(i, color) {
         if (this.currentPolygon) {
+            this.currentPolygon.color = color
             this.polygons[i].color = color;
             this.redraw();
-
         }
     }
 

@@ -10,6 +10,8 @@ import ServicesSettings from "../../components/pages/router/settings/ServicesSet
 import StorageSettings from "../../components/pages/router/settings/StorageSettings.vue";
 import CamerasPage from "../../components/pages/router/CamerasPage.vue";
 import CameraPage from "../../components/pages/router/CameraPage.vue";
+import CameraEventsPage from "../../components/pages/router/CameraEventsPage.vue";
+import CameraEventPage from "../../components/pages/router/CameraEventPage.vue";
 
 const routes = [
     {
@@ -47,24 +49,44 @@ const routes = [
             },
             {
                 path: ':id(\\d+)',
-                component: CameraPage,
-                name: 'camera',
+                children: [
+                    {
+                        path: '',
+                        component: CameraPage,
+                        name: 'camera',
+                        props: (route) => {
+                            return {
+                                ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
+                            }
+                        }
+                    },
+                    {
+                        path: 'events',
+                        component: CameraEventsPage,
+                        name: 'camera-events',
+                        props: (route) => {
+                            return {
+                                ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        path: '/events',
+        children: [
+            {
+                path: ':id(\\d+)',
+                name: 'event',
+                component: CameraEventPage,
                 props: (route) => {
                     return {
                         ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
                     }
                 }
             }
-            // {
-            //     path: ':id(\\d+)',
-            //     component: DevicePage,
-            //     name: 'device',
-            //     props: (route) => {
-            //         return {
-            //             ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
-            //         }
-            //     }
-            // }
         ]
     },
     {

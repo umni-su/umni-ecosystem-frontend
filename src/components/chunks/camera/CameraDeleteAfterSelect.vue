@@ -13,6 +13,22 @@ export default {
       selected: 60 * 24,
       items: [
         {
+          title: this.$t('{n} hours', 1),
+          value: 60
+        },
+        {
+          title: this.$t('{n} hours', 3),
+          value: 60 * 3
+        },
+        {
+          title: this.$t('{n} hours', 6),
+          value: 60 * 6
+        },
+        {
+          title: this.$t('{n} hours', 12),
+          value: 60 * 12
+        },
+        {
           title: this.$t('{n} days', 1),
           value: 60 * 24
         },

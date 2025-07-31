@@ -19,6 +19,10 @@ export default {
     device: null,
     sensor: null,
     tracker: null,
+    playback: {
+        date: null,
+        seconds: null,
+    },
     confirmation: {
         show: false,
         options: {}

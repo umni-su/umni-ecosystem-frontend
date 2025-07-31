@@ -110,6 +110,18 @@ export default {
           color="default"
           @click="opened = !opened"
         />
+        <VBtn
+          class="ml-2"
+          icon="mdi-arrow-left"
+          color="default"
+          @click="$router.go(-1)"
+        />
+        <VBtn
+          class="ml-2"
+          icon="mdi-arrow-right"
+          color="default"
+          @click="$router.forward()"
+        />
       </template>
       <template #title>
         <PageTitle />

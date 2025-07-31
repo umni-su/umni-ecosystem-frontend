@@ -66,7 +66,7 @@ const vuetify = createVuetify({
         },
         VBtn: {
             variant: 'flat',
-            color: 'primary'
+            color: 'primary',
         },
         VChip: {
             rounded: 'pill'
@@ -81,9 +81,18 @@ const vuetify = createVuetify({
             hideDetails: true,
             color: 'primary'
         },
+        VSlider: {
+            hideDetails: true,
+            color: 'primary'
+        },
         VContainer: {
             fluid: true
         },
+        VBtnToggle: {
+            VBtn: {
+                rounded: 0
+            }
+        }
     },
     theme: {
         defaultTheme: 'light',

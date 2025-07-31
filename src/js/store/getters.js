@@ -73,5 +73,8 @@ export default {
     },
     getTracker(state) {
         return state.tracker
+    },
+    getPlayback(state) {
+        return state.playback
     }
 }
