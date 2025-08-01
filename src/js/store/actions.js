@@ -1,6 +1,7 @@
 import axios from 'axios'
 import {getBase64Image} from "../helpers/resToBase64.js";
 import state from "./state.js";
+import store from "./store.js";
 
 window.axios = axios
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
@@ -9,14 +10,19 @@ window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage
 axios.interceptors.response.use(function (response) {
     if (response.headers['x-auth-token']) {
         localStorage.setItem('token', response.headers['x-auth-token'])
+        state.token = response.headers['x-auth-token'];
         window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.headers['x-auth-token']
     }
     if (response.headers['x-refresh-token']) {
         localStorage.setItem('token', response.headers['x-refresh-token'])
+        state.token = response.headers['x-refresh-token'];
         window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.headers['x-refresh-token']
     }
     return response;
 }, function (error) {
+    if (error.response.status === 401) {
+        store.commit('logout')
+    }
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
     return Promise.reject(error);
@@ -468,9 +474,9 @@ export default {
         }
     },
 
-    async getCameraEventScreenshot({state}, id) {
+    async getCameraEventScreenshot({state}, {id, type}) {
         const res = await fetch(
-            `/api/cameras/events/${id}/preview`,
+            `/api/cameras/events/${id}/${type}`,
             {
                 headers: {
                     Authorization: `Bearer ${state.token}`,

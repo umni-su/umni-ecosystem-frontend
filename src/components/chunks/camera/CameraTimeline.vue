@@ -81,9 +81,9 @@ export default {
       timeIntervalHours: 4,
       clips: [],
       pixelsPerHour: 100,
-      zoomLevel: 3,
-      minZoom: 0.1,
-      maxZoom: 20,
+      zoomLevel: 6, // Увеличиваем базовый масштаб для 5-минутных тиков
+      minZoom: 6,   // Фиксируем минимальный масштаб
+      maxZoom: 6,    // Фиксируем максимальный масштаб
       timelineStart: new Date(),
       timelineEnd: new Date(),
       isDragging: false,
@@ -106,17 +106,10 @@ export default {
       const start = new Date(this.timelineStart);
       const end = new Date(this.timelineEnd);
 
-      // Определяем шаг меток в зависимости от масштаба
-      const zoom = this.zoomLevel;
-      let minuteStep = 60; // по умолчанию 1 час
+      // Фиксированный шаг 5 минут
+      const minuteStep = 5;
 
-      if (zoom > 15) minuteStep = 1; // минуты при максимальном зуме
-      else if (zoom > 10) minuteStep = 5;
-      else if (zoom > 5) minuteStep = 10;
-      else if (zoom > 2) minuteStep = 15;
-      else if (zoom > 1) minuteStep = 30;
-
-      // Выравниваем начало
+      // Выравниваем начало по 5-минутным интервалам
       start.setMinutes(Math.floor(start.getMinutes() / minuteStep) * minuteStep, 0, 0);
 
       let lastDay = null;
@@ -143,18 +136,18 @@ export default {
           type = 'hour';
           isMajor = true;
           label = time.getHours() + ':00';
-        } else if (minuteStep <= 15 && time.getMinutes() % 30 === 0) {
-          type = 'halfhour';
-          isMajor = zoom > 5;
-          label = isMajor ? time.getHours() + ':' + time.getMinutes().toString().padStart(2, '0') : '';
-        } else if (minuteStep <= 5) {
+        } else if (time.getMinutes() % 15 === 0) {
+          type = 'quarterhour';
+          isMajor = true;
+          label = time.getHours() + ':' + time.getMinutes().toString().padStart(2, '0');
+        } else {
           type = 'minute';
-          isMajor = time.getMinutes() % 15 === 0 && zoom > 10;
+          isMajor = time.getMinutes() % 5 === 0;
           label = isMajor ? time.getMinutes().toString().padStart(2, '0') : '';
         }
 
         ticks.push({
-          key: time.getTime() + '-' + type, // Уникальный ключ
+          key: time.getTime() + '-' + type,
           time: new Date(time),
           type,
           isMajor,
@@ -355,18 +348,8 @@ export default {
     // Модифицируем handleWheel для загрузки только видимых событий после зума
     handleWheel(e) {
       e.preventDefault();
-
-      const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      const oldZoom = this.zoomLevel;
-      this.zoomLevel = Math.min(this.maxZoom, Math.max(this.minZoom, this.zoomLevel * delta));
-
-      const container = this.$refs.scrollContainer;
-      const mouseX = e.clientX - container.getBoundingClientRect().left;
-      const scrollX = container.scrollLeft + mouseX;
-      container.scrollLeft = scrollX * (this.zoomLevel / oldZoom) - mouseX;
-
-      // После изменения зума загружаем события только для видимой области
-      this.loadVisibleEvents();
+      // Оставляем только вертикальный скролл
+      this.$refs.scrollContainer.scrollLeft += e.deltaY;
     },
     scrollToNow() {
       const now = this.playback.date !== null ? this.playback.date : new Date(this.event.start);

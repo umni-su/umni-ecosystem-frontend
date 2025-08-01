@@ -2,10 +2,16 @@
 import CameraVideoPlayer from "../../chunks/camera/CameraVideoPlayer.vue";
 import CameraTimeline from "../../chunks/camera/CameraTimeline.vue";
 import CameraEventsBar from "../../chunks/camera/CameraEventsBar.vue";
+import SidebarPanel from "../../chunks/SidebarPanel.vue";
+import CameraRecordingPlayback from "../../chunks/camera/CameraRecordingPlayback.vue";
+import CameraEventDetails from "../../chunks/camera/CameraEventDetails.vue";
 
 export default {
   name: "CameraEventPage",
-  components: {CameraEventsBar, CameraTimeline, CameraVideoPlayer},
+  components: {
+    CameraEventDetails,
+    CameraRecordingPlayback, SidebarPanel, CameraEventsBar, CameraTimeline, CameraVideoPlayer
+  },
   props: {
     id: {
       type: Number,
@@ -16,7 +22,8 @@ export default {
     return {
       asTimeLine: false,
       url: null,
-      event: null
+      event: null,
+      open: true
     }
   },
   computed: {
@@ -51,44 +58,44 @@ export default {
 </script>
 
 <template>
-  <VSheet
+  <VCard
     v-if="event"
     class="pa-4 position-relative"
     color="default"
   >
     <VSheet class="mode-switcher">
-      <VMenu max-width="400">
-        <template #activator="{props}">
-          <VBtn
-            v-bind="props"
-            icon="mdi-information"
-            color="white"
-            density="comfortable"
-            class="mr-2"
-          />
-        </template>
-        <VCard>
-          <template #text>
-            {{ playback }}
-            {{ event }}
-          </template>
-        </VCard>
-      </VMenu>
-      <VBtnToggle
-        v-model="asTimeLine"
-        color="primary"
+      <VBtn
         density="comfortable"
-      >
-        <VBtn
-          icon="mdi-image"
-          :value="false"
-        />
-        <VBtn
-          :value="true"
-          icon="mdi-timeline"
-        />
-      </VBtnToggle>
+        :color="!asTimeLine ? 'primary':'white'"
+        :variant="!asTimeLine ? 'flat':'text'"
+        icon="mdi-image"
+        class="mr-2"
+        @click="asTimeLine = false"
+      />
+      <VBtn
+        density="comfortable"
+        :color="asTimeLine ? 'primary':'white'"
+        :variant="asTimeLine ? 'flat':'text'"
+        icon="mdi-timeline"
+        class="mr-2"
+        @click="asTimeLine = true"
+      />
+      <VBtn
+        density="comfortable"
+        color="white"
+        variant="text"
+        icon="mdi-menu"
+        @click="open = !open"
+      />
     </VSheet>
+
+    <SidebarPanel v-model="open">
+      <CameraRecordingPlayback
+        style="z-index: 10"
+        :event="event"
+      />
+      <CameraEventDetails :event="event" />
+    </SidebarPanel>
 
 
     <CameraVideoPlayer
@@ -114,7 +121,7 @@ export default {
         :event="event"
       />
     </VSheet>
-  </VSheet>
+  </VCard>
 </template>
 
 <style scoped lang="scss">

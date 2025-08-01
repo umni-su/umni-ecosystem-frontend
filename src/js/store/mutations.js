@@ -1,4 +1,8 @@
 export default {
+    logout(state) {
+        state.user = null
+        state.authenticated = false
+    },
     setLoading(state, loading) {
         state.loading = loading
     },

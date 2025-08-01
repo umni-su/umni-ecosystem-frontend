@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     getPreview() {
-      this.$store.dispatch('getCameraEventScreenshot', this.event.id).then(res => {
+      this.$store.dispatch('getCameraEventScreenshot', {id: this.event.id, type: 'resized'}).then(res => {
         this.src = res
       })
     }
