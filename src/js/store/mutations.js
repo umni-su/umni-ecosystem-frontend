@@ -177,8 +177,16 @@ export default {
   updateNodeData(state, {id,data}) {
     const index = state.nodes.findIndex(n => n.id === id)
     if (index > -1) {
-      updateNodeData(id,data)
       state.nodes[index].data = {...state.nodes[index].data,...data}
+      updateNodeData(id,state.nodes[index].data)
+      console.log(nodes.value,state.nodes[index])
+    }
+  },
+  updateNodeDataOptions(state, {id,options}) {
+    const index = state.nodes.findIndex(n => n.id === id)
+    if (index > -1) {
+      state.nodes[index].data.options = {...state.nodes[index].data.options,...options}
+      updateNodeData(id,state.nodes[index].data)
       console.log(nodes.value,state.nodes[index])
     }
   },

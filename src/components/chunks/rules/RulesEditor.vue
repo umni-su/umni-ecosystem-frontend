@@ -216,7 +216,7 @@ export default {
         //   y: event.clientY - rect.top
         // }
 
-        const nodeData = {...this.getInitialNodeData(this.flowType),...{flow: objFlow}}
+        const nodeData = {...{options:this.getInitialNodeData(this.flowType)},...{flow: objFlow}}
 
         // Создаем новую ноду
         const newNode = {

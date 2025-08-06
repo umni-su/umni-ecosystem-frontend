@@ -38,22 +38,11 @@
           class="mt-2"
         />
       </div>
-      <VSheet v-if="type==='trigger'">
-        <VSelect
-          v-if="isCameraTrigger"
-          density="compact"
-          :label="$t('Camera')"
-        />
-        <VSelect
-          v-if="isDeviceTrigger"
-          density="compact"
-          :label="$t('Device')"
-        />
-      </VSheet>
+      <EditTriggerRuleItem v-if="type==='trigger'"/>
       {{id}}
       {{type}}
       {{flow.el.key}}
-      {{node.data}}
+      {{options}}
     </template>
     <template #actions>
       <VBtn
@@ -69,10 +58,11 @@
 <script>
 import ModalDialog from '../ModalDialog.vue'
 import {isCameraTrigger, isDeviceTrigger} from '../../../js/helpers/rulesHelper.js'
+import EditTriggerRuleItem from './edit/EditTriggerRuleItem.vue'
 
 export default {
   name: 'RuleEditDialog',
-  components: {ModalDialog},
+  components: {EditTriggerRuleItem, ModalDialog},
   props: {
     modelValue: {
       type: Boolean,
@@ -97,12 +87,18 @@ export default {
     },
     flow(){
       return this.node.data.flow
+    },
+    options(){
+      return this.node.data.options
     }
   },
   emits: ['save','update:model-value'],
   watch:{
     open(){
       this.$emit('update:model-value', this.open)
+      if(!this.open){
+        this.$store.commit('destroySelectedNode')
+      }
     },
     modelValue(val){
       this.open = val
@@ -123,8 +119,8 @@ export default {
   methods: {
     save() {
       this.$emit('save', this.form)
-      this.$emit('update:model-value', this.open)
       this.open = false
+      this.$emit('update:model-value', this.open)
     }
   }
 }

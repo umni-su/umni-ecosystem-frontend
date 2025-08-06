@@ -35,7 +35,7 @@
         v-if="typeof icon === 'string' && typeof label === 'string'"
         variant="tonal"
         block
-        rounded="pill"
+        density="compact"
         :color="color"
         :prepend-icon="icon"
         :text="label"
@@ -64,6 +64,9 @@ export default {
     }
   },
   computed:{
+    options(){
+      return this.data.options
+    },
     flow(){
       return this.data.flow
     },
@@ -106,11 +109,11 @@ export default {
     }
   },
   methods: {
-    changeType() {
+    changeType(e) {
       this.index = this.index >= (this.types.length - 1) ? 0 : this.index+1
-      this.$store.commit('updateNodeData', {
+      this.$store.commit('updateNodeDataOptions', {
         id: this.$attrs.id,
-        data:{
+        options:{
           operand: this.operand
         }
       })
