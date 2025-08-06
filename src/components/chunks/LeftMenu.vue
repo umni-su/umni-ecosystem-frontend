@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "LeftMenu"
+  name: 'LeftMenu'
 }
 </script>
 
@@ -15,7 +15,7 @@ export default {
     <VListItem
       class="py-4"
       :title="$t('Devices')"
-      prepend-icon="mdi-robot-outline"
+      prepend-icon="mdi-chip"
       :to="{name: 'devices'}"
     />
     <VListItem
@@ -28,6 +28,13 @@ export default {
       :title="$t('Access control')"
       class="py-4"
       prepend-icon="mdi-hand-back-left-outline"
+    />
+
+    <VListItem
+      :title="$t('Rules')"
+      class="py-4"
+      prepend-icon="mdi-graph-outline"
+      :to="{name: 'rules'}"
     />
   </VList>
 </template>

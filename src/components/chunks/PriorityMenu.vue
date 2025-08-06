@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "PriorityMenu",
+  name: 'PriorityMenu',
   props: {
     modelValue: {
       type: Number,
@@ -36,7 +36,7 @@ export default {
           label: this.$t('Danger'),
           value: 4,
           color: 'red-darken-4'
-        },
+        }
       ]
     }
   },
@@ -54,7 +54,7 @@ export default {
     }
   },
   created() {
-    this.value = this.modelValue;
+    this.value = this.modelValue
   },
   methods: {
     onClickValue(e) {

@@ -1,8 +1,8 @@
 <script>
-import secondsToHms from "../../../js/helpers/secondsToHms.js";
+import secondsToHms from '../../../js/helpers/secondsToHms.js'
 
 export default {
-  name: "CameraEventItem",
+  name: 'CameraEventItem',
   props: {
     event: {
       type: Object,

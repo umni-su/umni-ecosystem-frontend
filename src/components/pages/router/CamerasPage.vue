@@ -1,10 +1,10 @@
 <script>
-import CameraItem from "../../chunks/camera/CameraItem.vue";
-import CameraForm from "../../chunks/camera/CameraForm.vue";
-import SidebarPanel from "../../chunks/SidebarPanel.vue";
+import CameraItem from '../../chunks/camera/CameraItem.vue'
+import CameraForm from '../../chunks/camera/CameraForm.vue'
+import SidebarPanel from '../../chunks/SidebarPanel.vue'
 
 export default {
-  name: "CamerasPage",
+  name: 'CamerasPage',
   components: {
     SidebarPanel,
     CameraForm,
@@ -20,8 +20,8 @@ export default {
   },
   computed: {
     cameras() {
-      return this.$store.getters['getCameras'];
-    },
+      return this.$store.getters['getCameras']
+    }
   },
   async created() {
     this.$store.commit('setTitle', this.$t('Cameras'))
@@ -45,10 +45,15 @@ export default {
 </script>
 
 <template>
-  <VContainer fluid>
-    <VRow>
+  <VContainer
+    class="pa-0"
+    fluid
+  >
+    <VRow no-gutters>
       <VCol>
-        <VCard>
+        <VCard
+          variant="text"
+        >
           <template #append>
             <VBtn
               density="comfortable"
@@ -61,12 +66,12 @@ export default {
             <VBtn
               density="comfortable"
               variant="plain"
-              icon="mdi-plus"
+              :icon="!open?'mdi-plus' : 'mdi-chevron-left'"
               color="default"
               @click="openModal()"
             />
           </template>
-          <template #text>
+          <VCardText class="pa-0">
             <VContainer fluid>
               <VRow>
                 <CameraItem
@@ -76,7 +81,7 @@ export default {
                 />
               </VRow>
             </VContainer>
-          </template>
+          </VCardText>
         </VCard>
         <SidebarPanel v-model="open">
           <CameraForm

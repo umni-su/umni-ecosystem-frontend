@@ -1,15 +1,15 @@
 <script>
-import StorageListItem from "../../../chunks/storage/StorageListItem.vue";
-import ModalDialog from "../../../chunks/ModalDialog.vue";
+import StorageListItem from '../../../chunks/storage/StorageListItem.vue'
+import ModalDialog from '../../../chunks/ModalDialog.vue'
 import {
   createManyNotifications,
   createSuccessNotification,
   createWarningNotification
-} from "../../../../js/helpers/notificationHelper.js";
-import ConfirmationDialog from "../../../chunks/ConfirmationDialog.vue";
+} from '../../../../js/helpers/notificationHelper.js'
+import ConfirmationDialog from '../../../chunks/ConfirmationDialog.vue'
 
 export default {
-  name: "StorageSettings",
+  name: 'StorageSettings',
   components: {ConfirmationDialog, ModalDialog, StorageListItem},
   data() {
     return {
@@ -31,11 +31,11 @@ export default {
     }
   },
   async created() {
-    await this.getStorages();
+    await this.getStorages()
   },
   methods: {
     async getStorages() {
-      await this.$store.dispatch('getStorages');
+      await this.$store.dispatch('getStorages')
     },
     async deleteStorage(storage) {
       const ok = await this.$refs.conf.show({
@@ -43,7 +43,7 @@ export default {
         message: this.$t('All data will be deleted'),
         okText: this.$t('Delete'),
         okIcon: 'mdi-trash-can'
-      });
+      })
       if (ok) {
         if (await this.$store.dispatch('deleteStorage', storage.id)) {
           this.$store.commit('addNotification', createWarningNotification(this.$t('Deleted')))
@@ -65,8 +65,8 @@ export default {
       }
     },
     openModal(storage = {}) {
-      this.open = true;
-      this.model = storage;
+      this.open = true
+      this.model = storage
     }
   }
 }

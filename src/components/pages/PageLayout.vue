@@ -1,10 +1,10 @@
 <script>
-import ThemeSwitcher from "../../components/chunks/ThemeSwitcher.vue";
-import UmniLogo from "../../components/chunks/UmniLogo.vue";
-import LeftMenu from "../../components/chunks/LeftMenu.vue";
-import NotificationsPanel from "../../components/chunks/NotificationsPanel.vue";
-import PageTitle from "../../components/chunks/PageTitle.vue";
-import UserMenu from "../../components/chunks/UserMenu.vue";
+import ThemeSwitcher from '../../components/chunks/ThemeSwitcher.vue'
+import UmniLogo from '../../components/chunks/UmniLogo.vue'
+import LeftMenu from '../../components/chunks/LeftMenu.vue'
+import NotificationsPanel from '../../components/chunks/NotificationsPanel.vue'
+import PageTitle from '../../components/chunks/PageTitle.vue'
+import UserMenu from '../../components/chunks/UserMenu.vue'
 
 export default {
   name: 'PageLayout',
@@ -14,7 +14,7 @@ export default {
     NotificationsPanel,
     LeftMenu,
     UmniLogo,
-    ThemeSwitcher,
+    ThemeSwitcher
   },
   data() {
     return {
@@ -42,7 +42,7 @@ export default {
   watch: {
     lastMessage: {
       handler() {
-        console.log(this.lastMessage);
+        console.log(this.lastMessage)
       },
       deep: true
     }

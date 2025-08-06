@@ -1,11 +1,11 @@
 <script>
-import CameraRecordDot from "../../chunks/camera/CameraRecordDot.vue";
-import CameraForm from "../../chunks/camera/CameraForm.vue";
-import SidebarPanel from "../../chunks/SidebarPanel.vue";
-import CameraRootArea from "../../chunks/camera/CameraRootArea.vue";
+import CameraRecordDot from '../../chunks/camera/CameraRecordDot.vue'
+import CameraForm from '../../chunks/camera/CameraForm.vue'
+import SidebarPanel from '../../chunks/SidebarPanel.vue'
+import CameraRootArea from '../../chunks/camera/CameraRootArea.vue'
 
 export default {
-  name: "CameraPage",
+  name: 'CameraPage',
   components: {CameraRootArea, SidebarPanel, CameraForm, CameraRecordDot},
   props: {
     id: {
@@ -22,7 +22,7 @@ export default {
       url: null,
       src: null,
       open: true,
-      openMotions: false,
+      openMotions: false
     }
   },
 
@@ -42,7 +42,7 @@ export default {
   },
   watch: {
     async id() {
-      if (typeof this.id === "number") {
+      if (typeof this.id === 'number') {
         this.pause()
         await this.getCamera()
         await this.play()
@@ -51,14 +51,14 @@ export default {
     lastMessage: {
       deep: true,
       handler(newVal) {
-        if (newVal.camera_id === this.camera.id) {
+        if (newVal.camera_id === this.camera?.id) {
           switch (newVal.topic) {
-            case 'detection.start':
-              this.alert = true
-              break
-            case 'detection.end':
-              this.alert = false
-              break
+          case 'detection.start':
+            this.alert = true
+            break
+          case 'detection.end':
+            this.alert = false
+            break
           }
         }
       }
@@ -92,7 +92,7 @@ export default {
       if (this.tracker !== null) {
         this.tracker.toggleMode()
       }
-    },
+    }
 
   }
 }
@@ -169,8 +169,8 @@ export default {
         class="mr-2"
       />
       <VBtn
-        icon="mdi-cog"
-        color="primary"
+        :icon="open? 'mdi-cog':'mdi-cog-play'"
+        :color="open ?'primary':'secondary'"
         density="comfortable"
         variant="tonal"
         class="mr-2"

@@ -1,19 +1,19 @@
 <script>
-import UmniLogo from "../chunks/UmniLogo.vue";
-import ThemeSwitcher from "../chunks/ThemeSwitcher.vue";
-import InstallForm from "../chunks/InstallForm.vue";
+import UmniLogo from '../chunks/UmniLogo.vue'
+import ThemeSwitcher from '../chunks/ThemeSwitcher.vue'
+import InstallForm from '../chunks/InstallForm.vue'
 
 export default {
-  name: "InstallPage",
+  name: 'InstallPage',
   components: {
     InstallForm,
     ThemeSwitcher,
-    UmniLogo,
+    UmniLogo
   },
   data() {
     return {
       show: false,
-      start: false,
+      start: false
     }
   },
   computed: {
@@ -25,7 +25,7 @@ export default {
     },
     theme() {
       return this.$store.getters['getTheme']
-    },
+    }
   },
   created() {
     setTimeout(() => {
@@ -64,7 +64,8 @@ export default {
         </div>
         <div class="text-subtitle-2 w-75 mx-auto">
           {{
-            $t('The first free open-source ecosystem of control of automation devices, access control systems and video surveillance')
+            $t('The first free open-source ecosystem of control' +
+              ' of automation devices, access control systems and video surveillance')
           }}
         </div>
         <VBtn

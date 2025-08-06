@@ -1,8 +1,8 @@
 <script>
-import SystemNotificationMenuItem from "../../components/chunks/SystemNotificationMenuItem.vue";
+import SystemNotificationMenuItem from '../../components/chunks/SystemNotificationMenuItem.vue'
 
 export default {
-  name: "NotificationsPanel",
+  name: 'NotificationsPanel',
   components: {
     SystemNotificationMenuItem
   },
@@ -21,7 +21,7 @@ export default {
     async getNotifications() {
       //await this.$store.dispatch('getNotifications')
     }
-  },
+  }
 }
 </script>
 

@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "CameraRecordDot",
+  name: 'CameraRecordDot',
   props: {
     camera: {
       type: Object,
@@ -13,7 +13,7 @@ export default {
     },
     hasDetection() {
       return this.camera.record && [3, 4].indexOf(this.camera.record_mode) > -1
-    },
+    }
   }
 }
 </script>
@@ -31,11 +31,6 @@ export default {
 
 <style lang="scss" scoped>
 .record {
-  position: absolute;
-  top: 30px;
-  right: 30px;
-  z-index: 10;
-
   &.pulse {
     animation: pulse 1s ease infinite;
   }

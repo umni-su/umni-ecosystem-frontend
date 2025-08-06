@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "CameraRecordModeSelect",
+  name: 'CameraRecordModeSelect',
   props: {
     modelValue: {
       type: Number,

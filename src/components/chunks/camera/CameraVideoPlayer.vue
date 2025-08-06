@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import moment from "moment";
+import moment from 'moment'
 
 export default {
   name: 'CameraVideoPlayer',
@@ -49,14 +49,14 @@ export default {
       videoObjectUrl: '',
       error: null,
       loading: false
-    };
+    }
   },
   mounted() {
-    this.setupVideoPlayer();
+    this.setupVideoPlayer()
   },
   beforeUnmount() {
     if (this.videoObjectUrl) {
-      URL.revokeObjectURL(this.videoObjectUrl);
+      URL.revokeObjectURL(this.videoObjectUrl)
     }
   },
   methods: {
@@ -66,30 +66,30 @@ export default {
       this.$store.commit('updatePlayback', {seconds, date})
     },
     setupVideoPlayer() {
-      this.loading = true;
+      this.loading = true
       try {
         this.$nextTick(() => {
-          this.player = this.$refs.videoPlayer;
-          this.player.addEventListener("timeupdate", this.onTimeUpdate);
-          this.player.src = this.src;
-          this.player.load();
+          this.player = this.$refs.videoPlayer
+          this.player.addEventListener('timeupdate', this.onTimeUpdate)
+          this.player.src = this.src
+          this.player.load()
           this.player.play().catch(e => {
-            console.log('Autoplay prevented:', e);
-          });
-        });
+            console.log('Autoplay prevented:', e)
+          })
+        })
       } catch (err) {
-        console.error('Error loading video:', err);
-        this.error = err.response?.data?.detail || 'Failed to load video';
+        console.error('Error loading video:', err)
+        this.error = err.response?.data?.detail || 'Failed to load video'
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
     handleError(e) {
-      console.error('Video error:', e);
-      this.error = 'Video playback error';
+      console.error('Video error:', e)
+      this.error = 'Video playback error'
     }
   }
-};
+}
 </script>
 
 <style scoped>

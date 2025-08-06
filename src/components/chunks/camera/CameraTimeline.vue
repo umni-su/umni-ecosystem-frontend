@@ -66,8 +66,8 @@
 </template>
 
 <script>
-import moment from "moment";
-import {debounce} from "vuetify/lib/util/index.js";
+import moment from 'moment'
+import {debounce} from 'vuetify/lib/util/index.js'
 
 export default {
   props: {
@@ -91,7 +91,7 @@ export default {
       startScrollLeft: 0,
       loading: false,
       colors: ['grey', 'red', 'green', 'yellow']
-    };
+    }
   },
   computed: {
     playbackLeft() {
@@ -102,48 +102,48 @@ export default {
       return this.$store.getters['getPlayback']
     },
     visibleTicks() {
-      const ticks = [];
-      const start = new Date(this.timelineStart);
-      const end = new Date(this.timelineEnd);
+      const ticks = []
+      const start = new Date(this.timelineStart)
+      const end = new Date(this.timelineEnd)
 
       // Фиксированный шаг 5 минут
-      const minuteStep = 5;
+      const minuteStep = 5
 
       // Выравниваем начало по 5-минутным интервалам
-      start.setMinutes(Math.floor(start.getMinutes() / minuteStep) * minuteStep, 0, 0);
+      start.setMinutes(Math.floor(start.getMinutes() / minuteStep) * minuteStep, 0, 0)
 
-      let lastDay = null;
-      let lastHour = null;
+      let lastDay = null
+      let lastHour = null
 
       for (let time = new Date(start); time <= end; time.setMinutes(time.getMinutes() + minuteStep)) {
-        const currentDay = time.getDate();
-        const currentHour = time.getHours();
-        const isNewDay = currentDay !== lastDay;
-        const isNewHour = currentHour !== lastHour;
-        lastDay = currentDay;
-        lastHour = currentHour;
+        const currentDay = time.getDate()
+        const currentHour = time.getHours()
+        const isNewDay = currentDay !== lastDay
+        const isNewHour = currentHour !== lastHour
+        lastDay = currentDay
+        lastHour = currentHour
 
         // Определяем тип метки
-        let type = 'minute';
-        let isMajor = false;
-        let label = '';
+        let type = 'minute'
+        let isMajor = false
+        let label = ''
 
         if (isNewDay) {
-          type = 'day';
-          isMajor = true;
-          label = time.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short'});
+          type = 'day'
+          isMajor = true
+          label = time.toLocaleDateString('ru-RU', {day: 'numeric', month: 'short'})
         } else if (time.getMinutes() === 0) {
-          type = 'hour';
-          isMajor = true;
-          label = time.getHours() + ':00';
+          type = 'hour'
+          isMajor = true
+          label = time.getHours() + ':00'
         } else if (time.getMinutes() % 15 === 0) {
-          type = 'quarterhour';
-          isMajor = true;
-          label = time.getHours() + ':' + time.getMinutes().toString().padStart(2, '0');
+          type = 'quarterhour'
+          isMajor = true
+          label = time.getHours() + ':' + time.getMinutes().toString().padStart(2, '0')
         } else {
-          type = 'minute';
-          isMajor = time.getMinutes() % 5 === 0;
-          label = isMajor ? time.getMinutes().toString().padStart(2, '0') : '';
+          type = 'minute'
+          isMajor = time.getMinutes() % 5 === 0
+          label = isMajor ? time.getMinutes().toString().padStart(2, '0') : ''
         }
 
         ticks.push({
@@ -153,33 +153,41 @@ export default {
           isMajor,
           label,
           isNewDay
-        });
+        })
       }
 
-      return ticks;
+      return ticks
     },
 
     timelineWidth() {
-      const hours = (this.timelineEnd - this.timelineStart) / (1000 * 60 * 60);
-      return hours * this.pixelsPerHour * this.zoomLevel;
+      const hours = (this.timelineEnd - this.timelineStart) / (1000 * 60 * 60)
+      return hours * this.pixelsPerHour * this.zoomLevel
     },
     visibleClips() {
       return this.clips.filter(clip => {
-        const clipStart = new Date(clip.start);
-        const clipEnd = new Date(clip.end);
-        return clipEnd >= this.timelineStart && clipStart <= this.timelineEnd;
-      });
-    },
+        const clipStart = new Date(clip.start)
+        const clipEnd = new Date(clip.end)
+        return clipEnd >= this.timelineStart && clipStart <= this.timelineEnd
+      })
+    }
+  },
+  watch: {
+    event: {
+      deep: true,
+      async handler(newVal) {
+        await this.loadEvents()
+      }
+    }
   },
   mounted() {
-    this.calculateScale();
-    window.addEventListener('resize', this.handleResize);
-    this.initTimeline();
-    this.$refs.scrollContainer.addEventListener('wheel', this.handleWheel, {passive: false});
+    this.calculateScale()
+    window.addEventListener('resize', this.handleResize)
+    this.initTimeline()
+    this.$refs.scrollContainer.addEventListener('wheel', this.handleWheel, {passive: false})
   },
   beforeUnmount() {
-    window.removeEventListener('resize', this.handleResize);
-    this.$refs.scrollContainer.removeEventListener('wheel', this.handleWheel);
+    window.removeEventListener('resize', this.handleResize)
+    this.$refs.scrollContainer.removeEventListener('wheel', this.handleWheel)
   },
   methods: {
     mapColor(clip) {
@@ -190,14 +198,14 @@ export default {
        *     DETECTION_SCREENSHOTS = 4
        */
       switch (clip.type) {
-        case 1:
-          return 'success'
-        case 2:
-          return 'secondary'
-        case 3:
-          return 'error'
-        case 4:
-          return 'warning'
+      case 1:
+        return 'success'
+      case 2:
+        return 'secondary'
+      case 3:
+        return 'error'
+      case 4:
+        return 'warning'
 
       }
       return 'red'
@@ -210,199 +218,199 @@ export default {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-      };
-      return date.toLocaleDateString('ru-RU', options);
+      }
+      return date.toLocaleDateString('ru-RU', options)
     },
     clipTooltip(clip) {
-      return `Видео #${clip.id}\n${this.formatDateTooltip(new Date(clip.start))} - ${this.formatDateTooltip(new Date(clip.end))}`;
+      return `Видео #${clip.id}\n${this.formatDateTooltip(new Date(clip.start))} - ${this.formatDateTooltip(new Date(clip.end))}`
     },
     handleResize: debounce(function () {
-      this.calculateScale();
+      this.calculateScale()
       this.$nextTick(() => {
-        this.scrollToNow();
-        this.loadVisibleEvents();
-      });
+        this.scrollToNow()
+        this.loadVisibleEvents()
+      })
     }, 200),
     calculateScale() {
       this.$nextTick(() => {
-        const container = this.$refs.scrollContainer;
-        if (!container) return;
+        const container = this.$refs.scrollContainer
+        if (!container) return
 
-        const containerWidth = container.clientWidth || 800;
-        this.pixelsPerHour = (containerWidth * 1.2) / this.timeIntervalHours;
+        const containerWidth = container.clientWidth || 800
+        this.pixelsPerHour = (containerWidth * 1.2) / this.timeIntervalHours
 
         // Принудительное обновление размеров
-        this.$forceUpdate();
-      });
+        this.$forceUpdate()
+      })
     },
     updateTimelineRange() {
-      const now = new Date();
-      this.timelineStart = new Date(now);
-      this.timelineStart.setHours(now.getHours() - Math.floor(this.timeIntervalHours / 2));
+      const now = new Date()
+      this.timelineStart = new Date(now)
+      this.timelineStart.setHours(now.getHours() - Math.floor(this.timeIntervalHours / 2))
 
-      this.timelineEnd = new Date(this.timelineStart);
-      this.timelineEnd.setHours(this.timelineEnd.getHours() + this.timeIntervalHours);
+      this.timelineEnd = new Date(this.timelineStart)
+      this.timelineEnd.setHours(this.timelineEnd.getHours() + this.timeIntervalHours)
     },
     async initTimeline() {
-      this.timelineStart = new Date(this.event.start);
-      this.timelineStart.setHours(this.timelineStart.getHours() - 1);
+      this.timelineStart = new Date(this.event.start)
+      this.timelineStart.setHours(this.timelineStart.getHours() - 1)
 
-      this.timelineEnd = new Date(this.event.start);
-      this.timelineEnd.setHours(this.timelineEnd.getHours() + 1);
+      this.timelineEnd = new Date(this.event.start)
+      this.timelineEnd.setHours(this.timelineEnd.getHours() + 1)
 
-      await this.loadEvents();
+      await this.loadEvents()
       this.$nextTick(() => {
-        this.scrollToNow();
-      });
+        this.scrollToNow()
+      })
     },
     async loadEvents() {
-      if (this.loading) return;
-      this.loading = true;
+      if (this.loading) return
+      this.loading = true
 
       try {
         this.clips = await this.$store.dispatch('getCameraTimeline', {
           id: this.event.camera.id,
           start: moment(this.timelineStart).format('YYYY-MM-DD HH:mm:ss'),
-          end: moment(this.timelineEnd).format('YYYY-MM-DD HH:mm:ss'),
-        });
+          end: moment(this.timelineEnd).format('YYYY-MM-DD HH:mm:ss')
+        })
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
     // Модифицируем handleScroll для загрузки только видимых событий
     handleScroll() {
-      const container = this.$refs.scrollContainer;
-      const scrollLeft = container.scrollLeft;
-      const containerWidth = container.clientWidth;
-      const timelineWidth = this.timelineWidth;
+      const container = this.$refs.scrollContainer
+      const scrollLeft = container.scrollLeft
+      const containerWidth = container.clientWidth
+      const timelineWidth = this.timelineWidth
 
-      const threshold = 0.2;
+      const threshold = 0.2
 
       if (scrollLeft + containerWidth > timelineWidth - containerWidth * threshold) {
-        this.extendTimeline('end');
+        this.extendTimeline('end')
       } else if (scrollLeft < containerWidth * threshold) {
-        this.extendTimeline('start');
+        this.extendTimeline('start')
       } else {
         // При обычном скролле без достижения границ загружаем только видимые события
         //this.loadVisibleEvents();
       }
     },
     async extendTimeline(direction) {
-      if (this.loading) return;
+      if (this.loading) return
 
-      const oldStart = new Date(this.timelineStart);
-      const oldEnd = new Date(this.timelineEnd);
+      const oldStart = new Date(this.timelineStart)
+      const oldEnd = new Date(this.timelineEnd)
 
       if (direction === 'start') {
-        this.timelineStart = new Date(oldStart);
-        this.timelineStart.setHours(this.timelineStart.getHours() - 1);
+        this.timelineStart = new Date(oldStart)
+        this.timelineStart.setHours(this.timelineStart.getHours() - 1)
       } else {
-        this.timelineEnd = new Date(oldEnd);
-        this.timelineEnd.setHours(this.timelineEnd.getHours() + 1);
+        this.timelineEnd = new Date(oldEnd)
+        this.timelineEnd.setHours(this.timelineEnd.getHours() + 1)
       }
 
-      await this.loadEvents();
+      await this.loadEvents()
 
       this.$nextTick(() => {
-        const container = this.$refs.scrollContainer;
+        const container = this.$refs.scrollContainer
         if (direction === 'start') {
-          const hoursDiff = (oldStart - this.timelineStart) / (1000 * 60 * 60);
-          container.scrollLeft += hoursDiff * this.pixelsPerHour * this.zoomLevel;
+          const hoursDiff = (oldStart - this.timelineStart) / (1000 * 60 * 60)
+          container.scrollLeft += hoursDiff * this.pixelsPerHour * this.zoomLevel
         }
-      });
+      })
     },
     getPosition(time) {
-      const hours = (time - this.timelineStart) / (1000 * 60 * 60);
-      return hours * this.pixelsPerHour * this.zoomLevel;
+      const hours = (time - this.timelineStart) / (1000 * 60 * 60)
+      return hours * this.pixelsPerHour * this.zoomLevel
     },
     getWidth(start, end) {
-      const hours = (end - start) / (1000 * 60 * 60);
-      return Math.max(10, hours * this.pixelsPerHour * this.zoomLevel);
+      const hours = (end - start) / (1000 * 60 * 60)
+      return Math.max(10, hours * this.pixelsPerHour * this.zoomLevel)
     },
     startDrag(e) {
-      if (e.target.closest('.video-clip')) return;
-      this.isDragging = true;
-      this.dragStartX = e.clientX;
-      this.startScrollLeft = this.$refs.scrollContainer.scrollLeft;
-      this.$refs.scrollContainer.style.cursor = 'grabbing';
-      e.preventDefault();
+      if (e.target.closest('.video-clip')) return
+      this.isDragging = true
+      this.dragStartX = e.clientX
+      this.startScrollLeft = this.$refs.scrollContainer.scrollLeft
+      this.$refs.scrollContainer.style.cursor = 'grabbing'
+      e.preventDefault()
     },
     handleDrag(e) {
-      if (!this.isDragging) return;
-      const dx = e.clientX - this.dragStartX;
-      this.$refs.scrollContainer.scrollLeft = this.startScrollLeft - dx;
+      if (!this.isDragging) return
+      const dx = e.clientX - this.dragStartX
+      this.$refs.scrollContainer.scrollLeft = this.startScrollLeft - dx
 
       if (this.$refs.scrollContainer.scrollLeft < 0) {
-        const extendHours = 12;
-        this.timelineStart = new Date(this.timelineStart.getTime() - extendHours * 60 * 60 * 1000);
-        this.$refs.scrollContainer.scrollLeft += extendHours * this.pixelsPerHour * this.zoomLevel;
+        const extendHours = 12
+        this.timelineStart = new Date(this.timelineStart.getTime() - extendHours * 60 * 60 * 1000)
+        this.$refs.scrollContainer.scrollLeft += extendHours * this.pixelsPerHour * this.zoomLevel
       }
     },
     stopDrag() {
-      this.isDragging = false;
-      this.$refs.scrollContainer.style.cursor = 'grab';
+      this.isDragging = false
+      this.$refs.scrollContainer.style.cursor = 'grab'
 
       // После окончания перетаскивания загружаем события только для видимой области
-      this.loadVisibleEvents();
+      this.loadVisibleEvents()
     },
     // Модифицируем handleWheel для загрузки только видимых событий после зума
     handleWheel(e) {
-      e.preventDefault();
+      e.preventDefault()
       // Оставляем только вертикальный скролл
-      this.$refs.scrollContainer.scrollLeft += e.deltaY;
+      this.$refs.scrollContainer.scrollLeft += e.deltaY
     },
     scrollToNow() {
-      const now = this.playback.date !== null ? this.playback.date : new Date(this.event.start);
+      const now = this.playback.date !== null ? this.playback.date : new Date(this.event.start)
       if (now < this.timelineStart) {
-        this.timelineStart = new Date(now);
-        this.timelineStart.setHours(this.timelineStart.getHours() - 2);
+        this.timelineStart = new Date(now)
+        this.timelineStart.setHours(this.timelineStart.getHours() - 2)
       }
 
-      const pos = this.getPosition(now);
-      const containerWidth = this.$refs.scrollContainer.clientWidth;
-      this.$refs.scrollContainer.scrollLeft = pos - containerWidth / 2;
+      const pos = this.getPosition(now)
+      const containerWidth = this.$refs.scrollContainer.clientWidth
+      this.$refs.scrollContainer.scrollLeft = pos - containerWidth / 2
     },
     getVisibleTimeRange() {
-      const container = this.$refs.scrollContainer;
-      const scrollLeft = container.scrollLeft;
-      const containerWidth = container.clientWidth;
+      const container = this.$refs.scrollContainer
+      const scrollLeft = container.scrollLeft
+      const containerWidth = container.clientWidth
 
       // Вычисляем время начала и конца видимой области
-      const startPixel = scrollLeft;
-      const endPixel = scrollLeft + containerWidth;
+      const startPixel = scrollLeft
+      const endPixel = scrollLeft + containerWidth
 
-      const startTime = new Date(this.timelineStart.getTime() + (startPixel / (this.pixelsPerHour * this.zoomLevel)) * 3600000);
-      const endTime = new Date(this.timelineStart.getTime() + (endPixel / (this.pixelsPerHour * this.zoomLevel)) * 3600000);
+      const startTime = new Date(this.timelineStart.getTime() + (startPixel / (this.pixelsPerHour * this.zoomLevel)) * 3600000)
+      const endTime = new Date(this.timelineStart.getTime() + (endPixel / (this.pixelsPerHour * this.zoomLevel)) * 3600000)
 
-      return {start: startTime, end: endTime};
+      return {start: startTime, end: endTime}
     },
 
     async loadVisibleEvents() {
-      if (this.loading) return;
-      this.loading = true;
+      if (this.loading) return
+      this.loading = true
 
       try {
-        const visibleRange = this.getVisibleTimeRange();
+        const visibleRange = this.getVisibleTimeRange()
 
         // Добавляем небольшой буфер по краям (1 час с каждой стороны)
-        const bufferHours = 1;
-        const start = new Date(visibleRange.start);
-        start.setHours(start.getHours() - bufferHours);
+        const bufferHours = 1
+        const start = new Date(visibleRange.start)
+        start.setHours(start.getHours() - bufferHours)
 
-        const end = new Date(visibleRange.end);
-        end.setHours(end.getHours() + bufferHours);
+        const end = new Date(visibleRange.end)
+        end.setHours(end.getHours() + bufferHours)
 
         this.clips = await this.$store.dispatch('getCameraTimeline', {
           id: this.event.camera.id,
           start: moment(start).format('YYYY-MM-DD HH:mm:ss'),
           end: moment(end).format('YYYY-MM-DD HH:mm:ss')
-        });
+        })
       } finally {
-        this.loading = false;
+        this.loading = false
       }
-    },
+    }
   }
-};
+}
 </script>
 
 <style scoped>

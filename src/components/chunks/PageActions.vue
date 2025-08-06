@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "PageActions"
+  name: 'PageActions'
 }
 </script>
 

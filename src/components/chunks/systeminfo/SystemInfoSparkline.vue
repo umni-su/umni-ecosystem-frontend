@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "SystemInfoSparkline",
+  name: 'SystemInfoSparkline',
   props: {
     values: {
       type: Array,

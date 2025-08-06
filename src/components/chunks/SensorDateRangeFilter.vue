@@ -1,14 +1,14 @@
 <script>
 
-import DatePicker from "./DatePicker.vue";
+import DatePicker from './DatePicker.vue'
 
 export default {
-  name: "SensorDateRangeFilter",
+  name: 'SensorDateRangeFilter',
   components: {DatePicker},
   emits: ['on-update-range'],
   data() {
     return {
-      range: [null, null],
+      range: [null, null]
     }
   },
   watch: {
@@ -24,25 +24,25 @@ export default {
   created() {
     this.range = [
       this.$moment(Date.now()).add(-4, 'hour').local().format('YYYY-MM-DD HH:mm:ss'),
-      this.$moment(Date.now()).local().format('YYYY-MM-DD HH:mm:ss'),
+      this.$moment(Date.now()).local().format('YYYY-MM-DD HH:mm:ss')
     ]
   },
   methods: {
     shiftRange({days, hours}) {
       if (this.range.indexOf(null) === -1) {
         this.range[0] = this.$moment(this.range[0])
-            .add(days, 'days')
-            .add(hours, 'hour')
-            .local().format('YYYY-MM-DD HH:mm:ss');
+          .add(days, 'days')
+          .add(hours, 'hour')
+          .local().format('YYYY-MM-DD HH:mm:ss')
         this.range[1] = this.$moment(this.range[1])
-            .add(days, 'days')
-            .add(hours, 'hour')
-            .local().format('YYYY-MM-DD HH:mm:ss');
+          .add(days, 'days')
+          .add(hours, 'hour')
+          .local().format('YYYY-MM-DD HH:mm:ss')
       }
     },
     onUpdateRange() {
-      this.$emit('on-update-range', this.range);
-      console.log('onUpdateRange', this.range);
+      this.$emit('on-update-range', this.range)
+      console.log('onUpdateRange', this.range)
     }
   }
 }

@@ -1,13 +1,13 @@
 <script>
-import CameraVideoPlayer from "../../chunks/camera/CameraVideoPlayer.vue";
-import CameraTimeline from "../../chunks/camera/CameraTimeline.vue";
-import CameraEventsBar from "../../chunks/camera/CameraEventsBar.vue";
-import SidebarPanel from "../../chunks/SidebarPanel.vue";
-import CameraRecordingPlayback from "../../chunks/camera/CameraRecordingPlayback.vue";
-import CameraEventDetails from "../../chunks/camera/CameraEventDetails.vue";
+import CameraVideoPlayer from '../../chunks/camera/CameraVideoPlayer.vue'
+import CameraTimeline from '../../chunks/camera/CameraTimeline.vue'
+import CameraEventsBar from '../../chunks/camera/CameraEventsBar.vue'
+import SidebarPanel from '../../chunks/SidebarPanel.vue'
+import CameraRecordingPlayback from '../../chunks/camera/CameraRecordingPlayback.vue'
+import CameraEventDetails from '../../chunks/camera/CameraEventDetails.vue'
 
 export default {
-  name: "CameraEventPage",
+  name: 'CameraEventPage',
   components: {
     CameraEventDetails,
     CameraRecordingPlayback, SidebarPanel, CameraEventsBar, CameraTimeline, CameraVideoPlayer
@@ -47,12 +47,12 @@ export default {
       this.$store.commit('setTitle', this.$t('Event {id}', {id: this.id}))
     },
     async getEvent() {
-      this.event = await this.$store.dispatch('getCameraEvent', this.id);
+      this.event = await this.$store.dispatch('getCameraEvent', this.id)
     },
     async getUrl() {
       const url = await this.$store.dispatch('getEventStream', this.id)
-      this.url = URL.createObjectURL(url);
-    },
+      this.url = URL.createObjectURL(url)
+    }
   }
 }
 </script>
@@ -96,8 +96,6 @@ export default {
       />
       <CameraEventDetails :event="event" />
     </SidebarPanel>
-
-
     <CameraVideoPlayer
       v-if="url"
       :src="url"

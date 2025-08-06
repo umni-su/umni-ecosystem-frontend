@@ -1,33 +1,33 @@
 <script>
-import {DEVICE_TYPES, mapType} from "../../js/helpers/mapDeviceType.js";
+import {DEVICE_TYPES, mapType} from '../../js/helpers/mapDeviceType.js'
 
 export default {
-    name: "SystemNotificationMenuItem",
-    props: {
-        noty: {
-            type: Object,
-            required: true
-        }
-    },
-    data() {
-        return {
-            types: DEVICE_TYPES
-        }
-    },
-    computed: {
-        type() {
-            return this.noty.type
-        },
-        message() {
-            return this.noty.message
-        },
-        name() {
-            return `${this.message.name}`
-        },
-    },
-    methods: {
-        mapType
+  name: 'SystemNotificationMenuItem',
+  props: {
+    noty: {
+      type: Object,
+      required: true
     }
+  },
+  data() {
+    return {
+      types: DEVICE_TYPES
+    }
+  },
+  computed: {
+    type() {
+      return this.noty.type
+    },
+    message() {
+      return this.noty.message
+    },
+    name() {
+      return `${this.message.name}`
+    }
+  },
+  methods: {
+    mapType
+  }
 }
 </script>
 

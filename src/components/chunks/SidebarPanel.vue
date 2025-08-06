@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "SidebarPanel",
+  name: 'SidebarPanel',
   props: {
     modelValue: {
       type: Boolean,
@@ -14,7 +14,7 @@ export default {
   emits: ['update:model-value'],
   data() {
     return {
-      open: false,
+      open: false
     }
   },
   watch: {
@@ -26,7 +26,7 @@ export default {
     },
     open() {
       this.$emit('update:model-value', this.open)
-    },
+    }
   },
   created() {
     this.open = this.modelValue
@@ -42,13 +42,16 @@ export default {
     location="right"
   >
     <template #default>
-      <VSheet class="pa-4">
-        <div class="text-h6 mb-4 d-flex justify-space-between">
+      <VSheet
+        class="pa-4"
+        color="default"
+      >
+        <VSheet class="text-h6 mb-4 d-flex justify-space-between">
           <div>{{ title }}</div>
           <div>
             <slot name="prepend" />
           </div>
-        </div>
+        </VSheet>
         <slot />
       </VSheet>
     </template>

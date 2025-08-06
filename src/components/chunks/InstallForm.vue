@@ -1,10 +1,10 @@
 <script>
-import UmniLogo from "./UmniLogo.vue";
-import ThemeSwitcher from "./ThemeSwitcher.vue";
-import {createErrorNotification, createManyNotifications} from "../../js/helpers/notificationHelper.js";
+import UmniLogo from './UmniLogo.vue'
+import ThemeSwitcher from './ThemeSwitcher.vue'
+import {createErrorNotification, createManyNotifications} from '../../js/helpers/notificationHelper.js'
 
 export default {
-  name: "InstallForm",
+  name: 'InstallForm',
   components: {ThemeSwitcher, UmniLogo},
   emits: ['on-account-updated'],
   data() {
@@ -18,23 +18,23 @@ export default {
         username: null,
         email: null,
         password: null,
-        passwordConfirm: null,
+        passwordConfirm: null
       },
       mqtt: {
         port: 1883,
         host: '127.0.0.1',
         user: null,
-        password: null,
+        password: null
       }
     }
   },
   computed: {
     loading() {
-      return this.$store.getters['isLoading'];
+      return this.$store.getters['isLoading']
     },
     theme() {
       return this.$store.getters['getTheme']
-    },
+    }
   },
   watch: {
     account: {
@@ -52,12 +52,12 @@ export default {
   },
   methods: {
     async checkMqttConnection() {
-      const res = await this.$store.dispatch("checkMqttConnection", this.mqtt).catch(e => {
-        this.canInstall = false;
+      const res = await this.$store.dispatch('checkMqttConnection', this.mqtt).catch(e => {
+        this.canInstall = false
         this.$store.commit('addNotification', createErrorNotification(this.$t('Error to connect. Please check your credentials or MQTT broker settings.')))
-      });
+      })
       if (res) {
-        this.canInstall = true;
+        this.canInstall = true
       }
     },
     async installEcosystem() {
@@ -65,7 +65,7 @@ export default {
         account: this.account,
         mqtt: this.mqtt
       }
-      const ok = await this.$store.dispatch("install", data).catch(e => {
+      const ok = await this.$store.dispatch('install', data).catch(e => {
         console.log(e.response.data.error)
         this.$store.commit('addNotification', createManyNotifications('error', e.response.data.error))
       })

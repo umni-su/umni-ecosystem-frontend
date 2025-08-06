@@ -1,26 +1,26 @@
 export function createNotification(text, style = 'primary', timeout = 2000, timer = 'white') {
 
-    return {
-        text,
-        style,
-        timeout,
-        timer,
-        active: true
-    }
+  return {
+    text,
+    style,
+    timeout,
+    timer,
+    active: true
+  }
 }
 
 export function createSuccessNotification(text) {
-    return createNotification(text, 'success')
+  return createNotification(text, 'success')
 }
 
 export function createErrorNotification(text) {
-    return createNotification(text, 'error')
+  return createNotification(text, 'error')
 }
 
 export function createWarningNotification(text) {
-    return createNotification(text, 'warning')
+  return createNotification(text, 'warning')
 }
 
 export function createManyNotifications(type, arr) {
-    return createNotification(arr, type)
+  return createNotification(arr, type)
 }

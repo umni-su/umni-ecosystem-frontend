@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "SettingsPage",
+  name: 'SettingsPage',
   data() {
     return {
       opened: true

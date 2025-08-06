@@ -1,8 +1,8 @@
 <script>
-import DeviceSensor from "./DeviceListItemSensor.vue";
+import DeviceSensor from './DeviceListItemSensor.vue'
 
 export default {
-  name: "DeviceSensors",
+  name: 'DeviceSensors',
   components: {
     DeviceSensor
   },

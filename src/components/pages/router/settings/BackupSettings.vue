@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "BackupSettings"
+  name: 'BackupSettings'
 }
 </script>
 

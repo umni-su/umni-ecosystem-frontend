@@ -1,29 +1,27 @@
 <script>
-import {createSuccessNotification} from "../../../../js/helpers/notificationHelper.js";
+import {createSuccessNotification} from '../../../../js/helpers/notificationHelper.js'
 
 export default {
-  name: "BaseSettings",
+  name: 'BaseSettings',
   data() {
     return {
       configuration: null
     }
   },
-  async created() {
-    await this.getConfiguration();
-  },
+  async created() {await this.getConfiguration()   },
   methods: {
     async getConfiguration() {
-      this.configuration = await this.$store.dispatch('getBaseSettings');
+      this.configuration = await this.$store.dispatch('getBaseSettings')
     },
     async saveValue(conf) {
       await this.$store.dispatch('saveBaseSetting', {
         id: conf.id,
-        value: conf.value,
+        value: conf.value
       })
       this.$store.commit('addNotification', createSuccessNotification(this.$t('Updated')))
-      conf.success = true;
+      conf.success = true
       setTimeout(() => {
-        delete conf.success;
+        delete conf.success
       }, 1000)
     }
   }

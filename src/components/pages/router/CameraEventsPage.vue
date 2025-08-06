@@ -1,9 +1,9 @@
 <script>
-import CameraEventItem from "../../chunks/camera/CameraEventItem.vue";
-import PageActions from "../../chunks/PageActions.vue";
+import CameraEventItem from '../../chunks/camera/CameraEventItem.vue'
+import PageActions from '../../chunks/PageActions.vue'
 
 export default {
-  name: "CameraEventsPage",
+  name: 'CameraEventsPage',
   components: {PageActions, CameraEventItem},
   props: {
     id: {
@@ -53,7 +53,7 @@ export default {
       this.$store.commit('setTitle', this.$t('Camera {name} events', {name: this.camera.name}))
     },
     async getEvents() {
-      const res = await this.$store.dispatch("getCameraEvents", this.filter)
+      const res = await this.$store.dispatch('getCameraEvents', this.filter)
       this.events = [...this.events, ...res.items]
       this.total = res.total
       this.pages = res.pages

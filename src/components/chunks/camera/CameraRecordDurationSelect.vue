@@ -1,11 +1,11 @@
 <script>
 export default {
-  name: "CameraRecordDurationSelect",
+  name: 'CameraRecordDurationSelect',
   props: {
     modelValue: {
       type: Number,
       default: 60
-    },
+    }
   },
   emits: ['update:model-value'],
   data() {
@@ -14,26 +14,26 @@ export default {
       items: [
         {
           title: this.$t('{n} minutes', 5),
-          value: 5,
+          value: 5
         }, {
           title: this.$t('{n} minutes', 10),
-          value: 10,
+          value: 10
         },
         {
           title: this.$t('{n} minutes', 15),
-          value: 15,
+          value: 15
         },
         {
           title: this.$t('{n} minutes', 30),
-          value: 30,
+          value: 30
         },
         {
           title: this.$t('{n} minutes', 45),
-          value: 45,
+          value: 45
         },
         {
           title: this.$t('{n} hours', 1),
-          value: 60,
+          value: 60
         }
       ]
     }

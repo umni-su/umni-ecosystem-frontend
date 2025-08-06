@@ -1,6 +1,6 @@
 <script>
-import DiskUsageItem from "../../chunks/systeminfo/DiskUsageItem.vue";
-import SystemInfoSparkline from "../../chunks/systeminfo/SystemInfoSparkline.vue";
+import DiskUsageItem from '../../chunks/systeminfo/DiskUsageItem.vue'
+import SystemInfoSparkline from '../../chunks/systeminfo/SystemInfoSparkline.vue'
 
 export default {
   name: 'DashboardPage',
@@ -25,7 +25,7 @@ export default {
     },
     cpu() {
       return this.systemInfo?.cpu
-    },
+    }
   },
   mounted() {
     this.$store.commit('setTitle', this.$t('Dashboard'))

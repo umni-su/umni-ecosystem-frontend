@@ -1,9 +1,9 @@
 <script>
-import DeviceListItemSensor from "../DeviceListItemSensor.vue";
-import SimpleBar from "simplebar-vue";
+import DeviceListItemSensor from '../DeviceListItemSensor.vue'
+import SimpleBar from 'simplebar-vue'
 
 export default {
-  name: "DeviceInfoSensorsCard",
+  name: 'DeviceInfoSensorsCard',
   components: {
     SimpleBar,
     DeviceListItemSensor

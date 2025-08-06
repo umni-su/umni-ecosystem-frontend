@@ -1,8 +1,8 @@
 <script>
-import CameraRecordDot from "./CameraRecordDot.vue";
+import CameraRecordDot from './CameraRecordDot.vue'
 
 export default {
-  name: "CameraItem",
+  name: 'CameraItem',
   components: {CameraRecordDot},
   props: {
     camera: {
@@ -28,12 +28,12 @@ export default {
       handler(newVal, oldVal) {
         if (newVal.camera_id === this.camera.id) {
           switch (newVal.topic) {
-            case 'detection.start':
-              this.alert = true
-              break
-            case 'detection.end':
-              this.alert = false
-              break
+          case 'detection.start':
+            this.alert = true
+            break
+          case 'detection.end':
+            this.alert = false
+            break
           }
         }
       }
@@ -91,42 +91,18 @@ export default {
         <div class="overflow text-white pa-4">
           <div class="text-h6 ma-0 title">
             {{ camera.name }}
-            <CameraRecordDot :camera="camera" />
           </div>
 
           <div class="bottom">
             <VBtn
-              readonly
-              icon="mdi-file-refresh"
-              color="white"
-              variant="plain"
-              density="compact"
-              class="mr-4"
-            />
-            <VBtn
-              readonly
-              icon="mdi-cloud-upload"
-              color="white"
-              variant="plain"
-              density="compact"
-              class="mr-4"
-            />
-            <VBtn
-              readonly
               icon="mdi-folder-play"
               color="white"
               variant="plain"
               density="compact"
-              class="mr-4"
+              class="mx-4"
+              @click.stop="$router.push({name:'camera-events',params:{id:camera.id}})"
             />
-            <VBtn
-              readonly
-              icon="mdi-folder-multiple-image"
-              color="white"
-              variant="plain"
-              density="compact"
-              class="mr-4"
-            />
+            <CameraRecordDot :camera="camera" />
           </div>
         </div>
       </template>
@@ -142,39 +118,15 @@ export default {
   bottom: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.3);
-
-  .record {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 10;
-
-    &.pulse {
-      animation: pulse 1s ease infinite;
-    }
-  }
-
-  .bottom {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    left: 10px;
-    z-index: 10;
-  }
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(01);
-    opacity: 0.5;
-  }
+.bottom {
+  text-align: right;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  left: 10px;
+  z-index: 10;
 }
+
 </style>

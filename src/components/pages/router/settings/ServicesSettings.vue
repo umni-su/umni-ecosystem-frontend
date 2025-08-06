@@ -1,20 +1,20 @@
 <script>
-import ServiceItem from "../../../chunks/service/ServiceItem.vue";
+import ServiceItem from '../../../chunks/service/ServiceItem.vue'
 
 export default {
-  name: "ServicesSettings",
+  name: 'ServicesSettings',
   components: {ServiceItem},
   computed: {
     services() {
-      return this.$store.getters['getServices'];
+      return this.$store.getters['getServices']
     }
   },
   async created() {
-    await this.getServices();
+    await this.getServices()
   },
   methods: {
     async getServices() {
-      await this.$store.dispatch('getServices');
+      await this.$store.dispatch('getServices')
     }
   }
 }

@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "PageTitle",
+  name: 'PageTitle',
   computed: {
     title() {
       return this.$store.getters['getTitle']

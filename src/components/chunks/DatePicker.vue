@@ -2,7 +2,7 @@
 import VueDatePicker from '@vuepic/vue-datepicker'
 
 export default {
-  name: "DatePicker",
+  name: 'DatePicker',
   components: {
     VueDatePicker
   },
@@ -29,7 +29,7 @@ export default {
   computed: {
     format() {
       return this.$store.getters['getDateTimeFormat']
-    },
+    }
   },
   watch: {
     date() {

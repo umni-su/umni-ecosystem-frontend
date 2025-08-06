@@ -1,8 +1,8 @@
 <script>
 import PageLayout from './components/pages/PageLayout.vue'
 import LoginPage from './components/pages/LoginPage.vue'
-import InstallPage from "./components/pages/InstallPage.vue";
-import SystemNotifications from "./components/chunks/SystemNotifications.vue";
+import InstallPage from './components/pages/InstallPage.vue'
+import SystemNotifications from './components/chunks/SystemNotifications.vue'
 
 
 export default {

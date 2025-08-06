@@ -1,10 +1,10 @@
 <script>
-import {mapType} from "../../js/helpers/mapDeviceType.js";
-import DeviceCardCharacteristicItem from "./DeviceCardCharacteristicItem.vue";
-import DeviceCardNetworkItem from "./DeviceCardNetworkItem.vue";
+import {mapType} from '../../js/helpers/mapDeviceType.js'
+import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
+import DeviceCardNetworkItem from './DeviceCardNetworkItem.vue'
 
 export default {
-  name: "DeviceCardItem",
+  name: 'DeviceCardItem',
   components: {
     DeviceCardNetworkItem,
     DeviceCardCharacteristicItem

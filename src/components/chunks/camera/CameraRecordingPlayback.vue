@@ -1,7 +1,7 @@
 <script>
 
 export default {
-  name: "CameraRecordingPlayback",
+  name: 'CameraRecordingPlayback',
   props: {
     event: {
       type: Object,
@@ -24,7 +24,7 @@ export default {
     camera() {
       return this.event.camera
     }
-  },
+  }
 }
 </script>
 

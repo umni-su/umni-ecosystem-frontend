@@ -1,16 +1,16 @@
 <script>
-import * as echarts from 'echarts';
-import {markRaw} from 'vue';
-import SensorDateRangeFilter from "../SensorDateRangeFilter.vue";
-import {createErrorNotification} from "../../../js/helpers/notificationHelper.js";
-import {SENSOR_GROUP, SENSOR_TEXT} from "../../../js/helpers/sensorGroups.js";
-import ModalDialog from "../ModalDialog.vue";
+import * as echarts from 'echarts'
+import {markRaw} from 'vue'
+import SensorDateRangeFilter from '../SensorDateRangeFilter.vue'
+import {createErrorNotification} from '../../../js/helpers/notificationHelper.js'
+import {SENSOR_GROUP, SENSOR_TEXT} from '../../../js/helpers/sensorGroups.js'
+import ModalDialog from '../ModalDialog.vue'
 
 export default {
-  name: "DeviceActiveSensor",
+  name: 'DeviceActiveSensor',
   components: {
     ModalDialog,
-    SensorDateRangeFilter,
+    SensorDateRangeFilter
   },
   data() {
     return {
@@ -28,7 +28,7 @@ export default {
           left: '50px',
           right: '50px',
           bottom: '30px',
-          top: '30px',
+          top: '30px'
         },
         dataZoom: [
           {
@@ -41,14 +41,14 @@ export default {
           }
         ],
         tooltip: {
-          trigger: "axis",
+          trigger: 'axis'
         },
         xAxis: {
-          type: 'time',
+          type: 'time'
         },
         yAxis: {
           type: 'value',
-          scale: true,
+          scale: true
         },
         series: []
       }
@@ -56,41 +56,41 @@ export default {
   },
   computed: {
     loading() {
-      return this.$store.getters['isLoading'];
+      return this.$store.getters['isLoading']
     },
     device() {
-      return this.$store.getters['getDevice'];
+      return this.$store.getters['getDevice']
     },
     sensor() {
-      return this.$store.getters['getActiveSensor'];
+      return this.$store.getters['getActiveSensor']
     },
     title() {
-      return this.sensor?.visible_name !== null ? this.sensor?.visible_name?.toUpperCase() : this.sensor?.name?.toUpperCase();
+      return this.sensor?.visible_name !== null ? this.sensor?.visible_name?.toUpperCase() : this.sensor?.name?.toUpperCase()
     },
     typeText() {
       let t = 'Unknown'
       switch (this.sensor.type) {
-        case SENSOR_GROUP.SENSOR_RF433:
-          t = SENSOR_TEXT.SENSOR_RF433;
-          break;
-        case SENSOR_GROUP.SENSOR_ADC:
-          t = SENSOR_TEXT.SENSOR_ADC;
-          break;
-        case SENSOR_GROUP.SENSOR_NTC:
-          t = SENSOR_TEXT.SENSOR_NTC;
-          break;
-        case  SENSOR_GROUP.SENSOR_INPUTS:
-          t = SENSOR_TEXT.SENSOR_INPUTS;
-          break;
-        case  SENSOR_GROUP.SENSOR_RELAYS:
-          t = SENSOR_TEXT.SENSOR_RELAYS;
-          break;
-        case SENSOR_GROUP.SENSOR_DS18B20:
-          t = SENSOR_TEXT.SENSOR_DS18B20;
-          break;
-        case SENSOR_GROUP.SENSOR_OPENTHERM:
-          t = SENSOR_TEXT.SENSOR_OPENTHERM;
-          break;
+      case SENSOR_GROUP.SENSOR_RF433:
+        t = SENSOR_TEXT.SENSOR_RF433
+        break
+      case SENSOR_GROUP.SENSOR_ADC:
+        t = SENSOR_TEXT.SENSOR_ADC
+        break
+      case SENSOR_GROUP.SENSOR_NTC:
+        t = SENSOR_TEXT.SENSOR_NTC
+        break
+      case  SENSOR_GROUP.SENSOR_INPUTS:
+        t = SENSOR_TEXT.SENSOR_INPUTS
+        break
+      case  SENSOR_GROUP.SENSOR_RELAYS:
+        t = SENSOR_TEXT.SENSOR_RELAYS
+        break
+      case SENSOR_GROUP.SENSOR_DS18B20:
+        t = SENSOR_TEXT.SENSOR_DS18B20
+        break
+      case SENSOR_GROUP.SENSOR_OPENTHERM:
+        t = SENSOR_TEXT.SENSOR_OPENTHERM
+        break
       }
 
       return this.$t(t)
@@ -100,13 +100,13 @@ export default {
     sensor: {
       deep: true,
       handler(s) {
-        this.activeSensor = s;
-        this.open = this.activeSensor !== null;
+        this.activeSensor = s
+        this.open = this.activeSensor !== null
       }
     },
     open() {
       if (!this.open) {
-        this.$store.commit('setActiveSensor', null);
+        this.$store.commit('setActiveSensor', null)
         this.src = null
       } else {
         if (this.sensor.photo !== null) {
@@ -120,28 +120,28 @@ export default {
           })
         })
       }
-    },
+    }
   },
   unmounted() {
     window.removeEventListener('resize', this.resize)
   },
   methods: {
     resize() {
-      this.chart.resize();
+      this.chart.resize()
     },
     async getSensorHistory() {
       if (this.filter.range === null) {
         return false
       }
       this.options.series = await this.$store.dispatch('getSensorHistory',
-          {
-            ...{
-              id: this.sensor.id,
-            },
-            ...this.filter
-          }
+        {
+          ...{
+            id: this.sensor.id
+          },
+          ...this.filter
+        }
       ).catch(e => {
-        this.$store.commit('addNotification', createErrorNotification(e.response.data.message));
+        this.$store.commit('addNotification', createErrorNotification(e.response.data.message))
       })
       this.chart.setOption(this.options)
     },
@@ -149,7 +149,7 @@ export default {
       if (this.$refs.chart !== null && this.$refs.chart !== undefined) {
         if (e.indexOf(null) === -1) {
           this.filter.range = e
-          await this.getSensorHistory();
+          await this.getSensorHistory()
         }
       }
     },

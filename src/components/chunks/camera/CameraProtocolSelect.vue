@@ -1,10 +1,10 @@
 <script>
 export default {
-  name: "CameraProtocolSelect",
+  name: 'CameraProtocolSelect',
   props: {
     modelValue: {
       type: String,
-      default: 'RTSP',
+      default: 'RTSP'
     }
   },
   emits: ['update:model-value'],
@@ -22,9 +22,9 @@ export default {
   },
   created() {
     if (this.modelValue !== undefined) {
-      this.selected = this.modelValue;
+      this.selected = this.modelValue
     }
-    this.$emit('update:model-value', this.selected);
+    this.$emit('update:model-value', this.selected)
   }
 }
 </script>

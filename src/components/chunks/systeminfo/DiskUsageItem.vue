@@ -1,8 +1,8 @@
 <script>
-import formatBytes from "../../../js/helpers/formatBytes.js";
+import formatBytes from '../../../js/helpers/formatBytes.js'
 
 export default {
-  name: "DiskUsageItem",
+  name: 'DiskUsageItem',
   props: {
     disk: {
       type: Object,
@@ -11,7 +11,7 @@ export default {
   },
   computed: {
     stat() {
-      return this.disk.stat;
+      return this.disk.stat
     },
     free() {
       return (100 * this.stat.free / this.stat.total).toFixed(0)

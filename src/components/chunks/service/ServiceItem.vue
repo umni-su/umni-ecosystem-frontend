@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "ServiceItem",
+  name: 'ServiceItem',
   props: {
     service: {
       type: Object,

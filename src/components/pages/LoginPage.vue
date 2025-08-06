@@ -1,6 +1,6 @@
 <script>
-import UmniLogo from "../../components/chunks/UmniLogo.vue";
-import {createErrorNotification} from "../../js/helpers/notificationHelper.js";
+import UmniLogo from '../../components/chunks/UmniLogo.vue'
+import {createErrorNotification} from '../../js/helpers/notificationHelper.js'
 
 export default {
   name: 'LoginPage',

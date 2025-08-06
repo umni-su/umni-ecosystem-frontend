@@ -1,5 +1,5 @@
 <script>
-import DeviceCardItem from "../../../components/chunks/DeviceCardItem.vue";
+import DeviceCardItem from '../../../components/chunks/DeviceCardItem.vue'
 
 export default {
   name: 'DevicesPage',

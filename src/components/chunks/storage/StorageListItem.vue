@@ -1,8 +1,8 @@
 <script>
-import formatBytes from "../../../js/helpers/formatBytes.js";
+import formatBytes from '../../../js/helpers/formatBytes.js'
 
 export default {
-  name: "StorageListItem",
+  name: 'StorageListItem',
   props: {
     storage: {
       type: Object,

@@ -1,8 +1,8 @@
 <script>
-import {ImageClickTracker} from "../../../js/helpers/ImageClickTracker.js";
+import {ImageClickTracker} from '../../../js/helpers/ImageClickTracker.js'
 
 export default {
-  name: "CameraRootArea",
+  name: 'CameraRootArea',
   props: {
     camera: {
       type: Object,
@@ -17,13 +17,13 @@ export default {
     return {
       tracker: null,
       url: null,
-      src: null,
+      src: null
     }
   },
   computed: {
     token() {
       return this.$store.getters['getToken']
-    },
+    }
   },
   async mounted() {
     this.createUrl()
@@ -37,9 +37,9 @@ export default {
   methods: {
     createTracker(camera) {
       this.tracker = new ImageClickTracker(
-          this.$refs.image,
-          this.$refs.output,
-          this.$refs.draw
+        this.$refs.image,
+        this.$refs.output,
+        this.$refs.draw
       )
       this.tracker.importFromJSON(camera.areas)
       this.$store.commit('setTracker', this.tracker)
@@ -58,28 +58,25 @@ export default {
     },
     async getCameraCover() {
       if (this.camera.cover !== null) {
-        this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700});
+        this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700})
       }
-    },
-    onRootAreaClick(e) {
-
-    },
+    }
   }
 }
 </script>
 
 <template>
   <VSheet
+    v-if="src"
     class="frame position-relative"
     width="1000"
   >
-    <img
+    <VImg
       id="targetImage"
       ref="image"
       class="d-block video w-100"
       :src="url"
-      @click="onRootAreaClick"
-    >
+    />
     <canvas
       id="canvas"
       ref="draw"

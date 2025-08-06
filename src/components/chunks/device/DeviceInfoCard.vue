@@ -1,26 +1,27 @@
 <script>
-import {mapType} from "../../../js/helpers/mapDeviceType.js";
-import ModalDialog from "../ModalDialog.vue";
-import {createSuccessNotification} from "../../../js/helpers/notificationHelper.js";
+import {mapType} from '../../../js/helpers/mapDeviceType.js'
+import ModalDialog from '../ModalDialog.vue'
+import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
 
 export default {
-  name: "DeviceInfoCard",
+  name: 'DeviceInfoCard',
   components: {ModalDialog},
   props: {
     device: {
       type: Object,
-      required: true,
+      required: true
     }
   },
   data() {
     return {
       showForm: false,
-      src: null
+      src: null,
+      title: null
     }
   },
   computed: {
     token() {
-      return this.$store.state.token;
+      return this.$store.state.token
     },
     lastSyncFromNow() {
       return this.$moment(this.device.last_sync).fromNow()
@@ -30,7 +31,15 @@ export default {
     },
     name() {
       return this.device.title ? this.device.title.toUpperCase() : this.device.name.toUpperCase()
-    },
+    }
+  },
+  watch: {
+    device: {
+      deep: true,
+      handler(device) {
+        this.title = device.title
+      }
+    }
   },
   async created() {
     await this.getImage()
@@ -52,7 +61,7 @@ export default {
     async save() {
       const res = await this.$store.dispatch('updateDevice', {
         id: this.device.id,
-        title: this.device.title,
+        title: this.device.title
       })
       if (res) {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
@@ -155,7 +164,7 @@ export default {
         :title="$t('Device info')"
       >
         <VTextField
-          v-model="device.title"
+          v-model="title"
           :label="$t('Title')"
         />
         <template #actions>

@@ -1,8 +1,8 @@
 <script>
-import CameraEventItem from "./CameraEventItem.vue";
+import CameraEventItem from './CameraEventItem.vue'
 
 export default {
-  name: "CameraEventsBar",
+  name: 'CameraEventsBar',
   components: {CameraEventItem},
   props: {
     event: {
@@ -33,19 +33,22 @@ export default {
   watch: {
     event: {
       deep: true,
-      handler(ev) {
-        this.filter.id = ev?.camera?.id
+      async handler(ev) {
+        await this.init()
       }
     }
   },
   async mounted() {
-    this.filter.id = this.event.camera.id
-    this.filter.event_id = this.event.id
-    this.events = await this.getEvents()
+    await this.init()
   },
   methods: {
+    async init() {
+      this.filter.id = this.event.camera.id
+      this.filter.event_id = this.event.id
+      this.events = await this.getEvents()
+    },
     async getEvents() {
-      const res = await this.$store.dispatch("getCameraEvents", this.filter)
+      const res = await this.$store.dispatch('getCameraEvents', this.filter)
       this.events = [...this.events, ...res.items]
       this.total = res.total
       this.pages = res.pages
@@ -54,9 +57,9 @@ export default {
     },
     async loadEvents(direction) {
       if (this.events.length < 1) return false
-      if (direction === "start") {
+      if (direction === 'start') {
         this.filter.event_id = this.events[0]?.id
-      } else if (direction === "end") {
+      } else if (direction === 'end') {
         this.filter.event_id = this.events[this.events.length - 1]?.id
       }
 

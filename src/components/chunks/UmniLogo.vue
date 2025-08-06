@@ -1,10 +1,10 @@
 <script>
 export default {
-  name: "UmniLogo",
+  name: 'UmniLogo',
   props: {
     short: {
       type: Boolean,
-      default: true,
+      default: true
     },
     width: {
       type: Number,

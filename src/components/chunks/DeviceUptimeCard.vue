@@ -1,9 +1,9 @@
 <script>
-import microsecondsToUptime from "../../js/helpers/microsecondsToUptime.js";
-import DeviceCardCharacteristicItem from "./DeviceCardCharacteristicItem.vue";
+import microsecondsToUptime from '../../js/helpers/microsecondsToUptime.js'
+import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
 
 export default {
-  name: "DeviceUptimeCard",
+  name: 'DeviceUptimeCard',
   components: {DeviceCardCharacteristicItem},
   computed: {
     device() {

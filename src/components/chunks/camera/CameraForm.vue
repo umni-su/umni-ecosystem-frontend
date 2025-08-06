@@ -1,14 +1,14 @@
 <script>
-import CameraProtocolSelect from "./CameraProtocolSelect.vue";
-import CameraDeleteAfterSelect from "./CameraDeleteAfterSelect.vue";
-import CameraRecordDurationSelect from "./CameraRecordDurationSelect.vue";
-import StorageSelect from "../storage/StorageSelect.vue";
-import {createManyNotifications, createSuccessNotification} from "../../../js/helpers/notificationHelper.js";
-import CameraRecordModeSelect from "./CameraRecordModeSelect.vue";
-import CameraAreas from "./CameraAreas.vue";
+import CameraProtocolSelect from './CameraProtocolSelect.vue'
+import CameraDeleteAfterSelect from './CameraDeleteAfterSelect.vue'
+import CameraRecordDurationSelect from './CameraRecordDurationSelect.vue'
+import StorageSelect from '../storage/StorageSelect.vue'
+import {createManyNotifications, createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+import CameraRecordModeSelect from './CameraRecordModeSelect.vue'
+import CameraAreas from './CameraAreas.vue'
 
 export default {
-  name: "CameraForm",
+  name: 'CameraForm',
   components: {
     CameraAreas,
     CameraRecordModeSelect,
@@ -31,14 +31,15 @@ export default {
         {
           name: this.$t('Connection'),
           key: 'connection',
-          icon: 'mdi-connection',
+          icon: 'mdi-connection'
         },
         {
           name: this.$t('Detection'),
           key: 'detection',
-          icon: 'mdi-motion-sensor',
+          icon: 'mdi-motion-sensor'
         }
       ],
+      editCredentials: false,
       asLink: false,
       auth: false,
       link: null,
@@ -55,37 +56,51 @@ export default {
           || this.model?.ip?.length === undefined
     },
     loading() {
-      return this.$store.getters['isLoading'];
+      return this.$store.getters['isLoading']
+    },
+    modelHasCredentials() {
+      return this.model.id !== null && (this.cameraModel?.has_credentials)
     }
 
   },
   watch: {
-    auth() {
-      this.model.username = null
-      this.model.password = null
-    },
     tab() {
       this.showDrawings = this.tab === 'detection'
       this.$emit('on-show-areas', this.showDrawings)
     },
+    cameraModel: {
+      deep: true,
+      handler(newValue) {
+        this.init()
+      }
+    }
   },
   unmounted() {
-    this.$store.commit('destroyTracker');
+    this.$store.commit('destroyTracker')
   },
   created() {
-    this.model = this.cameraModel
-    if (this.model?.username?.length > 0 && this.model?.password?.length > 0) {
-      this.auth = true
-    }
-    this.open = this.modelValue
+    this.init()
   },
   methods: {
+    init() {
+      this.model = this.cameraModel
+      this.model.password = null
+      if (this.modelHasCredentials) {
+        this.auth = true
+      }
+      this.open = this.modelValue
+    },
     toggleView() {
       this.asLink = !this.asLink
       this.link = null
     },
     async saveCamera() {
       const method = this.model.id ? 'updateCamera' : 'addCamera'
+      if (method === 'addCamera') {
+        this.model.change_credentials = true
+      } else {
+        this.model.change_credentials = this.editCredentials
+      }
       const res = await this.$store.dispatch(method, this.model).catch(e => {
         this.$store.commit('addNotification', createManyNotifications('error', e.response.data.error))
       })
@@ -198,15 +213,22 @@ export default {
               v-model="auth"
               :label="$t('Authentication')"
             />
+            <VSwitch
+              v-if="modelHasCredentials && auth"
+              v-model="editCredentials"
+              :label="$t('Change credentials')"
+            />
             <VTextField
               v-if="auth"
               v-model="model.username"
+              :disabled="modelHasCredentials && !editCredentials"
               clearable
               :label="$t('Username')"
             />
             <VTextField
               v-if="auth"
               v-model="model.password"
+              :disabled="modelHasCredentials && !editCredentials"
               clearable
               class="mt-4"
               :label="$t('Password')"

@@ -1,8 +1,8 @@
 <script>
 export default {
-  name: "NotificationSettings",
+  name: 'NotificationSettings',
   async created() {
-    await this.$store.dispatch('getNotifications');
+    await this.$store.dispatch('getNotifications')
   }
 }
 </script>

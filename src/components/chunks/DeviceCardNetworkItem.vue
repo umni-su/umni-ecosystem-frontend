@@ -1,17 +1,17 @@
 <script>
-import DeviceCardCharacteristicItem from "./DeviceCardCharacteristicItem.vue";
+import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
 
 export default {
-    name: "DeviceCardNetworkItem",
-    components: {
-        DeviceCardCharacteristicItem
-    },
-    props: {
-        adapter: {
-            type: Object,
-            required: true
-        }
+  name: 'DeviceCardNetworkItem',
+  components: {
+    DeviceCardCharacteristicItem
+  },
+  props: {
+    adapter: {
+      type: Object,
+      required: true
     }
+  }
 }
 </script>
 

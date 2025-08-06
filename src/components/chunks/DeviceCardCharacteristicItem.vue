@@ -1,7 +1,7 @@
 <script>
 export default {
-  name: "DeviceCardCharacteristicItem",
-  props: {
+  name: 'DeviceCardCharacteristicItem',
+  props: { 
     icon: {
       type: String,
       default: null

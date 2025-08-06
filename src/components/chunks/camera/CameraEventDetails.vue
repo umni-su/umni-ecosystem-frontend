@@ -1,10 +1,10 @@
 <script>
-import {eventTypeToColor} from "../../../js/helpers/cameraHelper.js";
-import CameraEventImage from "./CameraEventImage.vue";
-import secondsToHms from "../../../js/helpers/secondsToHms.js";
+import {eventTypeToColor} from '../../../js/helpers/cameraHelper.js'
+import CameraEventImage from './CameraEventImage.vue'
+import secondsToHms from '../../../js/helpers/secondsToHms.js'
 
 export default {
-  name: "CameraEventDetails",
+  name: 'CameraEventDetails',
   components: {CameraEventImage},
   props: {
     event: {
@@ -35,7 +35,7 @@ export default {
   },
 
   methods: {
-    eventTypeToColor,
+    eventTypeToColor
   }
 }
 </script>
@@ -43,6 +43,7 @@ export default {
 <template>
   <VSheet>
     <VChip
+      :to="{name:'camera', params: {id: camera.id}}"
       :text="camera.name"
       prepend-icon="mdi-video"
       color="primary"
@@ -61,7 +62,10 @@ export default {
     />
 
     <VSheet class="mt-4">
-      <CameraEventImage :event="event" />
+      <CameraEventImage
+        :download="true"
+        :event="event"
+      />
       <VList density="compact">
         <VListSubheader :title="$t('Event')" />
         <VListItem>

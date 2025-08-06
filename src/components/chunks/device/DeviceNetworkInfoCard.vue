@@ -1,8 +1,8 @@
 <script>
-import DeviceCardCharacteristicItem from "../DeviceCardCharacteristicItem.vue";
+import DeviceCardCharacteristicItem from '../DeviceCardCharacteristicItem.vue'
 
 export default {
-  name: "DeviceNetworkInfoCard",
+  name: 'DeviceNetworkInfoCard',
   components: {
     DeviceCardCharacteristicItem
   },
@@ -15,7 +15,7 @@ export default {
   computed: {
     network() {
       return this.device.network_interfaces
-    },
+    }
   },
   methods: {
     url(ip) {

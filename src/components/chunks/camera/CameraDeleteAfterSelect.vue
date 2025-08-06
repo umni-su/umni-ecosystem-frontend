@@ -1,11 +1,11 @@
 <script>
 export default {
-  name: "CameraDeleteAfterSelect",
+  name: 'CameraDeleteAfterSelect',
   props: {
     modelValue: {
       type: Number,
       default: 60 * 24
-    },
+    }
   },
   emits: ['update:model-value'],
   data() {

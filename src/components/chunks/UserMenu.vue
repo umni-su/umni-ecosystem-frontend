@@ -1,10 +1,10 @@
 <script>
 export default {
-  name: "UserMenu",
+  name: 'UserMenu',
   props: {
     color: {
       type: String,
-      default: "primary"
+      default: 'primary'
     }
   },
   computed: {

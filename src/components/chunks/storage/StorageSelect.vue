@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "StorageSelect",
+  name: 'StorageSelect',
   props: {
     modelValue: {
       type: Number,
@@ -10,7 +10,7 @@ export default {
   emits: ['update:model-value'],
   data() {
     return {
-      value: null,
+      value: null
     }
   },
   computed: {

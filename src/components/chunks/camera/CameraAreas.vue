@@ -1,11 +1,11 @@
 <script>
-import ColorPicker from "../ColorPicker.vue";
-import PriorityMenu from "../PriorityMenu.vue";
-import {createSuccessNotification} from "../../../js/helpers/notificationHelper.js";
-import ConfirmationDialog from "../ConfirmationDialog.vue";
+import ColorPicker from '../ColorPicker.vue'
+import PriorityMenu from '../PriorityMenu.vue'
+import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+import ConfirmationDialog from '../ConfirmationDialog.vue'
 
 export default {
-  name: "CameraAreas",
+  name: 'CameraAreas',
   components: {ConfirmationDialog, PriorityMenu, ColorPicker},
   props: {
     camera: {
@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     areas() {
-      return this.camera.areas;
+      return this.camera.areas
     },
     tracker() {
       return this.$store.getters['getTracker']
@@ -71,7 +71,7 @@ export default {
       let ok = false
       this.polygons.map(polygon => {
         if (
-            polygon.name === null ||
+          polygon.name === null ||
             polygon.name === '' ||
             polygon.points?.length < 3
         ) {

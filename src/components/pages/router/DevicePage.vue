@@ -1,12 +1,12 @@
 <script>
-import DeviceInfoCard from "../../chunks/device/DeviceInfoCard.vue";
-import DeviceNetworkInfoCard from "../../chunks/device/DeviceNetworkInfoCard.vue";
-import DeviceInfoSensorsCard from "../../chunks/device/DeviceInfoSensorsCard.vue";
-import DeviceActiveSensor from "../../chunks/device/DeviceActiveSensor.vue";
-import DeviceUptimeCard from "../../chunks/DeviceUptimeCard.vue";
+import DeviceInfoCard from '../../chunks/device/DeviceInfoCard.vue'
+import DeviceNetworkInfoCard from '../../chunks/device/DeviceNetworkInfoCard.vue'
+import DeviceInfoSensorsCard from '../../chunks/device/DeviceInfoSensorsCard.vue'
+import DeviceActiveSensor from '../../chunks/device/DeviceActiveSensor.vue'
+import DeviceUptimeCard from '../../chunks/DeviceUptimeCard.vue'
 
 export default {
-  name: "DevicePage",
+  name: 'DevicePage',
   components: {
     DeviceUptimeCard,
     DeviceActiveSensor,
@@ -68,7 +68,7 @@ export default {
     async getDevice() {
       await this.$store.dispatch('getDevice', this.id)
       this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
-    },
+    }
   }
 }
 </script>
@@ -77,7 +77,6 @@ export default {
   <VSheet
     v-if="deviceModel"
     class="ma-auto"
-    max-width="1200"
     color="transparent"
   >
     <VContainer fluid>

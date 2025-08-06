@@ -1,8 +1,8 @@
 <script>
-import {SENSOR_GROUP} from "../../js/helpers/sensorGroups.js";
+import {SENSOR_GROUP} from '../../js/helpers/sensorGroups.js'
 
 export default {
-  name: "DeviceListItemSensor",
+  name: 'DeviceListItemSensor',
   props: {
     modelValue: {
       type: Object,
@@ -25,40 +25,40 @@ export default {
     icon() {
       let icon = 'mdi-help-circle'
       switch (this.sensor.type) {
-        case SENSOR_GROUP.SENSOR_RELAYS:
-          icon = 'mdi-lightbulb';
-          break
-        case SENSOR_GROUP.SENSOR_INPUTS:
-          icon = 'mdi-bell';
-          break
-        case SENSOR_GROUP.SENSOR_NTC :
-        case SENSOR_GROUP.SENSOR_DS18B20:
-          icon = 'mdi-thermometer'
-          break
-        case SENSOR_GROUP.SENSOR_ADC:
-          icon = 'mdi-square-wave'
-          break
-        case SENSOR_GROUP.SENSOR_RF433:
-          icon = 'mdi-access-point'
-          break
+      case SENSOR_GROUP.SENSOR_RELAYS:
+        icon = 'mdi-lightbulb'
+        break
+      case SENSOR_GROUP.SENSOR_INPUTS:
+        icon = 'mdi-bell'
+        break
+      case SENSOR_GROUP.SENSOR_NTC :
+      case SENSOR_GROUP.SENSOR_DS18B20:
+        icon = 'mdi-thermometer'
+        break
+      case SENSOR_GROUP.SENSOR_ADC:
+        icon = 'mdi-square-wave'
+        break
+      case SENSOR_GROUP.SENSOR_RF433:
+        icon = 'mdi-access-point'
+        break
       }
       return icon
     },
     value() {
       switch (this.sensor.type) {
-        case SENSOR_GROUP.SENSOR_NTC :
-        case SENSOR_GROUP.SENSOR_DS18B20:
-          return parseFloat(this.sensor.value).toFixed(2)
-        default:
-          return this.sensor.value
+      case SENSOR_GROUP.SENSOR_NTC :
+      case SENSOR_GROUP.SENSOR_DS18B20:
+        return parseFloat(this.sensor.value).toFixed(2)
+      default:
+        return this.sensor.value
       }
     },
     color() {
       switch (this.sensor.type) {
-        case SENSOR_GROUP.SENSOR_RELAYS:
-          return parseInt(this.value) === 1 ? 'primary' : 'default'
-        case SENSOR_GROUP.SENSOR_INPUTS:
-          return parseInt(this.value) === 1 ? 'orange' : 'default'
+      case SENSOR_GROUP.SENSOR_RELAYS:
+        return parseInt(this.value) === 1 ? 'primary' : 'default'
+      case SENSOR_GROUP.SENSOR_INPUTS:
+        return parseInt(this.value) === 1 ? 'orange' : 'default'
       }
       return 'default'
     },
@@ -76,7 +76,7 @@ export default {
   watch: {
     sensor() {
       this.$emit('update:model-value', this.sensor)
-    },
+    }
   },
   async mounted() {
     this.sensor = this.modelValue

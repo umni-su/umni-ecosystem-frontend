@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "ColorPicker",
+  name: 'ColorPicker',
   props: {
     modelValue: {
       type: String,
