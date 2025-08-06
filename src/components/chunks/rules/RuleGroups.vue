@@ -16,7 +16,7 @@ export default {
               type: 'trigger',
               title: this.$t('Sensor data'),
               icon: 'mdi-database-import',
-              key: 'sensors.changes.data'
+              key: 'sensors.changes.state'
             },
             {
               type: 'trigger',

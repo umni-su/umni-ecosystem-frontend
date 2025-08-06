@@ -6,7 +6,7 @@ const ruleTypes = {
     ],
     device:[
       'sensors.changes.data',
-      'device.changes.state'
+      'devices.changes.state'
     ]
   }
 }
