@@ -31,7 +31,6 @@ export default {
     this.$store.commit('destroyTracker')
     setTimeout(() => {
       this.createTracker(this.camera)
-      this.tracker.redraw()
     }, 200)
   },
   methods: {
@@ -71,12 +70,12 @@ export default {
     class="frame position-relative"
     width="1000"
   >
-    <VImg
+    <img
       id="targetImage"
       ref="image"
       class="d-block video w-100"
       :src="url"
-    />
+    >
     <canvas
       id="canvas"
       ref="draw"

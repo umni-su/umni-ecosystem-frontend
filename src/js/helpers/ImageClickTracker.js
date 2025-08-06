@@ -73,7 +73,7 @@ export class ImageClickTracker {
   closeCurrentPolygon() {
     if (this.currentPolygon && this.currentPolygon.points.length >= 3) {
       this.currentPolygon.isClosed = true
-      this.updateOutput(`Полигон ${this.polygons.length} замкнут`)
+      console.log(`Полигон ${this.polygons.length} замкнут`)
       this.redraw()
       this.fireData()
     }
@@ -296,7 +296,7 @@ export class ImageClickTracker {
     polygon.points.push([Math.round(x), Math.round(y)])
     polygon.isClosed = false
     this.redraw()
-    this.updateOutput(`Добавлена точка: (${Math.round(x)}, ${Math.round(y)})`)
+    console.log(`Добавлена точка: (${Math.round(x)}, ${Math.round(y)})`)
 
     this.fireData()
   }
@@ -305,7 +305,7 @@ export class ImageClickTracker {
     polygon.points.splice(index, 0, [Math.round(x), Math.round(y)])
     polygon.isClosed = false
     this.redraw()
-    this.updateOutput(`Вставлена точка между ${index - 1} и ${index}`)
+    console.log(`Вставлена точка между ${index - 1} и ${index}`)
 
   }
 
@@ -313,7 +313,7 @@ export class ImageClickTracker {
     const removedPoint = polygon.points.splice(index, 1)[0]
     polygon.isClosed = false
     this.redraw()
-    this.updateOutput(`Удалена точка: (${Math.round(removedPoint[0])}, ${Math.round(removedPoint[1])})`)
+    console.log(`Удалена точка: (${Math.round(removedPoint[0])}, ${Math.round(removedPoint[1])})`)
 
   }
 
@@ -324,7 +324,7 @@ export class ImageClickTracker {
       this.selectedPolygonIndex = this.polygons.length - 1
     }
     this.redraw()
-    this.updateOutput(`Удален полигон с ${removed.points.length} точками`)
+    console.log(`Удален полигон с ${removed.points.length} точками`)
 
     this.fireData()
   }
@@ -504,7 +504,7 @@ export class ImageClickTracker {
 
       this.currentPolygon = this.polygons[this.polygons.length - 1] || null
       this.selectedPolygonIndex = this.polygons.length - 1
-      this.updateOutput(`Импортировано ${this.polygons.length} полигонов`)
+      console.log(`Импортировано ${this.polygons.length} полигонов`)
       this.redraw()
       this.fireData()
     } catch (e) {

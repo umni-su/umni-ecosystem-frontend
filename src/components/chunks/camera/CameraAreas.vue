@@ -59,7 +59,7 @@ export default {
     }
   },
 
-  created() {
+  mounted() {
     document.addEventListener('on-redraw', e => {
       this.polygons = e.detail
       this.updateDisabled()
