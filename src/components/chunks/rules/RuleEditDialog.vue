@@ -38,8 +38,21 @@
           class="mt-2"
         />
       </div>
+      <VSheet v-if="type==='trigger'">
+        <VSelect
+          v-if="isCameraTrigger"
+          density="compact"
+          :label="$t('Camera')"
+        />
+        <VSelect
+          v-if="isDeviceTrigger"
+          density="compact"
+          :label="$t('Device')"
+        />
+      </VSheet>
       {{id}}
       {{type}}
+      {{flow.el.key}}
       {{node.data}}
     </template>
     <template #actions>
@@ -55,6 +68,7 @@
 
 <script>
 import ModalDialog from '../ModalDialog.vue'
+import {isCameraTrigger, isDeviceTrigger} from '../../../js/helpers/rulesHelper.js'
 
 export default {
   name: 'RuleEditDialog',
@@ -66,6 +80,12 @@ export default {
     }
   },
   computed:{
+    isCameraTrigger(){
+      return isCameraTrigger(this.flow.el.key)
+    },
+    isDeviceTrigger(){
+      return isDeviceTrigger(this.flow.el.key)
+    },
     node(){
       return this.$store.getters['getSelectedNode']
     },
@@ -74,6 +94,9 @@ export default {
     },
     type(){
       return this.node.type
+    },
+    flow(){
+      return this.node.data.flow
     }
   },
   emits: ['save','update:model-value'],

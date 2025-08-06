@@ -55,8 +55,8 @@ export default {
             },
             {
               type: 'condition',
-              title: this.$t('Condition'),
-              icon:'mdi-gate-or',
+              title: this.$t('State'),
+              icon:'mdi-circle-outline',
               key: 'rule.condition'
             }
           ]
@@ -67,7 +67,7 @@ export default {
             {
               type: 'camera',
               title: this.$t('Camera'),
-              icon:'mdi-camera',
+              icon:'mdi-video',
               key: 'entities.camera'
             },
             {
@@ -95,7 +95,7 @@ export default {
             },
             {
               type: 'action',
-              title: this.$t('Action'),
+              title: this.$t('Webhook'),
               icon:'mdi-gesture-tap',
               key: 'action.webhook'
             },
@@ -110,6 +110,18 @@ export default {
               title: this.$t('Telegram'),
               icon:'mdi-send',
               key: 'action.telegram'
+            },
+            {
+              type: 'action',
+              title: this.$t('Start record'),
+              icon:'mdi-record',
+              key: 'action.record'
+            },
+            {
+              type: 'action',
+              title: this.$t('Take screenshot'),
+              icon:'mdi-camera',
+              key: 'action.camera.screenshot'
             }
           ]
         }

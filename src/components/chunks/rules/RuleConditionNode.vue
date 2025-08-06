@@ -1,6 +1,6 @@
 <template>
   <RuleNodeWrapper
-    :title="$t('Condition')"
+    :title="flow.el.title"
     :icon="flow.el.icon"
   >
     <template #handle>
