@@ -5,6 +5,7 @@ import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
 export default {
   name: 'DeviceUptimeCard',
   components: {DeviceCardCharacteristicItem},
+  emits:['refresh-device'],
   computed: {
     device() {
       return this.$store.getters['getDevice']
@@ -12,8 +13,11 @@ export default {
     uptime() {
       return microsecondsToUptime(this.device.uptime)
     },
+    fwVer() {
+      return this.device?.fw_ver
+    },
     uptimeStr() {
-      return `${this.uptime.d} ${this.$t('d')}. ${this.uptime.h} ${this.$t('h')}. ${this.uptime.h} ${this.$t('m')}.`
+      return `${this.uptime.d} ${this.$t('d')}. ${this.uptime.h} ${this.$t('h')}. ${this.uptime.m} ${this.$t('m')}.`
     },
     memoryUsage() {
       return 100 - (this.device?.free_heap * 100 / this.device.total_heap)
@@ -40,6 +44,7 @@ export default {
         color="primary"
         class="mr-2"
         variant="plain"
+        @click="$emit('refresh-device')"
       />
       <VBtn
         icon="mdi-update"
@@ -56,6 +61,12 @@ export default {
       />
     </template>
     <template #text>
+      <DeviceCardCharacteristicItem
+        class="mb-2"
+        icon="mdi-code-block-tags"
+        :title="$t('Firmware')"
+        :value="fwVer"
+      />
       <DeviceCardCharacteristicItem
         class="mb-2"
         icon="mdi-timer"
