@@ -44,7 +44,8 @@ export default {
       auth: false,
       link: null,
       model: null,
-      showDrawings: false
+      showDrawings: false,
+      areasLoaded:false
     }
   },
   computed: {
@@ -68,12 +69,21 @@ export default {
       this.showDrawings = this.tab === 'detection'
       this.$emit('on-show-areas', this.showDrawings)
     },
+    auth(){
+      this.editCredentials = !this.modelHasCredentials
+
+    },
     cameraModel: {
       deep: true,
       handler(newValue) {
         this.init()
       }
     }
+  },
+  mounted() {
+    document.addEventListener('on-redraw', e => {
+      this.areasLoaded = true
+    })
   },
   unmounted() {
     this.$store.commit('destroyTracker')
@@ -84,7 +94,6 @@ export default {
   methods: {
     init() {
       this.model = this.cameraModel
-      this.model.password = null
       if (this.modelHasCredentials) {
         this.auth = true
       }
@@ -99,6 +108,7 @@ export default {
       if (method === 'addCamera') {
         this.model.change_credentials = true
       } else {
+
         this.model.change_credentials = this.editCredentials
       }
       const res = await this.$store.dispatch(method, this.model).catch(e => {
@@ -273,7 +283,10 @@ export default {
           </VSheet>
         </VSheet>
       </VTabsWindowItem>
-      <VTabsWindowItem value="detection">
+      <VTabsWindowItem
+        v-if="model.id && areasLoaded"
+        value="detection"
+      >
         <CameraAreas :camera="model" />
       </VTabsWindowItem>
     </VTabsWindow>

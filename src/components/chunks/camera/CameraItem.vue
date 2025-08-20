@@ -50,9 +50,7 @@ export default {
     }
   },
   async created() {
-    if (this.camera.cover !== null) {
-      this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 400})
-    }
+    this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 400})
     // this.height = this.$refs.card.$el.clientWidth / 4 * 3
     // window.addEventListener("resize", () => {
     //   this.height = this.$refs.card.$el.clientWidth / 4 * 3

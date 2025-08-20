@@ -66,7 +66,11 @@ export default {
   async checkAuth({commit}) {
     const url = `${API}auth/check`
     const res = await axios.get(url)
-      .catch(() => {
+      .catch(e => {
+        const status = e.response.status
+        if(status === 401) {
+          commit('setInstalled', true)
+        }
         commit('setAuthenticated', false)
         commit('setUser', null)
         commit('setToken', null)
@@ -448,6 +452,16 @@ export default {
       return res.data
     }
   },
+
+  async deleteCameraEvent({commit}, id) {
+    commit('setLoading', true)
+    const res = await axios.delete(`/api/events/${id}`).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      return res.data
+    }
+  },
   async getCameraEvents({commit}, data) {
     commit('setLoading', true)
     const res = await axios.post(
@@ -495,7 +509,54 @@ export default {
     if (response) {
       return response.data
     }
+  },
+
+  /** RULES **/
+
+  async getRules({commit}) {
+    commit('setLoading', true)
+    const res = await axios.get('/api/rules').finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      commit('setRules', res.data)
+      return res.data
+    }
+  },
+
+  async getRule({commit}, id) {
+    commit('setLoading', true)
+    const res = await axios.get(`/api/rules/${id}`).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      commit('setActiveRule', res.data)
+      return res.data
+    }
+  },
+
+  async addRule({commit}, data) {
+    commit('setLoading', true)
+    const res = await axios.post('/api/rules', data).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      commit('addRule', res.data)
+      return res.data
+    }
+  },
+
+  async updateRule({commit}, {id,nodes,edges}) {
+    commit('setLoading', true)
+    const res = await axios.put(`/api/rules/${id}/graph`, {nodes,edges}).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      commit('addRule', res.data)
+      return res.data
+    }
   }
+
 
 
 }

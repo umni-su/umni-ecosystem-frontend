@@ -9,24 +9,24 @@
         id="output-true"
         class="handler bg-success"
         type="source"
-        position="bottom"
+        position="right"
         :connectable="true"
-        :style="{ left: '20%' }"
+        :style="{ top: '20%' }"
       />
       <Handle
         id="output-false"
         class="handler bg-error"
         type="source"
-        position="bottom"
+        position="right"
         :connectable="true"
-        :style="{ left: '80%' }"
+        :style="{ top: '80%' }"
       />
       <!-- Target handle (вход) -->
       <Handle
         id="input"
-        class="handler bg-primary"
+        class="handler bg-purple"
         type="target"
-        position="top"
+        position="left"
         :connectable="true"
       />
     </template>
@@ -106,6 +106,12 @@ export default {
           color:'error'
         }
       ]
+    }
+  },
+  created() {
+    const operand = this.data?.options?.operand
+    if (operand !== null){
+      this.index = this.types.findIndex(t=> t.key === operand)
     }
   },
   methods: {

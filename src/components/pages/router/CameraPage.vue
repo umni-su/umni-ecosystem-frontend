@@ -87,13 +87,7 @@ export default {
     },
     openModal() {
       this.open = !this.open
-    },
-    toggleTrackerMode() {
-      if (this.tracker !== null) {
-        this.tracker.toggleMode()
-      }
     }
-
   }
 }
 </script>
@@ -124,7 +118,10 @@ export default {
     <VSheet
       class="actions text-center pa-2"
     >
-      <CameraRecordDot :camera="camera" />
+      <CameraRecordDot
+        :camera="camera"
+        class="mr-2"
+      />
 
       <VBtn
         :icon="!hideDrawings ? 'mdi-image' : 'mdi-image-off'"
@@ -183,24 +180,6 @@ export default {
       :title="title"
       :camera-model="camera"
     >
-      <template #prepend>
-        <VBtn
-          v-if="tracker"
-          variant="text"
-          density="comfortable"
-          :icon="tracker.isDrawingMode ? 'mdi-pencil' : 'mdi-cursor-move'"
-          @click="toggleTrackerMode"
-        />
-        <VBtn
-          v-if="tracker && tracker.isDrawingMode"
-          v-tooltip="$t('New zone')"
-          variant="text"
-          density="comfortable"
-          icon="mdi-plus"
-          class="mr-2"
-          @click="tracker.startNewPolygon()"
-        />
-      </template>
       <CameraForm
         :camera-model="camera"
         @on-show-areas="hideDrawings = !$event"

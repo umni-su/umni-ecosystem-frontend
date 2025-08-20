@@ -5,10 +5,12 @@ import CameraEventsBar from '../../chunks/camera/CameraEventsBar.vue'
 import SidebarPanel from '../../chunks/SidebarPanel.vue'
 import CameraRecordingPlayback from '../../chunks/camera/CameraRecordingPlayback.vue'
 import CameraEventDetails from '../../chunks/camera/CameraEventDetails.vue'
+import NotFound from '../../chunks/NotFound.vue'
 
 export default {
   name: 'CameraEventPage',
   components: {
+    NotFound,
     CameraEventDetails,
     CameraRecordingPlayback, SidebarPanel, CameraEventsBar, CameraTimeline, CameraVideoPlayer
   },
@@ -23,7 +25,8 @@ export default {
       asTimeLine: false,
       url: null,
       event: null,
-      open: true
+      open: true,
+      notFound:false
     }
   },
   computed: {
@@ -47,7 +50,11 @@ export default {
       this.$store.commit('setTitle', this.$t('Event {id}', {id: this.id}))
     },
     async getEvent() {
-      this.event = await this.$store.dispatch('getCameraEvent', this.id)
+      this.event = await this.$store.dispatch('getCameraEvent', this.id).catch(e =>{
+        if(e.response.status === 404){
+          this.notFound = true
+        }
+      })
     },
     async getUrl() {
       const url = await this.$store.dispatch('getEventStream', this.id)
@@ -63,7 +70,9 @@ export default {
     class="pa-4 position-relative"
     color="default"
   >
-    <VSheet class="mode-switcher">
+    <VSheet
+      class="mode-switcher"
+    >
       <VBtn
         density="comfortable"
         :color="!asTimeLine ? 'primary':'white'"
@@ -120,6 +129,7 @@ export default {
       />
     </VSheet>
   </VCard>
+  <NotFound v-else-if="!event && notFound"/>
 </template>
 
 <style scoped lang="scss">

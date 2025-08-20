@@ -6,16 +6,16 @@
     <template #handle>
       <Handle
         id="input"
-        class="handler bg-secondary"
+        class="handler bg-primary"
         type="target"
-        position="top"
+        position="left"
         :connectable="true"
       />
       <Handle
         id="output"
-        class="handler bg-orange"
-        type="target"
-        position="bottom"
+        class="handler bg-purple"
+        type="source"
+        position="right"
         :connectable="true"
       />
     </template>

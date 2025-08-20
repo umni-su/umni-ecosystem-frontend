@@ -46,16 +46,21 @@ export default {
 </script>
 
 <template>
-  <VApp
-    v-if="visible"
-    :theme="_theme"
-    class="fill-height"
-  >
-    <InstallPage v-if="!init && !installed" />
-    <PageLayout v-else-if="authenticated" />
-    <LoginPage v-else />
-    <SystemNotifications />
-  </VApp>
+  <VSheet>
+    <VApp
+      v-if="visible"
+      :theme="_theme"
+      class="fill-height"
+    >
+      <InstallPage v-if="!init && !installed" />
+      <PageLayout v-else-if="authenticated" />
+      <LoginPage v-else />
+
+    </VApp>
+    <Teleport to="body">
+      <SystemNotifications />
+    </Teleport>
+  </VSheet>
 </template>
 
 <style scoped>

@@ -5,9 +5,9 @@
     v-model="notification.active"
     variant="flat"
     location="bottom right"
+    class="position-fixed"
     :style="`bottom:${(60 * index)}px`"
     :color="notification.style"
-    :timeout="notification.timeout"
     @update:model-value="onClose($event,notification)"
   >
     <template #actions>

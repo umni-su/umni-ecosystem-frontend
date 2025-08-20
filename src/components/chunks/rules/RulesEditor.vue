@@ -55,6 +55,12 @@ export default {
     Controls,
     RuleEditDialog
   },
+  props:{
+    modelValue:{
+      type:Object,
+      required:true
+    }
+  },
   computed:{
     nodes(){
       return this.$store.getters['getNodes']
@@ -83,10 +89,10 @@ export default {
       },
       connectionRules: {
         // Какие типы узлов можно соединять
-        trigger: ['start','device'],
-        finish: ['start','condition','device', 'action', 'camera'],
-        start: ['finish','trigger'],
-        condition: ['trigger','condition','device', 'action', 'camera','finish'],
+        trigger: ['condition'],
+        end: ['start','condition','device', 'action', 'camera'],
+        start: ['end','trigger'],
+        condition: ['trigger','condition','device', 'action', 'camera','end'],
         device: ['action'],
         camera: ['action'],
         action: ['device', 'camera', 'condition','trigger']
@@ -94,7 +100,7 @@ export default {
       nodeTypes: markRaw({
         trigger: RuleTriggerNode,
         start: RuleStartNode,
-        finish: RuleEndNode,
+        end: RuleEndNode,
         condition: RuleConditionNode,
         device: RuleDeviceNode,
         camera: RuleCameraNode,
@@ -102,8 +108,11 @@ export default {
       })
     }
   },
-  mounted() {
-    this.initNodes()
+  created() {
+    //this.initNodes()
+    this.rule = this.modelValue
+    this.$store.commit('setNodes', this.rule.nodes)
+    this.$store.commit('setEdges', this.rule.edges)
   },
   methods: {
     onEdgesChanged(e){
@@ -126,22 +135,6 @@ export default {
       )
       this.$store.commit('setEdges', edges)
 
-    },
-    initNodes() {
-      //DEMO
-      const testNodes = [
-        {
-          id: '1',
-          type: 'start',
-          position: { x: 10, y: 10 }
-        },
-        {
-          id: '2',
-          type: 'finish',
-          position: { x: 10, y: 500 }
-        }
-      ]
-      this.$store.commit('setNodes', testNodes)
     },
     onConnect(params) {
       const sourceNode = this.nodes.find(n => n.id === params.source)

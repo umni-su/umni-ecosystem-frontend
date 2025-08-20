@@ -7,9 +7,9 @@
     <template #handle>
       <Handle
         id="input"
-        class="handler bg-grey"
+        class="handler bg-pink"
         type="target"
-        position="top"
+        position="left"
         :connectable="true"
       />
 

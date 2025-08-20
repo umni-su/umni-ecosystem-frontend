@@ -11,7 +11,7 @@
         id="output"
         class="handler bg-primary"
         type="source"
-        position="bottom"
+        position="right"
         :connectable="true"
       />
 

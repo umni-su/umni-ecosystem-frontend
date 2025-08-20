@@ -31,7 +31,7 @@ export default {
     this.$store.commit('destroyTracker')
     setTimeout(() => {
       this.createTracker(this.camera)
-    }, 200)
+    }, 1000)
   },
   methods: {
     createTracker(camera) {
@@ -56,9 +56,7 @@ export default {
       this.url = `/api/cameras/${this.camera.id}/stream?token=${this.token}`
     },
     async getCameraCover() {
-      if (this.camera.cover !== null) {
-        this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700})
-      }
+      this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700})
     }
   }
 }

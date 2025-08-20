@@ -7,14 +7,7 @@
         id="input"
         class="handler bg-primary"
         type="target"
-        position="top"
-        :connectable="true"
-      />
-      <Handle
-        id="output"
-        class="handler bg-primary"
-        type="target"
-        position="bottom"
+        position="left"
         :connectable="true"
       />
     </template>

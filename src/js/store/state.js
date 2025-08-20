@@ -7,6 +7,7 @@ export default {
   token: localStorage.getItem('token') ?? null,
   title: null,
   theme: localStorage.getItem('theme') ?? 'light',
+  fullWidth: false,
   notifications: [],
   dateFormat: 'DD.MM.YYYY',
   timeFormat: 'HH:mm',
@@ -35,6 +36,8 @@ export default {
   },
   edges:[],
   nodes:[],
+  rules:[],
+  rule: null,
   selectedNode:null,
   ws: {
     id: null,

@@ -1,6 +1,7 @@
 <script>
 export default {
   name: 'RuleGroups',
+  emits: ['on-drag-start'],
   computed:{
     flow(){
       return this.$store.getters['getFlow']
@@ -22,7 +23,7 @@ export default {
               type: 'trigger',
               title: this.$t('State changes'),
               icon: 'mdi-swap-horizontal',
-              key: 'device.changes.state'
+              key: 'devices.changes.state'
             },
             {
               type: 'trigger',
@@ -48,7 +49,7 @@ export default {
               key: 'rule.start'
             },
             {
-              type: 'finish',
+              type: 'end',
               title: this.$t('End'),
               icon:'mdi-ray-end',
               key: 'rule.end'
@@ -61,26 +62,21 @@ export default {
             }
           ]
         },
-        entities:{
-          label:this.$t('Entities'),
-          items:[
-            {
-              type: 'camera',
-              title: this.$t('Camera'),
-              icon:'mdi-video',
-              key: 'entities.camera'
-            },
-            {
-              type: 'device',
-              title: this.$t('Device'),
-              icon:'mdi-chip',
-              key: 'entities.device'
-            }
-          ]
-        },
         actions:{
           label:this.$t('Actions'),
           items:[
+            {
+              type: 'action',
+              title: this.$t('Camera'),
+              icon:'mdi-video',
+              key: 'action.camera'
+            },
+            {
+              type: 'action',
+              title: this.$t('Device'),
+              icon:'mdi-chip',
+              key: 'action.device'
+            },
             {
               type: 'action',
               title: this.$t('Enable alarm'),
@@ -130,6 +126,7 @@ export default {
   },
   methods: {
     onDragStart(event, el, index, group) {
+      this.$emit('on-drag-start', el, index, group)
       event.dataTransfer.setData('application/vueflow', el.type)
       event.dataTransfer.effectAllowed = 'move'
       this.$store.commit('setFlowDragging', true)

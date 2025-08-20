@@ -13,6 +13,7 @@ import CameraPage from '../../components/pages/router/CameraPage.vue'
 import CameraEventsPage from '../../components/pages/router/CameraEventsPage.vue'
 import CameraEventPage from '../../components/pages/router/CameraEventPage.vue'
 import RulesPage from '../../components/pages/router/RulesPage.vue'
+import RulePage from '../../components/pages/router/RulePage.vue'
 
 const routes = [
   {
@@ -92,11 +93,23 @@ const routes = [
   },
   {
     path: '/rules',
-    children: [{
-      path: '',
-      name: 'rules',
-      component: RulesPage
-    }]
+    children: [
+      {
+        path: '',
+        name: 'rules',
+        component: RulesPage
+      },
+      {
+        path: ':id(\\d+)',
+        name: 'rule',
+        props: (route) => {
+          return {
+            ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
+          }
+        },
+        component: RulePage
+      }
+    ]
   },
   {
     path: '/settings',

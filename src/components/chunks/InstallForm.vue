@@ -9,7 +9,7 @@ export default {
   emits: ['on-account-updated'],
   data() {
     return {
-      step: 1,
+      installStep: 1,
       canInstall: false,
       showPassword: false,
       account: {
@@ -79,33 +79,33 @@ export default {
     class="fill-height w-100 d-flex align-center justify-center"
   >
     <VCard
-      variant="tonal"
-      :color="theme === 'light' ? 'primary' : 'primary-darken'"
+      color="primary-darken"
       max-width="400"
       width="100%"
       class="ma-auto"
     >
       <VCardTitle class="text-center mt-6">
         <UmniLogo
-          :fill="theme === 'light' ? '#0486c2' : '#0486c2'"
-          :size="60"
+          fill="#ffffff"
+          :short="false"
+          :width="240"
         />
       </VCardTitle>
       <VCardTitle
-        v-if="step === 1"
+        v-if="installStep === 1"
         class="text-center"
       >
         {{ $t('Account settings') }}
       </VCardTitle>
       <VCardTitle
-        v-if="step === 2"
+        v-if="installStep === 2"
         class="text-center"
       >
         {{ $t('MQTT settings') }}
       </VCardTitle>
       <VCardText>
         <VWindow
-          v-model="step"
+          v-model="installStep"
           class="pt-4"
         >
           <VWindowItem
@@ -114,31 +114,36 @@ export default {
             <VForm>
               <VTextField
                 v-model="account.firstname"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 class="mb-4"
                 :label="$t('Firstname')"
               />
               <VTextField
                 v-model="account.lastname"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 class="mb-4"
                 :label="$t('Lastname')"
               />
               <VTextField
                 v-model="account.email"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 class="mb-4"
                 :label="$t('Email')"
               />
               <VTextField
                 v-model="account.username"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 class="mb-4"
                 :label="$t('Username')"
               />
               <VTextField
                 v-model="account.password"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 :type="showPassword ? 'text' : 'password'"
                 class="mb-4"
                 :label="$t('Password')"
@@ -156,7 +161,8 @@ export default {
               <VTextField
                 v-model="account.passwordConfirm"
                 color="default"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 :type="showPassword ? 'text' : 'password'"
                 class="mb-4"
                 :label="$t('Password confirmation')"
@@ -167,25 +173,29 @@ export default {
             <VForm>
               <VTextField
                 v-model="mqtt.host"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 class="mb-4"
                 :label="$t('Host')"
               />
               <VTextField
                 v-model.number="mqtt.port"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 class="mb-4"
                 :label="$t('Host')"
               />
               <VTextField
                 v-model.number="mqtt.user"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 class="mb-4"
                 :label="$t('User')"
               />
               <VTextField
                 v-model.number="mqtt.password"
-                autocomplete="off"
+                autocomplete="new-password"
+                inputmode="none"
                 type="password"
                 class="mb-4"
                 :label="$t('Password')"
@@ -194,23 +204,23 @@ export default {
           </VWindowItem>
         </VWindow>
       </VCardText>
-      <VCardActions v-show="step === 1">
+      <VCardActions v-show="installStep === 1">
         <VSpacer />
         <VBtn
           color="default"
           variant="plain"
           :text="$t('Next')"
           append-icon="mdi-chevron-right"
-          @click="step =2"
+          @click="installStep =2"
         />
       </VCardActions>
-      <VCardActions v-show="step === 2">
+      <VCardActions v-show="installStep === 2">
         <VBtn
           density="comfortable"
           color="default"
           variant="plain"
           icon="mdi-chevron-left"
-          @click="step = 1"
+          @click="installStep = 1"
         />
         <VSpacer />
         <VBtn
@@ -237,10 +247,10 @@ export default {
       <VBtn
         color="default"
         variant="plain"
-        :disabled="step === 1"
+        :disabled="installStep === 1"
         :text="$t('Account settings')"
         icon="mdi-chevron-left"
-        @click="step = 1"
+        @click="installStep = 1"
       />
       <ThemeSwitcher
         density="comfortable"
@@ -250,10 +260,10 @@ export default {
       <VBtn
         color="default"
         variant="plain"
-        :disabled="step === 2"
+        :disabled="installStep === 2"
         :text="$t('MQTT settings')"
         icon="mdi-chevron-right"
-        @click="step = 2"
+        @click="installStep = 2"
       />
     </VSheet>
   </VSheet>

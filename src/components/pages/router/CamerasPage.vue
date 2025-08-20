@@ -21,6 +21,9 @@ export default {
   computed: {
     cameras() {
       return this.$store.getters['getCameras']
+    },
+    storages() {
+      return this.$store.getters['getStorages']
     }
   },
   async created() {
@@ -50,7 +53,27 @@ export default {
     fluid
   >
     <VRow no-gutters>
-      <VCol>
+      <VCol v-if="storages.length === 0">
+        <VEmptyState>
+          <template #headline>{{$t('There are no storages')}}</template>
+          <template #title>{{$t('You should add at least one storage')}}</template>
+          <template #media>
+            <VIcon
+              icon="mdi-database"
+              size="200"
+            />
+          </template>
+          <template #actions>
+            <VBtn
+              color="primary"
+              prepend-icon="mdi-plus"
+              :text="$t('Add')"
+            />
+          </template>
+
+        </VEmptyState>
+      </VCol>
+      <VCol v-if="storages.length>0">
         <VCard
           variant="text"
         >

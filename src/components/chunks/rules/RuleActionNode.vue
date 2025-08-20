@@ -9,7 +9,7 @@
         id="input"
         class="handler bg-secondary"
         type="target"
-        position="top"
+        position="left"
         :connectable="true"
       />
     </template>

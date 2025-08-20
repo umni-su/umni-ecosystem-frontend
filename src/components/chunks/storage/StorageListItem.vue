@@ -3,6 +3,7 @@ import formatBytes from '../../../js/helpers/formatBytes.js'
 
 export default {
   name: 'StorageListItem',
+  methods: {formatBytes},
   props: {
     storage: {
       type: Object,
@@ -12,12 +13,19 @@ export default {
   emits: ['on-click', 'on-edit', 'on-delete'],
   data() {
     return {
-      size: null
+      size: null,
+      usage: null
     }
   },
   computed: {
     lastMessage() {
       return this.$store.getters['getWsLastMessage']
+    },
+    storages() {
+      return this.$store.getters['getStorages']
+    },
+    total(){
+      return formatBytes(this.usage.total ?? 0)
     }
   },
   watch: {
@@ -26,6 +34,7 @@ export default {
       handler(newVal) {
         if (newVal.topic === 'storage.size' && newVal.storage_id === this.storage.id) {
           this.size = formatBytes(newVal.size)
+          this.usage = newVal.usage
         }
       }
     }
@@ -40,7 +49,29 @@ export default {
     :subtitle="storage.path"
     @click="$emit('on-click',storage)"
   >
-    {{ size }}
+    <VProgressLinear
+      v-if="size !== null"
+      v-tooltip="$t(
+        'Used: {used}% of {total}',
+        {
+          used:usage.used_total,
+          total:`${total.val} ${total.size}`,
+        }
+      )"
+      :max="100"
+      :model-value="usage.used_total"
+      color="primary"
+      height="6"
+      class="my-2"
+    />
+    <VProgressLinear
+      v-else
+      height="6"
+      class="my-2"
+      color="secondary"
+      disabled
+      indeterminate
+    />
     <template #prepend>
       <VBtn
         icon="mdi-harddisk"

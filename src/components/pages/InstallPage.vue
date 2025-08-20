@@ -1,13 +1,11 @@
 <script>
 import UmniLogo from '../chunks/UmniLogo.vue'
-import ThemeSwitcher from '../chunks/ThemeSwitcher.vue'
 import InstallForm from '../chunks/InstallForm.vue'
 
 export default {
   name: 'InstallPage',
   components: {
     InstallForm,
-    ThemeSwitcher,
     UmniLogo
   },
   data() {
@@ -44,7 +42,7 @@ export default {
   <VLayout
     :theme="theme"
     full-height
-    class="bg-default"
+    class="bg-primary"
   >
     <VSheet
       v-if="!start"
@@ -55,12 +53,13 @@ export default {
     >
       <UmniLogo
         class="d-block mb-6"
-        :fill="theme === 'light' ? '#0486c2' : '#ffffff'"
-        :size="160"
+        fill="#ffffff"
+        :width="280"
+        :short="false"
       />
       <div class="text-center mb-6">
         <div class="text-h5 mb-2">
-          {{ $t('UMNI SERVER') }}
+          {{ $t('SERVER') }}
         </div>
         <div class="text-subtitle-2 w-75 mx-auto">
           {{
@@ -72,9 +71,10 @@ export default {
           class="mt-8"
           size="x-large"
           :text="$t('Install ecosystem')"
-          color="primary-darken"
-          prepend-icon="mdi-send"
+          color="white"
           rounded="lg"
+          elevation="1"
+          variant="tonal"
           @click="startInstall"
         />
       </div>
@@ -83,7 +83,10 @@ export default {
         variant="tonal"
       >
         <VBtn
-          color="default"
+          color="white"
+          rounded="lg"
+          elevation="1"
+          variant="tonal"
           prepend-icon="mdi-web"
           :text="$t('Site')"
           href="https://umni.su"
@@ -91,15 +94,14 @@ export default {
           class="mr-4"
         />
         <VBtn
-          color="default"
+          color="white"
+          rounded="lg"
+          elevation="1"
+          variant="tonal"
           prepend-icon="mdi-book"
           href="https://docs.umni.su"
           target="_blank"
           :text="$t('Documentation')"
-        />
-        <ThemeSwitcher
-          density="comfortable"
-          class="ml-3"
         />
       </VSheet>
     </VSheet>

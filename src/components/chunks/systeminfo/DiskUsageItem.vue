@@ -14,7 +14,7 @@ export default {
       return this.disk.stat
     },
     free() {
-      return (100 * this.stat.free / this.stat.total).toFixed(0)
+      return (100 * this.stat.free / this.stat.total).toFixed(2)
     },
     used() {
       return 100 - this.free
@@ -25,10 +25,10 @@ export default {
       else return 'error'
     },
     sizeTotal() {
-      return formatBytes(this.stat.total, 0)
+      return formatBytes(this.stat.total, 2)
     },
     sizeFree() {
-      return formatBytes(this.stat.free, 0)
+      return formatBytes(this.stat.free, 2)
     }
   }
 }

@@ -48,6 +48,11 @@ const vuetify = createVuetify({
       variant: 'outlined',
       hideDetails: true
     },
+    VTextarea: {
+      density: 'compact',
+      variant: 'outlined',
+      hideDetails: true
+    },
     VFileInput: {
       density: 'compact',
       variant: 'outlined',

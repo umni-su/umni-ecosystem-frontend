@@ -2,50 +2,91 @@
 import SidebarPanel from '../../chunks/SidebarPanel.vue'
 import RulesEditor from '../../chunks/rules/RulesEditor.vue'
 import RuleGroups from '../../chunks/rules/RuleGroups.vue'
+import PageActions from '../../chunks/PageActions.vue'
+import ModalDialog from '../../chunks/ModalDialog.vue'
+import RuleForm from '../../chunks/rules/edit/RuleForm.vue'
+import RuleListItem from '../../chunks/rules/RuleListItem.vue'
 
 export default {
   name: 'RulesPage',
-  components: {RuleGroups, RulesEditor, SidebarPanel},
-  data() {
-    return {
-      open: true
+  components: {
+    RuleListItem,
+    RuleForm,
+    ModalDialog,
+    PageActions,
+    RuleGroups,
+    RulesEditor,
+    SidebarPanel
+  },
+  computed: {
+    rules(){
+      return this.$store.getters['getRules']
     }
   },
-  created() {
-    this.$store.commit('setTitle', this.$t('Rules editor'))
+  data() {
+    return {
+      open: false,
+      model: null
+    }
+  },
+  async created() {
+    this.empty()
+    this.$store.commit('setTitle', this.$t('Rules'))
+    await this.getRules()
+  },
+  methods:{
+    empty(){
+      this.model = {
+        name: null,
+        description: null,
+        active: false,
+        priority: 0
+      }
+    },
+    async getRules(){
+      await this.$store.dispatch('getRules')
+    },
+    onSaveRule(){
+      this.open = false
+      this.empty()
+    }
   }
 }
 </script>
 
 <template>
-  <VCard
-    class="position-relative fill-height"
+  <VSheet
+    color="default"
+    class="pa-4 position-relative fill-height"
   >
-    <VCardText class="fill-height pt-10">
-      <VSheet class="actions">
+    <PageActions>
+      <template #append>
         <VBtn
-          :icon="open ? 'mdi-menu-close':'mdi-menu-open'"
-          density="comfortable"
-          color="default"
+          icon="mdi-plus"
           variant="text"
-          @click="open = !open"
+          color="secondary"
+          density="comfortable"
+          @click="open = true"
         />
-      </VSheet>
-      <RulesEditor />
-      <SidebarPanel
-        v-model="open"
-        :title="$t('Rules elements')"
-      >
-        <template #default>
-          <RuleGroups/>
-          EDGES:
-          <pre>{{$store.state.edges}}</pre>
-          NODES:
-          <pre>{{$store.state.nodes}}</pre>
-        </template>
-      </SidebarPanel>
-    </VCardText>
-  </VCard>
+      </template>
+    </PageActions>
+    <ModalDialog
+      v-model="open"
+      :title="$t('Add rule')"
+    >
+      <RuleForm
+        v-model="model"
+        @rule-saved="onSaveRule"
+      />
+    </ModalDialog>
+    <VList>
+      <RuleListItem
+        v-for="rule in rules"
+        :key="rule.id"
+        :rule="rule"
+      />
+    </VList>
+  </VSheet>
 </template>
 
 <style scoped>

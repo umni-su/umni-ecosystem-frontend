@@ -75,7 +75,10 @@ export default {
 </script>
 
 <template>
-  <VSheet v-if="camera">
+  <VSheet
+    v-if="camera"
+    color="default"
+  >
     <VInfiniteScroll
       mode="manual"
       direction="vertical"

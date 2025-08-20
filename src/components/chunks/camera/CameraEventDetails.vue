@@ -2,10 +2,12 @@
 import {eventTypeToColor} from '../../../js/helpers/cameraHelper.js'
 import CameraEventImage from './CameraEventImage.vue'
 import secondsToHms from '../../../js/helpers/secondsToHms.js'
+import ConfirmationDialog from '../ConfirmationDialog.vue'
+import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
 
 export default {
   name: 'CameraEventDetails',
-  components: {CameraEventImage},
+  components: {ConfirmationDialog, CameraEventImage},
   props: {
     event: {
       type: Object,
@@ -31,11 +33,33 @@ export default {
     },
     record_duration() {
       return this.recording ? secondsToHms(this.recording.duration) : 0
+    },
+    token(){
+      return this.$store.getters['getToken']
+    },
+    downloadUrl(){
+      return `/api/events/${this.event.id}/download?token=${this.token}`
     }
   },
 
   methods: {
-    eventTypeToColor
+    eventTypeToColor,
+    async deleteEvent(){
+      const ok = await this.$refs.confirm.show({
+        title: this.$t('Delete event'),
+        message: this.$t('Event with files will be deleted'),
+        okText: this.$t('Delete'),
+        okIcon: 'mdi-trash-can'
+      })
+      if(ok){
+        const res = await this.$store.dispatch('deleteCameraEvent', this.event.id)
+        if(res){
+          this.$router.push({name:'camera-events', params:{id:this.camera.id}})
+          this.$store.commit('addNotification', createSuccessNotification(this.$t('Event has been deleted')))
+        }
+
+      }
+    }
   }
 }
 </script>
@@ -173,6 +197,8 @@ export default {
               prepend-icon="mdi-download"
               :text="$t('Download')"
               class="mr-4"
+              :href="downloadUrl"
+              target="_blank"
             />
           </template>
           <template #append>
@@ -182,11 +208,13 @@ export default {
               variant="tonal"
               prepend-icon="mdi-trash-can"
               :text="$t('Delete')"
+              @click="deleteEvent"
             />
           </template>
         </VListItem>
       </VList>
     </VSheet>
+    <ConfirmationDialog ref="confirm"/>
   </VSheet>
 </template>
 

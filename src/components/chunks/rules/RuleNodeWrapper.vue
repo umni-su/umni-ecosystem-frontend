@@ -19,7 +19,7 @@
       variant="tonal"
       rounded="pill"
       size="sm"
-      color="default"
+      color="error"
       @mousedown.stop
       @click.capture.stop="removeNode"
     />
@@ -38,22 +38,24 @@
           v-if="icon"
           :icon="icon"
           class="mr-2"
-          size="sm"
         />{{title}}</VCardSubtitle>
       <VCardText class="pa-0 pb-3">
         <slot/>
       </VCardText>
     </VCard>
+    <ConfirmationDialog ref="confirm"/>
   </div>
 
 </template>
 
 <script>
 import { Handle} from '@vue-flow/core'
+import ConfirmationDialog from '../ConfirmationDialog.vue'
 
 export default {
   name: 'RuleNodeWrapper',
   components: {
+    ConfirmationDialog,
     Handle
   },
   props: {
@@ -72,8 +74,16 @@ export default {
     }
   },
   methods: {
-    removeNode() {
-      this.$store.commit('removeNode', this.id)
+    async removeNode() {
+      const ok = await this.$refs.confirm.show({
+        title: this.$t('Delete node'),
+        message: this.$t('Node with edges will be deleted'),
+        okText: this.$t('Delete'),
+        okIcon: 'mdi-trash-can'
+      })
+      if(ok){
+        this.$store.commit('removeNode', this.id)
+      }
     },
     editNode() {
       this.$store.commit('selectNode', this.id)
@@ -86,13 +96,13 @@ export default {
 .close {
   position: absolute;
   top:-10px;
-  right:-10px;
+  right:calc(50% - 12px);
   z-index: 100;
 }
 .edit {
   position: absolute;
-  top:-10px;
-  left:-10px;
+  bottom:-10px;
+  right:calc(50% - 12px);
   z-index: 100;
 }
 ::v-deep(.handler) {

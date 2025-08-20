@@ -99,7 +99,7 @@ export default {
           cols="12"
           md="6"
         >
-          <DeviceUptimeCard />
+          <DeviceUptimeCard @refresh-device="getDevice" />
           <DeviceInfoSensorsCard :device="deviceModel" />
         </VCol>
       </VRow>

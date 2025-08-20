@@ -123,6 +123,11 @@ export default {
     },
     openAreaSettings(poly) {
       console.log(poly)
+    },
+    toggleTrackerMode() {
+      if (this.tracker !== null) {
+        this.tracker.toggleMode()
+      }
     }
   }
 }
@@ -130,7 +135,25 @@ export default {
 
 <template>
   <VSheet>
-    <VSheet class="mt-4">
+    <VBtn
+      v-if="tracker"
+      variant="tonal"
+      density="comfortable"
+      :prepend-icon="tracker.isDrawingMode ? 'mdi-pencil' : 'mdi-cursor-move'"
+      :text="tracker.isDrawingMode ? $t('Editing') : $t('Dragging')"
+      @click="toggleTrackerMode"
+    />
+    <VBtn
+      v-if="tracker && tracker.isDrawingMode"
+      v-tooltip="$t('New zone')"
+      variant="tonal"
+      density="comfortable"
+      prepend-icon="mdi-plus"
+      class="ml-4"
+      :text="$t('Add area')"
+      @click="tracker.startNewPolygon()"
+    />
+    <VSheet class="mt-2">
       <VList
         v-model="selected"
         selectable

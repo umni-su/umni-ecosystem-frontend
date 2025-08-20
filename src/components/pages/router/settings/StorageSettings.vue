@@ -30,9 +30,6 @@ export default {
       return this.model.hasOwnProperty('id') ? this.$t('Edit storage') : this.$t('Add storage')
     }
   },
-  async created() {
-    await this.getStorages()
-  },
   methods: {
     async getStorages() {
       await this.$store.dispatch('getStorages')

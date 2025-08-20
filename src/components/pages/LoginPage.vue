@@ -45,36 +45,37 @@ export default {
       <template #text>
         <UmniLogo
           :short="false"
-          :width="250"
-          :height="80"
-          class="d-block ma-auto mb-2"
+          :width="280"
+          class="d-block ma-auto mb-4"
           color="#008dd2"
         />
-        <VTextField
-          v-model="username"
-          :label="$t('Username')"
-          class="mb-4"
-          autocomplete="off"
-          prepend-inner-icon="mdi-account"
-        />
-        <VTextField
-          v-model="password"
-          autocomplete="off"
-          :label="$t('Password')"
-          type="password"
-          class="mb-4"
-          prepend-inner-icon="mdi-key"
-        />
-        <VBtn
-          :loading="loading"
-          :disabled="loading"
-          class="w-100"
-          :text="$t('Login')"
-          prepend-icon="mdi-send"
-          color="primary-darken"
-          size="large"
-          @click="login"
-        />
+        <VForm @keydown.enter="login">
+          <VTextField
+            v-model="username"
+            :label="$t('Username')"
+            class="mb-4"
+            autocomplete="off"
+            prepend-inner-icon="mdi-account"
+          />
+          <VTextField
+            v-model="password"
+            autocomplete="off"
+            :label="$t('Password')"
+            type="password"
+            class="mb-4"
+            prepend-inner-icon="mdi-key"
+          />
+          <VBtn
+            :loading="loading"
+            :disabled="loading"
+            class="w-100"
+            :text="$t('Login')"
+            prepend-icon="mdi-send"
+            color="primary-darken"
+            size="large"
+            @click="login"
+          />
+        </VForm>
       </template>
     </VCard>
     <div class="mini-slog">

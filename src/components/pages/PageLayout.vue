@@ -32,6 +32,9 @@ export default {
     lastMessage() {
       return this.$store.getters['getWsLastMessage']
     },
+    isFullWidth() {
+      return this.$store.getters['isFullWidth']
+    },
     appBarColor() {
       if (!this.opened) {
         return 'primary'
@@ -52,6 +55,9 @@ export default {
   },
   unmounted() {
     this.$store.dispatch('wsDisconnect')
+  },
+  async created() {
+    await this.$store.dispatch('getStorages')
   }
 }
 </script>
@@ -143,7 +149,7 @@ export default {
         full-height
       >
         <VSheet
-          max-width="1200"
+          :max-width="isFullWidth ? 'none' : 1200"
           class="mx-auto pa-4 fill-height"
         >
           <RouterView />

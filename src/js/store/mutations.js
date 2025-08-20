@@ -19,6 +19,9 @@ export default {
   setTitle(state, title) {
     state.title = title
   },
+  setFullWidth(state, w) {
+    state.fullWidth = w
+  },
   setInterval(state, interval) {
     state.interval = interval
   },
@@ -216,5 +219,23 @@ export default {
     } else {
       state.edges.push(edge)
     }
+  },
+  /** RULES **/
+  setRules(state, rules){
+    state.rules = rules
+  },
+  setActiveRule(state, rule){
+    state.rule = rule
+  },
+  addRule(state, rule) {
+    const ind = state.rules.findIndex(n => n.id === rule.id)
+    if (ind > -1) {
+      state.rules[ind] = rule
+    } else {
+      state.rules.push(rule)
+    }
+  },
+  removeRule(state, id){
+    state.rules = state.rules.filter(rule => rule.id !== id)
   }
 }

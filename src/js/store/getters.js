@@ -5,6 +5,9 @@ export default {
   isLoading(state) {
     return state.loading
   },
+  isFullWidth(state) {
+    return state.fullWidth
+  },
   isAuthenticated(state) {
     return state.authenticated
   },
@@ -91,5 +94,14 @@ export default {
   },
   getSelectedNode(state) {
     return state.selectedNode
+  },
+  getRules(state){
+    return state.rules
+  },
+  getRule:(state)=> id => {
+    return state.rules.find(node => node.id === id)
+  },
+  getCurrentRule(state){
+    return state.rule
   }
 }
