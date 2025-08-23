@@ -38,7 +38,9 @@
           v-if="icon"
           :icon="icon"
           class="mr-2"
-        />{{title}}</VCardSubtitle>
+        />
+        {{title}}
+      </VCardSubtitle>
       <VCardText class="pa-0 pb-3">
         <slot/>
       </VCardText>
@@ -58,6 +60,7 @@ export default {
     ConfirmationDialog,
     Handle
   },
+  emits:['on-edit-node'],
   props: {
     id: String,
     title: String,
@@ -87,6 +90,7 @@ export default {
     },
     editNode() {
       this.$store.commit('selectNode', this.id)
+      this.$emit('on-edit-node', this.id)
     }
   }
 }

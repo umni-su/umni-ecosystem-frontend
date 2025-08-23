@@ -3,7 +3,7 @@ export default {
   name: 'CameraSelect',
   props:{
     modelValue:{
-      type:Number,
+      type:Object,
       default:null
     }
   },
@@ -26,8 +26,10 @@ export default {
     }
   },
   async created(){
+    if(this.cameras.length === 0){
+      await this.getCameras()
+    }
     this.camera = this.modelValue
-    await this.getCameras()
   },
   methods:{
     async getCameras(){
@@ -44,6 +46,7 @@ export default {
     :label="$t('Camera')"
     prepend-inner-icon="mdi-camera"
     :items="cameras"
+    :return-object="true"
     item-value="id"
     item-title="name"
   />

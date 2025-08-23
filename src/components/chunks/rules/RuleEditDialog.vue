@@ -24,25 +24,11 @@
           class="mt-2"
         />
       </div>
-
-      <div v-if="node.type === 'device'">
-        <VSelect
-          v-model="form.device"
-          :items="['relay1', 'light1', 'fan1']"
-          label="Устройство"
-        />
-        <VSelect
-          v-model="form.state"
-          :items="['on', 'off', 'toggle']"
-          label="Состояние"
-          class="mt-2"
-        />
-      </div>
       <EditTriggerRuleItem v-if="type==='trigger'"/>
-      {{id}}
-      {{type}}
-      {{flow.el.key}}
-      {{options}}
+      id - {{id}}<br>
+      type - {{type}}<br>
+      flow.el.key - {{flow.el.key}}<br>
+      options - {{options}}<br>
     </template>
     <template #actions>
       <VBtn

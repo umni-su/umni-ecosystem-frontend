@@ -555,6 +555,26 @@ export default {
       commit('addRule', res.data)
       return res.data
     }
+  },
+
+  async getRuleNode({commit}, id) {
+    commit('setLoading', true)
+    const res = await axios.get(`/api/rules/nodes/${id}`).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      return res.data
+    }
+  },
+
+  async getRuleNodeList({commit}, id) {
+    commit('setLoading', true)
+    const res = await axios.get(`/api/rules/nodes/${id}/list`).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      return res.data
+    }
   }
 
 

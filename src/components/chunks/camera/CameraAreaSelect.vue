@@ -8,6 +8,10 @@ export default {
     modelValue:{
       type:Number,
       default:null
+    },
+    camera:{
+      type:Object,
+      required:true
     }
   },
   emits:[
@@ -15,66 +19,36 @@ export default {
   ],
   data(){
     return {
-      camera: null,
-      cameraId: null,
-      area: null,
-      areas: []
+      area:null
     }
   },
   watch:{
-    area(){
-      this.$emit('update:model-value', this.area)
-    },
-    async cameraId(val){
-      this.camera = null
-      this.area = null
-      if(val === null){
-        this.areas = []
-      } else {
-        await this.getCamera()
+    camera:{
+      deep:true,
+      handler(value){
+        this.area = null
       }
     }
   },
-  async created(){
-
-  },
-  methods:{
-    async getCamera(){
-      this.camera = await this.$store.dispatch('getCamera', this.cameraId)
-      this.areas = this.camera.areas
+  computed:{
+    areas(){
+      return this.camera !== null? this.camera.areas : []
     }
   }
 }
 </script>
 
 <template>
-  <VSheet>
-    <VContainer class="pa-0">
-      <VRow>
-        <VCol
-          cols="12"
-          md="6"
-        >
-          <CameraSelect v-model="cameraId"/>
-        </VCol>
-        <VCol
-          cols="12"
-          md="6"
-        >
-          <VSelect
-            v-model="area"
-            :disabled="camera === null"
-            clearable
-            :label="$t('Area')"
-            prepend-inner-icon="mdi-texture-box"
-            :items="areas"
-            item-value="id"
-            item-title="name"
-          />
-        </VCol>
-      </VRow>
-    </VContainer>
-  </VSheet>
+  <VSelect
+    v-model="area"
+    clearable
+    :label="$t('Area')"
+    prepend-inner-icon="mdi-texture-box"
+    :items="areas"
+    item-value="id"
+    item-title="name"
+    @update:model-value="$emit('update:model-value', this.area)"
+  />
 </template>
 
 <style scoped>

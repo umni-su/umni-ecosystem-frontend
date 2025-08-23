@@ -5,7 +5,7 @@ const ruleTypes = {
       'camera.motion.end'
     ],
     device:[
-      'sensors.changes.data',
+      'sensors.changes.state',
       'devices.changes.state'
     ]
   }

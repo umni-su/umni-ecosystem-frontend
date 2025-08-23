@@ -24,10 +24,10 @@
       />
       <Background />
     </VueFlow>
-    <RuleEditDialog
-      v-model="edit"
-      @save="updateNode"
-    />
+    <!--    <RuleEditDialog-->
+    <!--      v-model="edit"-->
+    <!--      @save="updateNode"-->
+    <!--    />-->
   </VSheet>
 </template>
 

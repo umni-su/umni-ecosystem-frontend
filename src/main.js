@@ -66,6 +66,11 @@ const vuetify = createVuetify({
       density: 'compact',
       hideDetails: true
     },
+    VAutocomplete: {
+      variant: 'outlined',
+      density: 'compact',
+      hideDetails: true
+    },
     VCheckbox: {
       hideDetails: true
     },

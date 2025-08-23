@@ -38,11 +38,12 @@ export default {
   },
   methods: {
     async getRule(){
-      await this.$store.dispatch('getRule', this.id).catch(e=>{
+      const ok = await this.$store.dispatch('getRule', this.id).catch(e=>{
         this.notFound = true
       })
-      if(!this.notFound){
+      if(ok){
         this.$store.commit('setTitle',this.$t('Rule: {name}',{name:this.rule.name}))
+        this.notFound = false
       }
     },
     async updateRule(){
@@ -106,7 +107,7 @@ export default {
       </SidebarPanel>
     </VCardText>
   </VCard>
-  <NotFound/>
+  <NotFound v-else-if="notFound"/>
 </template>
 
 <style scoped>

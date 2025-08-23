@@ -182,7 +182,7 @@ export default {
     if (index > -1) {
       state.nodes[index].data = {...state.nodes[index].data,...data}
       updateNodeData(id,state.nodes[index].data)
-      console.log(nodes.value,state.nodes[index])
+      console.log(nodes.value,state.nodes[index].data)
     }
   },
   updateNodeDataOptions(state, {id,options}) {
