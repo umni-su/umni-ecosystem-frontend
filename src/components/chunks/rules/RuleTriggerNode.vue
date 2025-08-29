@@ -75,9 +75,9 @@
       </VList>
       <template #actions>
         <VBtn
-          prepend-icon="mdi-content-save"
-          :text="$t('Save')"
-          @click="saveNode; open = false"
+          prepend-icon="mdi-check"
+          :text="$t('Apply')"
+          @click.stop="saveAndClose"
         />
       </template>
     </ModalDialog>
@@ -167,6 +167,13 @@ export default {
         }
       }
       this.$store.commit('updateNodeData',_data)
+    },
+    saveAndClose(){
+      this.saveNode()
+      this.$nextTick(() => {
+        this.valuesList = this.selectedItems
+        this.open = false
+      })
     },
     deleteArea(id){
       this.nodeOptions.ids=this.nodeOptions.ids.filter(_id=>_id!==id)
