@@ -37,7 +37,10 @@ export default {
       {{ title }}
     </template>
     <template #append>
-      <slot name="value">
+      <slot
+        v-if="values !== undefined"
+        name="value"
+      >
         {{ values[values.length - 1] }}%
       </slot>
     </template>

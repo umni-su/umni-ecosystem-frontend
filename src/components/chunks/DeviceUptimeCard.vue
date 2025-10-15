@@ -16,6 +16,9 @@ export default {
     fwVer() {
       return this.device?.fw_ver
     },
+    online() {
+      return this.device?.online
+    },
     uptimeStr() {
       return `${this.uptime.d} ${this.$t('d')}. ${this.uptime.h} ${this.$t('h')}. ${this.uptime.m} ${this.$t('m')}.`
     },
@@ -61,6 +64,12 @@ export default {
       />
     </template>
     <template #text>
+      <DeviceCardCharacteristicItem
+        class="mb-2"
+        icon="mdi-code-block-tags"
+        :title="$t('Status')"
+        :value="online ? $t('Online') : $t('Offline')"
+      />
       <DeviceCardCharacteristicItem
         class="mb-2"
         icon="mdi-code-block-tags"

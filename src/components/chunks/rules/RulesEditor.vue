@@ -117,6 +117,18 @@ export default {
   methods: {
     onEdgesChanged(e){
       console.log('edges changed',e)
+      if(e.length > 0){
+        const edges = this.edges.filter(edge=>{
+          let can_return = true
+          e.map(_edge =>{
+            if(_edge.id === edge.id && _edge.type === 'remove'){
+              can_return = false
+            }
+          })
+          return can_return
+        })
+        this.$store.commit('setEdges', edges)
+      }
       return true
     },
     onNodeDragStop(event){

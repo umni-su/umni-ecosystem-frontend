@@ -2,6 +2,7 @@
   <RuleNodeWrapper
     :title="flow.el.title"
     :icon="flow.el.icon"
+    @on-edit-node="opened=true"
   >
     <template #handle>
       <!-- Source handle (выход) -->
@@ -30,19 +31,17 @@
         :connectable="true"
       />
     </template>
-    <div class="text-center pa-2 pb-0">
-      <VBtn
-        v-if="typeof icon === 'string' && typeof label === 'string'"
-        variant="tonal"
-        block
-        density="compact"
-        :color="color"
-        :prepend-icon="icon"
-        :text="label"
-        @mousedown.stop
-        @click.capture.stop="changeType"
+    <ModalDialog
+      v-model="opened"
+      :title="$t('Condition')"
+      :subtitle="`#${flow.el.key}`"
+    >
+
+      <RuleConditionItems
+        v-model="items"
+        @update:model-value="onUpdateConditions"
       />
-    </div>
+    </ModalDialog>
   </RuleNodeWrapper>
 
 </template>
@@ -50,10 +49,14 @@
 <script>
 import RuleNodeWrapper from './RuleNodeWrapper.vue'
 import {Handle} from '@vue-flow/core'
+import ModalDialog from '../ModalDialog.vue'
+import RuleConditionItems from './RuleConditionItems.vue'
 
 export default {
   name: 'RuleConditionNode',
   components: {
+    RuleConditionItems,
+    ModalDialog,
     Handle,
     RuleNodeWrapper
   },
@@ -64,65 +67,42 @@ export default {
     }
   },
   computed:{
+    selectedNode(){
+      return this.$store.getters['getSelectedNode']
+    },
     options(){
       return this.data.options
     },
+    conditions(){
+      return this.options?.conditions ?? []
+    },
     flow(){
       return this.data.flow
-    },
-    label(){
-      return this.types[this.index].label
-    },
-    icon(){
-      return this.types[this.index].icon
-    },
-    color(){
-      return this.types[this.index].color ?? 'grey'
-    },
-    operand(){
-      return this.types[this.index].key ?? 'and'
+    }
+  },
+  mounted() {
+    this.items = this.conditions
+  },
+  methods:{
+    onUpdateConditions(items){
+      this.$store.commit('updateNodeData',{
+        id: this.selectedNode.id,
+        data: {
+          ...this.data,
+          ...{
+            options: {
+              conditions: items
+            }
+          }
+        }
+      })
     }
   },
   data(){
     return {
-      index: 0,
-      types:[
-        {
-          label:this.$t('And'),
-          key: 'and',
-          icon:'mdi-gate-and',
-          color:'green'
-        },
-        {
-          label:this.$t('Or'),
-          key: 'or',
-          icon:'mdi-gate-or',
-          color:'warning'
-        },
-        {
-          label:this.$t('Not'),
-          key: 'not',
-          icon:'mdi-gate-not',
-          color:'error'
-        }
-      ]
-    }
-  },
-  created() {
-    const operand = this.data?.options?.operand
-    if (operand !== null){
-      this.index = this.types.findIndex(t=> t.key === operand)
-    }
-  },
-  methods: {
-    changeType(e) {
-      this.index = this.index >= (this.types.length - 1) ? 0 : this.index+1
-      this.$store.commit('updateNodeDataOptions', {
-        id: this.$attrs.id,
-        options:{
-          operand: this.operand
-        }
-      })
+      items:[],
+      opened: false,
+      index: 0
     }
   }
 }

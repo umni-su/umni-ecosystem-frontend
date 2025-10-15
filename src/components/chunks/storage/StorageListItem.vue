@@ -26,6 +26,9 @@ export default {
     },
     total(){
       return formatBytes(this.usage.total ?? 0)
+    },
+    used(){
+      return formatBytes(this.usage.used ?? 0)
     }
   },
   watch: {
@@ -52,9 +55,9 @@ export default {
     <VProgressLinear
       v-if="size !== null"
       v-tooltip="$t(
-        'Used: {used}% of {total}',
+        'Used: {used} of {total}',
         {
-          used:usage.used_total,
+          used:used,
           total:`${total.val} ${total.size}`,
         }
       )"

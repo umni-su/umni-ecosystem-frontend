@@ -5,14 +5,12 @@ export default {
   computed:{
     flow(){
       return this.$store.getters['getFlow']
-    }
-  },
-  data(){
-    return {
-      list:{
-        triggers:{
+    },
+    list(){
+      return {
+        triggers: {
           label: this.$t('Triggers'),
-          items:[
+          items: [
             {
               type: 'trigger',
               title: this.$t('Sensor data'),
@@ -39,89 +37,94 @@ export default {
             }
           ]
         },
-        conditions:{
-          label:this.$t('Conditions'),
-          items:[
+        conditions: {
+          label: this.$t('Conditions'),
+          items: [
             {
               type: 'start',
               title: this.$t('Start'),
-              icon:'mdi-ray-start',
+              icon: 'mdi-ray-start',
               key: 'rule.start'
             },
             {
               type: 'end',
               title: this.$t('End'),
-              icon:'mdi-ray-end',
+              icon: 'mdi-ray-end',
               key: 'rule.end'
             },
             {
               type: 'condition',
               title: this.$t('State'),
-              icon:'mdi-circle-outline',
+              icon: 'mdi-circle-outline',
               key: 'rule.condition'
             }
           ]
         },
-        actions:{
-          label:this.$t('Actions'),
-          items:[
+        actions: {
+          label: this.$t('Actions'),
+          items: [
             {
               type: 'action',
               title: this.$t('Camera'),
-              icon:'mdi-video',
+              icon: 'mdi-video',
               key: 'action.camera'
             },
             {
               type: 'action',
               title: this.$t('Device'),
-              icon:'mdi-chip',
+              icon: 'mdi-chip',
               key: 'action.device'
             },
             {
               type: 'action',
               title: this.$t('Enable alarm'),
-              icon:'mdi-alarm-light',
+              icon: 'mdi-alarm-light',
               key: 'action.alarm.on'
             },
             {
               type: 'action',
               title: this.$t('Disable alarm'),
-              icon:'mdi-alarm-light-off',
+              icon: 'mdi-alarm-light-off',
               key: 'action.alarm.off'
             },
             {
               type: 'action',
               title: this.$t('Webhook'),
-              icon:'mdi-gesture-tap',
+              icon: 'mdi-gesture-tap',
               key: 'action.webhook'
             },
             {
               type: 'action',
               title: this.$t('Email'),
-              icon:'mdi-email',
+              icon: 'mdi-email',
               key: 'action.email'
             },
             {
               type: 'action',
               title: this.$t('Telegram'),
-              icon:'mdi-send',
+              icon: 'mdi-send',
               key: 'action.telegram'
             },
             {
               type: 'action',
               title: this.$t('Start record'),
-              icon:'mdi-record',
+              icon: 'mdi-record',
               key: 'action.record'
             },
             {
               type: 'action',
               title: this.$t('Take screenshot'),
-              icon:'mdi-camera',
+              icon: 'mdi-camera',
               key: 'action.camera.screenshot'
             }
           ]
         }
       }
+    }
+  },
+  data(){
+    return {
+
     }
   },
   methods: {

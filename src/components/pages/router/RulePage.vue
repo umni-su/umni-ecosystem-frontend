@@ -17,17 +17,38 @@ export default {
   data(){
     return {
       open: true,
-      notFound:false
+      notFound:false,
+      message:null
     }
   },
   watch:{
     async id(){
       await this.getRule()
+    },
+    wsMessage:{
+      deep: true,
+      handler(newVal){
+        if(newVal && newVal.topic === 'rule.executed'){
+          if(newVal.rule_id===this.rule.id) this.message = newVal
+        }
+        return null
+      }
+    },
+    message:{
+      deep: true,
+      handler(newVal){
+        if(newVal && newVal.hasOwnProperty('edges')){
+          this.$store.commit('setEdges',newVal.edges)
+        }
+      }
     }
   },
   computed:{
     rule(){
       return this.$store.getters['getCurrentRule']
+    },
+    wsMessage(){
+      return this.$store.getters['getWsLastMessage']
     }
   },
   mounted(){
@@ -60,6 +81,9 @@ export default {
       if(this.$vuetify.display.mobile){
         this.open = false
       }
+    },
+    async executeRule(){
+      await this.$store.dispatch('executeRule', this.id)
     }
   }
 }
@@ -85,12 +109,16 @@ export default {
         v-model="open"
         :title="$t('Rules elements')"
       >
+        <template #prepend>
+          <VBtn
+            variant="text"
+            density="comfortable"
+            icon="mdi-play"
+            @click="executeRule"
+          />
+        </template>
         <template #default>
           <RuleGroups @on-drag-start="onDragStart"/>
-          EDGES:
-          <pre>{{$store.state.edges}}</pre>
-          NODES:
-          <pre>{{$store.state.nodes}}</pre>
           <VSheet class="position-absolute bottom-0 left-0 right-0 pa-2">
             <VBtn
               variant="tonal"
@@ -101,8 +129,6 @@ export default {
               @click="updateRule"
             />
           </VSheet>
-
-
         </template>
       </SidebarPanel>
     </VCardText>

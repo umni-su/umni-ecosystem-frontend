@@ -238,24 +238,46 @@ export default {
     }
   },
   /** SETTINGS **/
-  async getBaseSettings({commit}, data) {
+  async getConfiguration({commit}, data) {
     commit('setLoading', true)
     const res = await axios.get(`${API}configuration`, data).finally(() => {
       commit('setLoading', false)
     })
     if (res) {
+      commit('setConfiguration', res.data)
       return res.data
     }
   },
-  async saveBaseSetting({commit}, data) {
+  async saveConfigurationGroup({commit}, data) {
     commit('setLoading', true)
-    const res = await axios.post(`${API}configuration/${data.id}`, data).finally(() => {
+    const res = await axios.post(`${API}configuration`, data).finally(() => {
       commit('setLoading', false)
     })
     if (res) {
+      commit('setConfiguration', res.data)
       return res.data
     }
   },
+  async getAvailableLanguages({commit}, data) {
+    const res = await axios.get(`${API}configuration/lang`, data)
+    if (res) {
+      commit('setAvailableLanguages', res.data)
+      const currentLanguage = res.data.find(l=>l.selected === true).key
+      if(currentLanguage === null || currentLanguage === undefined) {
+        commit('setCurrentLanguage', 'en')
+      }else {
+        commit('setCurrentLanguage', currentLanguage)
+      }
+      return res.data
+    }
+  },
+  async getTranslationsForLang({_}, locale){
+    const translation = await axios.get(`${API}configuration/lang/${locale}`)
+    if(translation){
+      return translation.data
+    }
+  },
+
   /** SENSORS */
   async updateSensor({commit}, data) {
     commit('setLoading', true)
@@ -575,8 +597,28 @@ export default {
     if (res) {
       return res.data
     }
+  },
+
+  async executeRule({commit}, id) {
+    commit('setLoading', true)
+    const res = await axios.get(`/api/rules/${id}/execute`).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      return res.data
+    }
+  },
+
+  async getConditionsList({commit}){
+    const res = await axios.get('/api/rules/conditions/list')
+    if(res){
+      return res.data
+    }
+  },
+  async getConditionsEntities({commit}, filter){
+    const res = await axios.post('/api/rules/conditions/entities', filter)
+    if(res){
+      return res.data
+    }
   }
-
-
-
 }

@@ -50,7 +50,7 @@ export default {
 
 <template>
   <VCard
-    v-if="disks"
+    v-if="systemInfo"
     class="fill-height"
     cols="12"
     md="6"

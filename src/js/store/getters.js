@@ -1,4 +1,13 @@
 export default {
+  getConfiguration(state){
+    return state.configuration
+  },
+  getAvailableLanguages(state){
+    return state.languages
+  },
+  getCurrentLanguage(state){
+    return state.app.language
+  },
   getToken(state) {
     return state.token
   },

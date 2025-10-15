@@ -27,18 +27,6 @@ export default {
   data() {
     return {
       tab: 'connection',
-      tabs: [
-        {
-          name: this.$t('Connection'),
-          key: 'connection',
-          icon: 'mdi-connection'
-        },
-        {
-          name: this.$t('Detection'),
-          key: 'detection',
-          icon: 'mdi-motion-sensor'
-        }
-      ],
       editCredentials: false,
       asLink: false,
       auth: false,
@@ -49,6 +37,19 @@ export default {
     }
   },
   computed: {
+    tabs() {
+      return [
+        {
+          name: this.$t('Connection'),
+          key: 'connection',
+          icon: 'mdi-connection'
+        },
+        {
+          name: this.$t('Detection'),
+          key: 'detection',
+          icon: 'mdi-motion-sensor'
+        }
+      ]},
     disabled() {
       return this.model?.storage_id === undefined
           || this.model?.name?.length === undefined

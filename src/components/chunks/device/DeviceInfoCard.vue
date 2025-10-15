@@ -164,7 +164,7 @@ export default {
         :title="$t('Device info')"
       >
         <VTextField
-          v-model="title"
+          v-model="device.title"
           :label="$t('Title')"
         />
         <template #actions>

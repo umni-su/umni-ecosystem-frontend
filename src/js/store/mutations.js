@@ -25,6 +25,15 @@ export default {
   setInterval(state, interval) {
     state.interval = interval
   },
+  setConfiguration(state, c) {
+    state.configuration = c
+  },
+  setAvailableLanguages(state, languages) {
+    state.languages = languages
+  },
+  setCurrentLanguage(state, language) {
+    state.app.language = language
+  },
   setSystemInfo(state, systemInfo) {
     state.systemInfo = systemInfo
   },

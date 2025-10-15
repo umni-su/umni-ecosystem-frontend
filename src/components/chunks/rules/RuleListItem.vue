@@ -6,6 +6,11 @@ export default {
       type:Object,
       required:true
     }
+  },
+  methods:{
+    async executeRule(){
+      await this.$store.dispatch('executeRule', this.rule.id)
+    }
   }
 }
 </script>
@@ -25,10 +30,11 @@ export default {
     </template>
     <template #append>
       <VBtn
-        color="secondary"
-        icon="mdi-pencil"
+        color="primary"
+        icon="mdi-play"
         variant="text"
         density="comfortable"
+        @click.prevent.stop="executeRule"
       />
       <VBtn
         color="secondary"

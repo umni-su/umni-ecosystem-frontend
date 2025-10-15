@@ -1,65 +1,74 @@
 <script>
 import {createSuccessNotification} from '../../../../js/helpers/notificationHelper.js'
+import LanguageSwitcher from '../../../chunks/i18n/LanguageSwitcher.vue'
+import {changeLanguage} from '../../../../js/i18n.js'
 
 export default {
   name: 'BaseSettings',
+  components: {LanguageSwitcher},
   data() {
     return {
+      lang: null,
       configuration: null
     }
   },
-  async created() {await this.getConfiguration()   },
+  async created() {
+    await this.getConfiguration()
+  },
   methods: {
     async getConfiguration() {
-      this.configuration = await this.$store.dispatch('getBaseSettings')
+      this.configuration = await this.$store.dispatch('getConfiguration')
     },
-    async saveValue(conf) {
-      await this.$store.dispatch('saveBaseSetting', {
-        id: conf.id,
-        value: conf.value
-      })
+    async saveGroup(group) {
+      this.configuration = await this.$store.dispatch('saveConfigurationGroup', group)
       this.$store.commit('addNotification', createSuccessNotification(this.$t('Updated')))
-      conf.success = true
-      setTimeout(() => {
-        delete conf.success
-      }, 1000)
+      if(this.lang !== null){
+        await changeLanguage(this.lang)
+        this.$moment.locale(this.lang)
+      }
     }
   }
 }
 </script>
 
 <template>
-  <VCard
-    v-if="configuration"
-    class="mt-3"
-  >
-    <template #title>
-      {{ $t('System settings') }}
-    </template>
-    <template #text>
-      <VSheet
-        v-for="conf in configuration"
-        :key="conf.id"
-        class="mb-4"
-      >
-        <VTextField
-          v-model="conf.value"
-          :label="conf.key"
+  <VSheet v-if="configuration">
+    <VCard
+      v-for="conf in configuration"
+      class="mt-3"
+    >
+      <template #title>
+        {{ conf.label }}
+      </template>
+      <template #text>
+        <VSheet
+          v-for="setting in conf.items"
+          :key="setting.key"
+          class="mb-4"
         >
-          <template #append-inner>
-            <VBtn
-              variant="plain"
-              :disabled="conf?.success"
-              :color="conf?.success === undefined ? 'default' : 'success'"
-              density="comfortable"
-              :icon="conf?.success === undefined ? 'mdi-content-save':'mdi-check'"
-              @click="saveValue(conf)"
-            />
-          </template>
-        </VTextField>
-      </VSheet>
-    </template>
-  </VCard>
+          <LanguageSwitcher
+            v-if="setting.key === 'app.locale'"
+            v-model="setting.value"
+            :label="setting.translation"
+            @update:model-value="lang = $event"
+          />
+          <VTextField
+            v-else
+            v-model="setting.value"
+            :label="setting.translation"
+          />
+        </VSheet>
+      </template>
+      <template #actions>
+        <VSpacer/>
+        <VBtn
+          prepend-icon="mdi-content-save"
+          :text="$t('Save')"
+          @click="saveGroup(conf.items)"
+        />
+      </template>
+    </VCard>
+  </VSheet>
 </template>
 
 <style scoped>

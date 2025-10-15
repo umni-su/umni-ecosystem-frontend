@@ -1,4 +1,9 @@
 export default {
+  app:{
+    language: null
+  },
+  languages:[],
+  configuration:[],
   loading: false,
   interval: 10000,
   authenticated: false,

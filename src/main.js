@@ -6,11 +6,11 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import router from './js/router/router.js'
 import store from './js/store/store'
-import {setupI18n, loadLocaleMessages, plural} from './js/i18n'
 import moment from 'moment/min/moment-with-locales'
 import '@vuepic/vue-datepicker/dist/main.css'
 import App from './App.vue'
 import {createApp} from 'vue'
+import {createI18nInstance, installI18nHelpers} from './js/i18n.js'
 
 const light = {
   dark: false,
@@ -114,20 +114,14 @@ const vuetify = createVuetify({
 
 })
 
-const i18n = setupI18n({
-  legacy: false, // you must set `false`, to use Composition API
-  locale: defaultLang,
-  pluralRules: {
-    ru: plural
-  }
-})
-loadLocaleMessages(i18n, i18n.global.locale).then(() => {
-  const app = createApp(App)
-  moment.locale(defaultLang)
-  app.config.globalProperties.$moment = moment
-  app.use(store)
-  app.use(i18n)
-  app.use(router)
-  app.use(vuetify)
-  app.mount('#app')
-})
+const app = createApp(App)
+
+const i18n = createI18nInstance()
+
+installI18nHelpers(app)
+app.use(i18n)
+app.config.globalProperties.$moment = moment
+app.use(store)
+app.use(router)
+app.use(vuetify)
+app.mount('#app')
