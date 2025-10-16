@@ -1,10 +1,12 @@
 <script>
 import InfiniteAutocomplete from '../InfiniteAutocomplete.vue'
 import RuleConditionOperand from './RuleConditionOperand.vue'
+import RuleConditionGroupAction from './RuleConditionGroupAction.vue'
 
 export default {
   name: 'RuleConditionItem' ,
   components: {
+    RuleConditionGroupAction,
     RuleConditionOperand,
     InfiniteAutocomplete
   },
@@ -35,6 +37,9 @@ export default {
   computed:{
     itemsByGroup(){
       return this.groups.find(_group => this.condition?.group === _group.key)
+    },
+    currentItemByKey(){
+      return this.itemsByGroup?.items?.find(_item=>_item.key === this.condition.key)
     }
   },
   watch:{
@@ -85,7 +90,6 @@ export default {
         }
       }
     }
-
   }
 }
 </script>
@@ -97,7 +101,24 @@ export default {
         v-model="condition.operand"
         class="mr-2"
       />
-      {{$t('Condition')}}
+      <VChip
+        v-if="itemsByGroup?.label"
+        :prepend-icon="itemsByGroup?.icon"
+        variant="text"
+        :text="itemsByGroup?.label"
+      />
+      <VIcon
+        v-if="currentItemByKey"
+        icon="mdi-arrow-right"
+        size="small"
+        class="mx-1"
+      />
+      <VChip
+        v-if="currentItemByKey?.label"
+        :prepend-icon="currentItemByKey?.icon"
+        variant="text"
+        :text="currentItemByKey?.label"
+      />
       <template #actions="{ expanded }">
         <VBtn
           v-if="expanded"
@@ -105,7 +126,7 @@ export default {
           variant="text"
           icon="mdi-close"
           color="red"
-          @click.stop="$emit('on-remove',condition)"
+          @click.stop="$emit('on-remove', condition)"
         />
         <VBtn
           readonly
@@ -148,6 +169,7 @@ export default {
         item-value="key"
         :label="$t('Choose condition')"
         :items="itemsByGroup.items"
+        @update:model-value="condition.items = []"
       >
         <template #selection="{item}">
           <VIcon
@@ -170,6 +192,12 @@ export default {
         :data-response="entitiesPaginated"
         @update-term="updateTerm(condition)"
         @load="onLoad(condition, $event)"
+      />
+      <RuleConditionGroupAction
+        v-if="condition.items?.length > 0"
+        v-model="condition.action"
+        class="mt-2"
+        :condition="condition"
       />
     </VExpansionPanelText>
   </VExpansionPanel>

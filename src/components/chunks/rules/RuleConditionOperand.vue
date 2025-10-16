@@ -56,9 +56,6 @@ export default {
     },
     color(){
       return this.types[this.index].color ?? 'grey'
-    },
-    operand(){
-      return this.types[this.index].key ?? 'and'
     }
   },
   methods:{
@@ -71,6 +68,7 @@ export default {
     },
     changeType(e) {
       this.index = this.index >= (this.types.length - 1) ? 0 : this.index+1
+      this.operand = this.types[this.index].key
       this.$emit('update:model-value',this.operand)
     }
   }

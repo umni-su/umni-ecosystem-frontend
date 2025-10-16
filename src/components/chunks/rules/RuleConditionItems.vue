@@ -58,10 +58,9 @@ export default {
     </VExpansionPanels>
     <VSheet class="text-center">
       <VBtn
-        class="mt-2"
+        class="mt-4"
         prepend-icon="mdi-plus"
-        variant="text"
-        density="comfortable"
+        variant="tonal"
         color="default"
         :text="$t('Add')"
         @click="addCondition"

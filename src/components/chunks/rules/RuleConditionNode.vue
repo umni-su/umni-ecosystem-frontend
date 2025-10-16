@@ -31,12 +31,24 @@
         :connectable="true"
       />
     </template>
+
+    <VSheet class="text-center">
+      <VChip
+        v-if="conditions.length > 0"
+        class="my-1"
+        color="primary"
+        variant="tonal"
+        size="small"
+      >
+        {{$t('{n} conditions',{n:conditions.length})}}
+      </VChip>
+    </VSheet>
+
     <ModalDialog
       v-model="opened"
       :title="$t('Condition')"
       :subtitle="`#${flow.el.key}`"
     >
-
       <RuleConditionItems
         v-model="items"
         @update:model-value="onUpdateConditions"

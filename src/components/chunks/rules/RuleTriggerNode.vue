@@ -29,6 +29,17 @@
         :connectable="true"
       />
     </template>
+    <VSheet class="text-center">
+      <VChip
+        v-if="options?.ids?.length > 0"
+        class="my-1"
+        color="primary"
+        variant="tonal"
+        size="small"
+      >
+        {{$t('{n} triggers',{n:options?.ids?.length})}}
+      </VChip>
+    </VSheet>
     <ModalDialog
       v-model="open"
       :title="flow.el.title"
@@ -131,6 +142,9 @@ export default {
     },
     cameras(){
       return this.$store.getters['getCameras']
+    },
+    options(){
+      return this.data.options ?? []
     },
     selectedItems(){
       return this.nodeOptions.ids.map(id=>{
