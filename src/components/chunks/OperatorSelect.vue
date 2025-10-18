@@ -50,7 +50,7 @@ export default {
           label:this.$t('Greater than or equal')
         },
         {
-          key:'=',
+          key:'==',
           label:this.$t('Equal')
         },
         {

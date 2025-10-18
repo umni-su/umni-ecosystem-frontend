@@ -589,9 +589,9 @@ export default {
     }
   },
 
-  async getRuleNodeList({commit}, id) {
+  async getRuleNodeList({commit}, {id,filter}) {
     commit('setLoading', true)
-    const res = await axios.get(`/api/rules/nodes/${id}/list`).finally(() => {
+    const res = await axios.post(`/api/rules/nodes/${id}/list`,filter).finally(() => {
       commit('setLoading', false)
     })
     if (res) {
@@ -616,7 +616,7 @@ export default {
     }
   },
   async getConditionsEntities({commit}, filter){
-    const res = await axios.post('/api/rules/conditions/entities', filter)
+    const res = await axios.post('/api/rules/conditions/entities', filter.filter)
     if(res){
       return res.data
     }

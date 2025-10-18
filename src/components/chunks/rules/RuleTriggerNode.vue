@@ -4,15 +4,6 @@
     :icon="flow.el.icon"
     @on-edit-node="open = true"
   >
-    <VSheet class="text-center">
-      <VChip
-        v-if="valuesList.length > 0"
-        density="compact"
-        class="my-1"
-      >
-        {{$t('{n} entities',{n:valuesList.length ?? 0})}}
-      </VChip>
-    </VSheet>
     <template #handle>
       <Handle
         id="input"
@@ -29,15 +20,18 @@
         :connectable="true"
       />
     </template>
-    <VSheet class="text-center">
+    <VSheet
+      v-if="nodeOptions.items !== undefined"
+      class="text-center"
+    >
       <VChip
-        v-if="options?.ids?.length > 0"
+        v-if="nodeOptions.items.length > 0"
         class="my-1"
         color="primary"
         variant="tonal"
         size="small"
       >
-        {{$t('{n} triggers',{n:options?.ids?.length})}}
+        {{$t('{n} triggers',{n:nodeOptions.items.length})}}
       </VChip>
     </VSheet>
     <ModalDialog
@@ -45,45 +39,19 @@
       :title="flow.el.title"
       :subtitle="`#${flow.el.key}`"
     >
-      <VSheet
-        class="d-flex align-center justify-space-between"
-      >
-        <RuleEntitySelect
-          v-model="area"
-          :list="list"
-          @update:model-value="addNewEntry(area)"
+      <VSheet>
+        <InfiniteAutocomplete
+          v-model="nodeOptions.items"
+          :store-action-options="{id:selectedNode.id}"
+          store-action="getRuleNodeList"
         />
+        <!--        <RuleEntitySelect-->
+        <!--          v-model="area"-->
+        <!--          :list="list"-->
+        <!--          @update:model-value="addNewEntry(area)"-->
+        <!--        />-->
       </VSheet>
-      <VList
-        v-if="dataLoaded"
-        density="compact"
-      >
-        <VListItem
-          v-for="item in selectedItems"
-          :key="item"
-          :value="item.id"
-        >
-          <template #title>{{item.name}}</template>
-          <template #prepend>
-            <VBtn
-              readonly
-              density="comfortable"
-              class="mr-4"
-              :color="item.color ?? 'primary'"
-              :icon="item.icon ?? 'mdi-help'"
-            />
-          </template>
-          <template #append>
-            <VBtn
-              icon="mdi-trash-can"
-              density="comfortable"
-              variant="plain"
-              color="error"
-              @click="deleteArea(item.id)"
-            />
-          </template>
-        </VListItem>
-      </VList>
+
       <template #actions>
         <VBtn
           prepend-icon="mdi-check"
@@ -103,10 +71,13 @@ import ModalDialog from '../ModalDialog.vue'
 import CameraAreaSelect from '../camera/CameraAreaSelect.vue'
 import CameraSelect from '../camera/CameraSelect.vue'
 import RuleEntitySelect from './edit/RuleEntitySelect.vue'
+import InfiniteAutocomplete from '../InfiniteAutocomplete.vue'
 
 export default {
   name: 'RuleTriggerNode',
-  components: {RuleEntitySelect, CameraSelect, CameraAreaSelect, ModalDialog, Handle, RuleNodeWrapper},
+  components: {
+    InfiniteAutocomplete,
+    RuleEntitySelect, CameraSelect, CameraAreaSelect, ModalDialog, Handle, RuleNodeWrapper},
   props: {
     data: {
       type: Object,
@@ -115,24 +86,27 @@ export default {
   },
   data(){
     return {
-      list:[],
+      page:1,
+      term: null,
       valuesList:[],
       camera: null,
       area:null,
       open:false,
-      nodeOptions:{}
+      nodeOptions:{
+        items:[]
+      }
     }
   },
   async created() {
-    this.nodeOptions = {...{ids:[]},...this.data.options}
-    this.valuesList = this.data?.items ?? []
+    this.nodeOptions = this.options ?? []
+    if (this.nodeOptions.items === null){
+      this.nodeOptions.items = []
+    }
+    //this.valuesList = this.data?.items ?? []
   },
   computed: {
-    currentId(){
-      return this.$attrs.id
-    },
     dataLoaded(){
-      return this.selectedItems.indexOf(undefined) === -1
+      return this.selectedItems?.indexOf(undefined) === -1
     },
     selectedNode(){
       return this.$store.getters['getSelectedNode']
@@ -147,31 +121,17 @@ export default {
       return this.data.options ?? []
     },
     selectedItems(){
-      return this.nodeOptions.ids.map(id=>{
-        return this.list.find(a=>a.id === id)
-      })
+      return this.options.items ?? []
     }
   },
   watch:{
     async open(val){
       if(val){
-        await this.getRuleNodeList()
+        //await this.getRuleNodeList()
       }
     }
   },
   methods: {
-    async getRuleNodeList(){
-      this.list = await this.$store.dispatch('getRuleNodeList', this.currentId)
-    },
-    addNewEntry(id){
-      if(typeof id === 'number' && id > 0){
-        const founded = this.nodeOptions.ids.indexOf(id) > -1
-        if(!founded){
-          this.nodeOptions.ids.push(id)
-        }
-      }
-
-    },
     saveNode(){
       const _data = {
         id:this.selectedNode.id,
@@ -189,8 +149,9 @@ export default {
         this.open = false
       })
     },
-    deleteArea(id){
+    deleteItem(id){
       this.nodeOptions.ids=this.nodeOptions.ids.filter(_id=>_id!==id)
+      this.nodeOptions.items=this.nodeOptions.items.filter(item=>item.id!==id)
       this.saveNode()
     }
   }

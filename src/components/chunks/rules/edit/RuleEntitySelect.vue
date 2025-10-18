@@ -38,7 +38,16 @@ export default {
     item-value="id"
     :label="$t('Select entity')"
     @update:modelValue="onUpdate"
-  />
+  >
+    <template #item="{item,props}">
+      <VListItem
+        :prepend-icon="item.raw.icon"
+        :title="item.raw.name"
+        :subtitle="item.raw.description"
+        v-bind="props"
+      />
+    </template>
+  </VAutocomplete>
 </template>
 
 <style scoped>

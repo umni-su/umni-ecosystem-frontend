@@ -62,7 +62,7 @@ export default {
   },
   emits:['update:model-value','on-remove'],
   methods:{
-    async updateTerm(e){
+    async updateTerm(c,e){
       this.page = 1
       this.term = e
       this.entitiesPaginated = null
@@ -95,7 +95,7 @@ export default {
 </script>
 
 <template>
-  <VExpansionPanel>
+  <VExpansionPanel :color="$vuetify.theme.name === 'light' ? 'grey-lighten-4': 'grey-darken-3'">
     <VExpansionPanelTitle class="pa-2">
       <RuleConditionOperand
         v-model="condition.operand"
@@ -137,7 +137,7 @@ export default {
         />
       </template>
     </VExpansionPanelTitle>
-    <VExpansionPanelText>
+    <VExpansionPanelText class="py-2">
       <VAutocomplete
         v-model="condition.group"
         autocomplete="off"
@@ -189,14 +189,15 @@ export default {
         v-if="condition.key !== null && condition.key !== undefined"
         ref="autocomplete"
         v-model="condition.items"
-        :data-response="entitiesPaginated"
-        @update-term="updateTerm(condition)"
-        @load="onLoad(condition, $event)"
+        store-action="getConditionsEntities"
+        :store-filter-options="{
+          category:condition.group,
+          condition:condition.key}"
       />
       <RuleConditionGroupAction
         v-if="condition.items?.length > 0"
         v-model="condition.action"
-        class="mt-2"
+        class="mt-4"
         :condition="condition"
       />
     </VExpansionPanelText>
