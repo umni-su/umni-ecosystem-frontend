@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.4",
-    "@eslint/js": "^9.32.0",
+    "@eslint/js": "^9.38.0",
     "@types/drawflow": "^0.0.12",
     "@vitejs/plugin-vue": "^5.2.1",
     "eslint": "^9.32.0",
