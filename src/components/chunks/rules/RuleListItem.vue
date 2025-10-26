@@ -1,6 +1,10 @@
 <script>
+import ConfirmationDialog from '../ConfirmationDialog.vue'
+import {createErrorNotification, createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+
 export default {
   name: 'RuleListItem',
+  components: {ConfirmationDialog},
   props: {
     rule:{
       type:Object,
@@ -10,6 +14,22 @@ export default {
   methods:{
     async executeRule(){
       await this.$store.dispatch('executeRule', this.rule.id)
+    },
+    async deleteRule(){
+      const ok = await this.$refs.confirm.show({
+        title: this.$t('Delete area'),
+        message: this.$t('Rule will be deleted'),
+        okText: this.$t('Delete'),
+        okIcon: 'mdi-trash-can'
+      }).catch(e=>{
+        this.$store.commit('addNotification', createErrorNotification(e.response.data.detail))
+      })
+      if(ok){
+        const res = await this.$store.dispatch('deleteRule', this.rule.id)
+        if(res){
+          this.$store.commit('addNotification', createSuccessNotification(res.data.message))
+        }
+      }
     }
   }
 }
@@ -47,7 +67,11 @@ export default {
         icon="mdi-trash-can"
         variant="text"
         density="comfortable"
+        @click.stop="deleteRule"
       />
+    </template>
+    <template #default>
+      <ConfirmationDialog ref="confirm"/>
     </template>
   </VListItem>
 </template>

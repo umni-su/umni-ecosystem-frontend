@@ -30,7 +30,7 @@ export default {
       return this.$t(mapType(this.device.type))
     },
     name() {
-      return this.device.title ? this.device.title.toUpperCase() : this.device.name.toUpperCase()
+      return this.device.title ? `${this.device.title.toUpperCase()} (${this.device.name.toUpperCase()})` : this.device.name.toUpperCase()
     }
   },
   watch: {

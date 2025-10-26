@@ -568,6 +568,17 @@ export default {
     }
   },
 
+  async deleteRule({commit}, id) {
+    commit('setLoading', true)
+    const res = await axios.delete(`${API}rules/${id}`).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
+      commit('removeRule', id)
+      return res.data
+    }
+  },
+
   async getRuleNode({commit}, id) {
     commit('setLoading', true)
     const res = await axios.get(`/api/rules/nodes/${id}`).finally(() => {
