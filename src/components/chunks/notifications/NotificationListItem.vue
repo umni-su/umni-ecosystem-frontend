@@ -1,7 +1,7 @@
 <script>
 import ModalDialog from '../ModalDialog.vue'
 import ConfigurationDynamicField from '../configuration/ConfigurationDynamicField.vue'
-import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+import {createErrorNotification, createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
 
 export default {
   name: 'NotificationListItem',
@@ -27,6 +27,9 @@ export default {
     }
   },
   computed: {
+    loading(){
+      return this.$store.getters['isLoading']
+    },
     canSendTest(){
       return this.queue.message !== null
     }
@@ -83,13 +86,18 @@ export default {
       }
     },
     async sendTest(){
-      await this.$store.dispatch('sendNotification', {
+      const res = await this.$store.dispatch('sendNotification', {
         notification_id:this.notification.id,
         to:this.queue.to,
         subject:this.queue.subject,
         message:this.queue.message,
         priority:this.queue.priority
+      }).catch(e=>{
+        this.$store.commit('addNotification', createErrorNotification(e.response.data.detail))
       })
+      if(res){
+        this.$store.commit('addNotification', createSuccessNotification(res.message))
+      }
     }
   }
 }
@@ -188,7 +196,8 @@ export default {
         />
         <template #actions>
           <VBtn
-            :disabled="!canSendTest"
+            :disabled="!canSendTest || loading"
+            :loading="loading"
             :text="$t('Send')"
             prepend-icon="mdi-send"
             @click="sendTest"
