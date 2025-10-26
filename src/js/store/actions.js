@@ -150,17 +150,6 @@ export default {
       state.ws.lastMessage = null
     }
   },
-  /** NOTIFICATIONS **/
-  async getNotifications({commit}) {
-    commit('setLoading', true)
-    const res = await axios.get(`${API}notifications`).finally(() => {
-      commit('setLoading', false)
-    })
-    if (res) {
-      commit('setSystemNotifications', res.data)
-      return res.data
-    }
-  },
 
   async getDevices({commit, state}) {
     commit('setLoading', true)
@@ -617,6 +606,74 @@ export default {
   },
   async getConditionsEntities({commit}, filter){
     const res = await axios.post('/api/rules/conditions/entities', filter.filter)
+    if(res){
+      return res.data
+    }
+  },
+  /**
+   * NOTIFICATIONS
+   */
+  async getNotifications({commit})
+  {
+    commit('setLoading', true)
+    const res = await axios.get(`${API}notifications`).finally(() => {
+      commit('setLoading', false)
+    })
+    if(res){
+      commit('setSystemNotifications', res.data)
+      return res.data
+    }
+  },
+
+  async getNotificationSchema({commit}, id)
+  {
+    commit('setLoading', true)
+    const res = await axios.get(`${API}notifications/${id}/schema`).finally(() => {
+      commit('setLoading', false)
+    })
+    if(res){
+
+      return res.data
+    }
+  },
+
+  async addNotification({commit}, data)
+  {
+    commit('setLoading', true)
+    const res = await axios.post(`${API}notifications`, data).finally(() => {
+      commit('setLoading', false)
+    })
+    if(res){
+      commit('addSystemNotification', res.data)
+      return res.data
+    }
+  },
+  async editNotification({commit}, data)
+  {
+    commit('setLoading', true)
+    const res = await axios.put(`${API}notifications/${data.id}`, data).finally(() => {
+      commit('setLoading', false)
+    })
+    if(res){
+      return res.data
+    }
+  },
+  async deleteNotification({commit}, id)
+  {
+    commit('setLoading', true)
+    const res = await axios.delete(`${API}notifications/${id}`).finally(() => {
+      commit('setLoading', false)
+    })
+    if(res){
+      return res.data
+    }
+  },
+  async sendNotification({commit}, data)
+  {
+    commit('setLoading', true)
+    const res = await axios.post(`${API}notifications/test`, data).finally(() => {
+      commit('setLoading', false)
+    })
     if(res){
       return res.data
     }
