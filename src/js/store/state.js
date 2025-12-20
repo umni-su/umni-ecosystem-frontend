@@ -2,6 +2,35 @@ export default {
   app:{
     language: null
   },
+  chartOptions: {
+    backgroundColor:'transparent',
+    grid: {
+      left: '50px',
+      right: '50px',
+      bottom: '30px',
+      top: '30px'
+    },
+    dataZoom: [
+      {
+        id: 'dataZoomX',
+        type: 'inside'
+      },
+      {
+        id: 'dataZoomY',
+        type: 'inside'
+      }
+    ],
+    tooltip: {
+      trigger: 'axis'
+    },
+    xAxis: {
+      type: 'time'
+    },
+    yAxis: {
+      type: 'value',
+      scale: true
+    }
+  },
   languages:[],
   configuration:[],
   loading: false,

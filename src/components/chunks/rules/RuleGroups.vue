@@ -95,15 +95,9 @@ export default {
             },
             {
               type: 'action',
-              title: this.$t('Email'),
-              icon: 'mdi-email',
-              key: 'action.email'
-            },
-            {
-              type: 'action',
-              title: this.$t('Telegram'),
-              icon: 'mdi-send',
-              key: 'action.telegram'
+              title: this.$t('Notification'),
+              icon: 'mdi-email-alert',
+              key: 'action.notification'
             },
             {
               type: 'action',

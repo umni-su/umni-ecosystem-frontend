@@ -36,18 +36,18 @@ export default {
 <template>
   <VLayout
     class="login"
-    :class="theme ==='light' ?'bg-primary' : 'bg-primary-darken'"
+    :class="theme ==='light' ?'bg-primary' : 'bg-grey-darken'"
   >
     <VCard
-      width="390"
-      class="pa-6"
+      width="350"
+      class="py-3 px-8"
     >
       <template #text>
         <UmniLogo
           :short="false"
-          :width="280"
+          :width="210"
           class="d-block ma-auto mb-4"
-          color="#008dd2"
+          :color="theme ==='light' ? '#008dd2' : '#ffffff'"
         />
         <VForm @keydown.enter="login">
           <VTextField

@@ -61,7 +61,8 @@ export default {
 
 <template>
   <VCol
-    sm="4"
+    sm="6"
+    md="4"
     cols="12"
   >
     <VCard

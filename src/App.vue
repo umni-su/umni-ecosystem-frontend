@@ -21,9 +21,6 @@ export default {
       init: false
     }
   },
-  created() {
-    useI18n()
-  },
   computed: {
     _theme() {
       return this.$store.getters['getTheme']
@@ -33,12 +30,10 @@ export default {
     },
     installed() {
       return this.$store.getters['isInstalled']
-    },
-    step() {
-      return this.$route.params.step
     }
   },
   async created() {
+    useI18n()
     const res = await this.$store.dispatch('init').catch(e => {
       this.init = false
     })
@@ -58,21 +53,28 @@ export default {
 
 <template>
   <I18nLoader @initialized="onI18nInitialized">
-    <VSheet>
-      <VApp
-        v-if="visible"
-        :theme="_theme"
-        class="fill-height"
-      >
-        <InstallPage v-if="!init && !installed" />
-        <PageLayout v-else-if="authenticated" />
-        <LoginPage v-else />
 
-      </VApp>
-      <Teleport to="body">
-        <SystemNotifications />
-      </Teleport>
-    </VSheet>
+    <VLocaleProvider
+      :locale="$store.getters['getCurrentLanguage']"
+      fallback-locale="en"
+    >
+      <VSheet>
+        <VApp
+          v-if="visible"
+          :theme="_theme"
+          class="fill-height"
+        >
+          <InstallPage v-if="!init && !installed" />
+          <PageLayout v-else-if="authenticated" />
+          <LoginPage v-else />
+
+        </VApp>
+        <Teleport to="body">
+          <SystemNotifications />
+        </Teleport>
+      </VSheet>
+    </VLocaleProvider>
+
   </I18nLoader>
 </template>
 

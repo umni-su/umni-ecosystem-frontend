@@ -2,6 +2,8 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'simplebar-vue/dist/simplebar.min.css'
 import 'vuetify/styles'
 import {createVuetify} from 'vuetify'
+import { en, ru} from 'vuetify/locale'
+
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import router from './js/router/router.js'
@@ -34,14 +36,36 @@ const dark = {
   }
 }
 
-const defaultLang = 'ru'
+const app = createApp(App)
+
+const i18n = createI18nInstance()
+
+installI18nHelpers(app)
 
 const vuetify = createVuetify({
   components,
   directives,
+  locale: {
+    locale: 'en', // Устанавливаем английский по умолчанию для Vuetify
+    fallback: 'en', // Фолбэк на английский
+    messages: {en,ru} // Передаем все локали
+  },
   defaults: {
     global: {
       rounded: 'lg'
+    },
+    VPagination: {
+      density: 'compact'
+    },
+    VDateInput:{
+      density: 'compact',
+      variant: 'outlined',
+      hideDetails: true,
+      prependIcon:null,
+      prependInnerIcon:'mdi-calendar',
+      VSheet: {
+        color: 'default'
+      }
     },
     VTextField: {
       density: 'compact',
@@ -114,11 +138,7 @@ const vuetify = createVuetify({
 
 })
 
-const app = createApp(App)
 
-const i18n = createI18nInstance()
-
-installI18nHelpers(app)
 app.use(i18n)
 app.config.globalProperties.$moment = moment
 app.use(store)

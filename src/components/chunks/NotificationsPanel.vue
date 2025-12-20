@@ -1,34 +1,42 @@
 <script>
-import SystemNotificationMenuItem from '../../components/chunks/SystemNotificationMenuItem.vue'
+import LogItem from './LogItem.vue'
 
 export default {
   name: 'NotificationsPanel',
   components: {
-    SystemNotificationMenuItem
+    LogItem
+  },
+  data(){
+    return {
+      params: {
+        page:1,
+        size:25
+      }
+    }
   },
   computed: {
     theme() {
       return this.$store.getters['getTheme']
     },
-    systemNotifications() {
-      return this.$store.getters['getSystemNotifications']?.map(n => n.data)
+    logs() {
+      return this.$store.getters['logs/getLogs']
     }
   },
   async mounted() {
-    await this.getNotifications()
+    await this.getLogs()
   },
   methods: {
-    async getNotifications() {
-      //await this.$store.dispatch('getNotifications')
+    async getLogs() {
+      await this.$store.dispatch('logs/getLogs', this.params)
     }
   }
 }
 </script>
 
 <template>
+
   <VMenu
     width="500"
-    :close-on-content-click="false"
   >
     <template #activator="{props}">
       <VBtn
@@ -37,20 +45,41 @@ export default {
         v-bind="props"
         variant="text"
         color="orange"
-        icon="mdi-bell"
+        icon="mdi-math-log"
       />
     </template>
-    <VList class="pa-0">
-      <SystemNotificationMenuItem
-        v-for="noty in systemNotifications"
-        :key="noty"
-        :noty="noty"
-      />
-      <VListItem
-        v-if="systemNotifications.length === 0"
-        :title="$t('Empty')"
-      />
-    </VList>
+    <VCard>
+      <VCardTitle>{{$t('Event log')}}</VCardTitle>
+      <VCardText
+        style="max-height: 500px"
+        class="overflow-x-auto"
+      >
+        <VList
+          v-if="logs.items"
+          class="pa-0"
+        >
+          <LogItem
+            v-for="log in logs.items"
+            :key="log"
+            :log="log"
+          />
+          <VListItem
+            v-if="logs.items.length === 0"
+            :title="$t('Empty')"
+          />
+        </VList>
+      </VCardText>
+      <VCardActions class="d-block text-center">
+        <VBtn
+          :to="{name: 'logs'}"
+          variant="tonal"
+          size="small"
+          prepend-icon="mdi-format-list-group"
+          :text="$t('History')"
+        />
+      </VCardActions>
+    </VCard>
+
   </VMenu>
 </template>
 

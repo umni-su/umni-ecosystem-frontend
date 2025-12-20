@@ -14,6 +14,8 @@ import CameraEventsPage from '../../components/pages/router/CameraEventsPage.vue
 import CameraEventPage from '../../components/pages/router/CameraEventPage.vue'
 import RulesPage from '../../components/pages/router/RulesPage.vue'
 import RulePage from '../../components/pages/router/RulePage.vue'
+import PluginsSettings from '../../components/pages/router/settings/PluginsSettings.vue'
+import LogPage from '../../components/pages/router/system/LogPage.vue'
 
 const routes = [
   {
@@ -42,6 +44,16 @@ const routes = [
     ]
   },
   {
+    path: '/system',
+    children: [
+      {
+        path: 'logs',
+        component: LogPage,
+        name: 'logs'
+      }
+    ]
+  }
+  ,{
     path: '/cameras',
     children: [
       {
@@ -139,6 +151,17 @@ const routes = [
         path: 'backup',
         name: 'backup',
         component: BackupSettings
+      }
+    ]
+  },
+  {
+    path: '/plugins',
+    component: SettingsPage,
+    children: [
+      {
+        path: '',
+        name: 'plugins',
+        component: PluginsSettings
       }
     ]
   }

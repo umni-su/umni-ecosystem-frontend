@@ -37,7 +37,7 @@ export default {
 <template>
   <VCard
     density="compact"
-    variant="text"
+    variant="tonal"
   >
     <template #title>
       {{ disk.device }}

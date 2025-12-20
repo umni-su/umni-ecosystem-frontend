@@ -91,22 +91,21 @@ export default {
         >
           <VCard
             elevation="0"
-            color="rgba(0,0,0,0.05)"
-            height="200"
-            variant="elevated"
+            class="fill-height"
+            variant="text"
             :title="$t('Disks usage')"
           >
             <template #text>
               <DiskUsageItem
                 v-for="disk in disks"
                 :key="disk.mountpoint"
+                class="mb-4"
                 :disk="disk"
               />
             </template>
           </VCard>
         </VCol>
       </VRow>
-      {{ systemInfo }}
     </VContainer>
   </VCard>
 </template>

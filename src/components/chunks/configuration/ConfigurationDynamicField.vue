@@ -158,6 +158,9 @@ export default {
       isEditing: false
     }
   },
+  created() {
+    this.localValue = this.modelValue === null ? this.field.value : this.modelValue
+  },
 
   computed: {
     // Проверяем, является ли значение зашифрованным

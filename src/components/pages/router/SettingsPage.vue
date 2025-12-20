@@ -57,6 +57,11 @@ export default {
           :to="{name: 'storages'}"
         />
         <VListItem
+          :title="$t('Plugins')"
+          prepend-icon="mdi-puzzle"
+          :to="{name: 'plugins'}"
+        />
+        <VListItem
           :title="$t('Notifications settings')"
           prepend-icon="mdi-bell"
           :to="{name: 'notifications'}"

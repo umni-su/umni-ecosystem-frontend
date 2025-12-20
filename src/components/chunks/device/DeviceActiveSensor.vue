@@ -15,6 +15,7 @@ export default {
   data() {
     return {
       activeSensor: null,
+      fullscreen: false,
       src: null,
       cover: null,
       open: false,
@@ -24,35 +25,12 @@ export default {
         range: null
       },
       options: {
-        grid: {
-          left: '50px',
-          right: '50px',
-          bottom: '30px',
-          top: '30px'
-        },
-        dataZoom: [
-          {
-            id: 'dataZoomX',
-            type: 'inside'
-          },
-          {
-            id: 'dataZoomY',
-            type: 'inside'
-          }
-        ],
-        tooltip: {
-          trigger: 'axis'
-        },
-        xAxis: {
-          type: 'time'
-        },
-        yAxis: {
-          type: 'value',
-          scale: true
-        },
         series: []
       }
     }
+  },
+  created() {
+    this.options = {...this.$store.getters['getChartOptions'],...this.options}
   },
   computed: {
     loading() {
@@ -94,9 +72,24 @@ export default {
       }
 
       return this.$t(t)
+    },
+    appTheme(){
+      return this.$store.getters['getTheme']
     }
   },
   watch: {
+    appTheme(){
+      console.log(this.appTheme, this.chart)
+      this.chart?.setTheme(this.appTheme)
+    },
+    fullscreen(f){
+      this.$nextTick(() => {
+        const height = f ? this.$refs?.cardText?.$el?.offsetHeight ?? 300 : 400
+        this.$refs.chart.$el.style.height = (height - 40) + 'px'
+        console.log(height)
+        this.resize()
+      })
+    },
     sensor: {
       deep: true,
       handler(s) {
@@ -117,6 +110,7 @@ export default {
           window.addEventListener('resize', this.resize)
           this.getSensorHistory().then(() => {
             this.chart.setOption(this.options)
+            this.chart.setTheme(this.appTheme)
           })
         })
       }
@@ -173,6 +167,7 @@ export default {
 <template>
   <VBottomSheet
     v-model="open"
+    :fullscreen="fullscreen"
   >
     <VCard
       v-if="sensor"
@@ -194,6 +189,7 @@ export default {
             icon="mdi-fullscreen"
             variant="text"
             density="comfortable"
+            @click="fullscreen = !fullscreen"
           />
         </div>
       </VCardTitle>
@@ -228,7 +224,7 @@ export default {
           />
         </VBtnGroup>
       </VCardTitle>
-      <VCardText>
+      <VCardText ref="cardText">
         <VSheet
           ref="chart"
           class="mt-6"

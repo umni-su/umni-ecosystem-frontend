@@ -102,6 +102,8 @@ export async function loadLocaleMessages(i18n, locale) {
 
     const messages = response
 
+
+
     i18n.global.setLocaleMessage(locale, messages)
     loadedLanguages.add(locale)
 
@@ -202,5 +204,27 @@ export function installI18nHelpers(app) {
 
   app.config.globalProperties.$i18n = getI18n().global
 }
+
+// Динамический импорт локалей Vuetify
+// export async function loadVuetifyLocale(locale) {
+//   const normalizedLocale = locale.toLowerCase().split('-')[0]
+//
+//   try {
+//     // Попытка загрузить локаль
+//     const module = await import(`vuetify/locale/${normalizedLocale}.mjs`)
+//     return module.default || module
+//   } catch (error) {
+//     console.warn(`Vuetify locale ${normalizedLocale} not found, trying English fallback...`)
+//
+//     try {
+//       // Фоллбэк на английский
+//       const en = await import('vuetify/locale/en.mjs')
+//       return en.default || en
+//     } catch (fallbackError) {
+//       console.error('Failed to load even English locale:', fallbackError)
+//       return {}
+//     }
+//   }
+// }
 
 export default getI18n

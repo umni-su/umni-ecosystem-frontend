@@ -11,6 +11,9 @@ export default {
   getToken(state) {
     return state.token
   },
+  getChartOptions(state){
+    return state.chartOptions
+  },
   isLoading(state) {
     return state.loading
   },
