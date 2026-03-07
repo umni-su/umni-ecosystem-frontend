@@ -57,7 +57,22 @@ export default {
     this.$store.dispatch('wsDisconnect')
   },
   async created() {
+    await this.getAlarmSecurityStates()
     await this.$store.dispatch('getStorages')
+  },
+  methods: {
+    async getAlarmSecurityStates(){
+      const res = await this.$store.dispatch('getConfigurationStateByValues', [
+        'app.mode_alarm',
+        'app.mode_security'
+      ])
+      if(res){
+        const alarm = res.data?.find(c=>c.key === 'app.mode_alarm')
+        const security = res.data?.find(c=>c.key === 'app.mode_security')
+        this.$store.commit('setAlarmMode', alarm?.value)
+        this.$store.commit('setSecurityMode', security?.value)
+      }
+    }
   }
 }
 </script>
@@ -112,17 +127,20 @@ export default {
     >
       <template #prepend>
         <VBtn
+          density="comfortable"
           :icon="opened ? 'mdi-backburger' : 'mdi-menu-close'"
           color="default"
           @click="opened = !opened"
         />
         <VBtn
+          density="comfortable"
           class="ml-2"
           icon="mdi-arrow-left"
           color="default"
           @click="$router.go(-1)"
         />
         <VBtn
+          density="comfortable"
           class="ml-2"
           icon="mdi-arrow-right"
           color="default"

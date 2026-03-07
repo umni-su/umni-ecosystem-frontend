@@ -45,7 +45,14 @@ export class ImageClickTracker {
 
   enableDrawing() {
     this.isDrawingMode = true
-    this.startNewPolygon()
+    //this.startNewPolygon()
+
+    this.redraw()
+  }
+
+  disableDrawing() {
+    this.isDrawingMode = false
+    this.closeCurrentPolygon()
 
     this.redraw()
   }

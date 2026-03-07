@@ -55,8 +55,8 @@ export default {
     <VRow no-gutters>
       <VCol v-if="storages.length === 0">
         <VEmptyState>
-          <template #headline>{{$t('There are no storages')}}</template>
-          <template #title>{{$t('You should add at least one storage')}}</template>
+          <template #headline>{{ $t('There are no storages') }}</template>
+          <template #title>{{ $t('You should add at least one storage') }}</template>
           <template #media>
             <VIcon
               icon="mdi-database"
@@ -68,6 +68,7 @@ export default {
               color="primary"
               prepend-icon="mdi-plus"
               :text="$t('Add')"
+              :to="{name: 'storages'}"
             />
           </template>
 

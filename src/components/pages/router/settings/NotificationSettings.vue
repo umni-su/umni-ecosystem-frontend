@@ -16,7 +16,10 @@ export default {
 </script>
 
 <template>
-  <VCard :title="$t('Notifications settings')">
+  <VCard
+    :title="$t('Notifications settings')"
+    class="mt-3"
+  >
     <template #text>
       <VList>
         <NotificationListItem

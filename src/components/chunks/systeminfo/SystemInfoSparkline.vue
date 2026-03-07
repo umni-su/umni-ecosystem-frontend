@@ -126,7 +126,7 @@ export default {
     </template>
     <VSheet
       ref="chart"
-      height="280"
+      height="170"
     />
   </VCard>
 </template>

@@ -9,7 +9,6 @@ import * as directives from 'vuetify/directives'
 import router from './js/router/router.js'
 import store from './js/store/store'
 import moment from 'moment/min/moment-with-locales'
-import '@vuepic/vue-datepicker/dist/main.css'
 import App from './App.vue'
 import {createApp} from 'vue'
 import {createI18nInstance, installI18nHelpers} from './js/i18n.js'
@@ -64,6 +63,9 @@ const vuetify = createVuetify({
       prependIcon:null,
       prependInnerIcon:'mdi-calendar',
       VSheet: {
+        color: 'default'
+      },
+      VBtn:{
         color: 'default'
       }
     },

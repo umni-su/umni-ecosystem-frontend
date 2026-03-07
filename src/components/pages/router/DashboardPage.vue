@@ -1,10 +1,12 @@
 <script>
 import DiskUsageItem from '../../chunks/systeminfo/DiskUsageItem.vue'
 import SystemInfoSparkline from '../../chunks/systeminfo/SystemInfoSparkline.vue'
+import AlarmToggleWidget from '../../chunks/dashboard/AlarmToggleWidget.vue'
+import SecurityToggleWidget from '../../chunks/dashboard/SecurityToggleWidget.vue'
 
 export default {
   name: 'DashboardPage',
-  components: {SystemInfoSparkline, DiskUsageItem},
+  components: {SecurityToggleWidget, AlarmToggleWidget, SystemInfoSparkline, DiskUsageItem},
   data() {
     return {
       handler: null
@@ -49,65 +51,87 @@ export default {
 </script>
 
 <template>
-  <VCard
-    v-if="systemInfo"
-    class="fill-height"
-    cols="12"
-    md="6"
-  >
-    <VContainer>
-      <VRow>
+  <VSheet class="fill-height pa-4">
+    <VContainer class="pa-0 fill-height">
+      <VRow class="fill-height">
         <VCol
           cols="12"
-          sm="6"
-        >
-          <SystemInfoSparkline
-            :title="$t('Cpu')"
-            :values="cpu.values"
-          />
-        </VCol>
-        <VCol
-          cols="12"
-          sm="6"
-        >
-          <SystemInfoSparkline
-            :title="$t('Ram')"
-            :values="memory.virtual.values"
-          />
-        </VCol>
-        <VCol
-          cols="12"
-          sm="6"
-        >
-          <SystemInfoSparkline
-            :title="$t('Swap')"
-            :values="memory.swap.values"
-          />
-        </VCol>
-        <VCol
-          v-if="disks"
-          cols="12"
-          sm="6"
+          md="11"
+          :order="$vuetify.display.xs || $vuetify.display.sm ? 2 : null"
         >
           <VCard
-            elevation="0"
+            v-if="systemInfo"
             class="fill-height"
-            variant="text"
-            :title="$t('Disks usage')"
+            cols="12"
+            md="6"
           >
-            <template #text>
-              <DiskUsageItem
-                v-for="disk in disks"
-                :key="disk.mountpoint"
-                class="mb-4"
-                :disk="disk"
-              />
-            </template>
+            <VContainer>
+              <VRow>
+                <VCol
+                  cols="12"
+                  sm="6"
+                >
+                  <SystemInfoSparkline
+                    :title="$t('Cpu')"
+                    :values="cpu.values"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  sm="6"
+                >
+                  <SystemInfoSparkline
+                    :title="$t('Ram')"
+                    :values="memory.virtual.values"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  sm="6"
+                >
+                  <SystemInfoSparkline
+                    :title="$t('Swap')"
+                    :values="memory.swap.values"
+                  />
+                </VCol>
+                <VCol
+                  v-if="disks"
+                  cols="12"
+                  sm="6"
+                >
+                  <VCard
+                    elevation="0"
+                    class="fill-height"
+                    variant="text"
+                    :title="$t('Disks usage')"
+                  >
+                    <template #text>
+                      <DiskUsageItem
+                        v-for="disk in disks"
+                        :key="disk.mountpoint"
+                        class="mb-4"
+                        :disk="disk"
+                      />
+                    </template>
+                  </VCard>
+                </VCol>
+              </VRow>
+            </VContainer>
           </VCard>
+        </VCol>
+        <VCol
+          cols="12"
+          md="1"
+          :order="$vuetify.display.xs || $vuetify.display.sm  ? 1 : null"
+        >
+          <AlarmToggleWidget/>
+          <SecurityToggleWidget class="mt-4"/>
         </VCol>
       </VRow>
     </VContainer>
-  </VCard>
+
+  </VSheet>
+
 </template>
 
 <style scoped>

@@ -16,6 +16,9 @@ import RulesPage from '../../components/pages/router/RulesPage.vue'
 import RulePage from '../../components/pages/router/RulePage.vue'
 import PluginsSettings from '../../components/pages/router/settings/PluginsSettings.vue'
 import LogPage from '../../components/pages/router/system/LogPage.vue'
+import UsersSettings from '../../components/pages/router/settings/UsersSettings.vue'
+import UserForm from '../../components/pages/router/settings/users/UserForm.vue'
+import UsersList from '../../components/pages/router/settings/users/UsersList.vue'
 
 const routes = [
   {
@@ -53,7 +56,7 @@ const routes = [
       }
     ]
   }
-  ,{
+  , {
     path: '/cameras',
     children: [
       {
@@ -131,6 +134,27 @@ const routes = [
         path: 'base',
         name: 'settings',
         component: BaseSettings
+      },
+      {
+        path: 'users',
+        component: UsersSettings,
+        children: [
+          {
+            path: '',
+            name: 'users',
+            component: UsersList
+          },
+          {
+            path: ':id?(\\d+)',
+            name: 'user',
+            props: (route) => {
+              return {
+                ...route.params, ...{id: Number.parseInt(route.params.id, 10) || undefined}
+              }
+            },
+            component: UserForm
+          }
+        ]
       },
       {
         path: 'services',

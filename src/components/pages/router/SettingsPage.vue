@@ -21,7 +21,15 @@ export default {
 </script>
 
 <template>
-  <VSheet>
+  <VSheet class="position-relative">
+    <VBtn
+      density="comfortable"
+      color="default"
+      variant="text"
+      class="burger-opened"
+      icon="mdi-menu"
+      @click="opened = !opened"
+    />
     <VNavigationDrawer
       v-model="opened"
       width="300"
@@ -29,14 +37,7 @@ export default {
       rounded="0"
       :permanent="!isMobile"
     >
-      <VBtn
-        density="comfortable"
-        color="default"
-        variant="text"
-        class="burger-opened"
-        icon="mdi-menu"
-        @click="opened = !opened"
-      />
+
       <VList
         class="pa-0"
         rounded="0"
@@ -45,6 +46,11 @@ export default {
           :title="$t('System settings')"
           prepend-icon="mdi-cog"
           :to="{name: 'settings'}"
+        />
+        <VListItem
+          :title="$t('Users and access')"
+          prepend-icon="mdi-account-multiple"
+          :to="{name: 'users'}"
         />
         <VListItem
           :title="$t('Services')"
@@ -83,7 +89,8 @@ export default {
 <style scoped lang="scss">
 .burger-opened {
   position: absolute;
-  right: -40px;
-  top: 2px
+  left: 0;
+  top: -10px;
+  z-index: 0000;
 }
 </style>

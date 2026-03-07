@@ -17,7 +17,8 @@ export default {
     return {
       disabled: false,
       polygons: [],
-      selected: null
+      selected: null,
+      mode: 'drag'
     }
   },
   computed: {
@@ -128,6 +129,16 @@ export default {
       if (this.tracker !== null) {
         this.tracker.toggleMode()
       }
+    },
+    enableDrawing() {
+      if (this.tracker !== null) {
+        this.tracker.enableDrawing()
+      }
+    },
+    disableDrawing() {
+      if (this.tracker !== null) {
+        this.tracker.disableDrawing()
+      }
     }
   }
 }
@@ -135,21 +146,34 @@ export default {
 
 <template>
   <VSheet>
-    <VBtn
+    <VBtnToggle
       v-if="tracker"
+      v-model="mode"
       variant="tonal"
-      density="comfortable"
-      :prepend-icon="tracker.isDrawingMode ? 'mdi-pencil' : 'mdi-cursor-move'"
-      :text="tracker.isDrawingMode ? $t('Editing') : $t('Dragging')"
-      @click="toggleTrackerMode"
-    />
+      density="compact"
+    >
+      <VBtn
+        color="primary"
+        :active="tracker.isDrawingMode"
+        value="edit"
+        prepend-icon="mdi-pencil"
+        :text="$t('Editing')"
+        @click="enableDrawing"
+      />
+      <VBtn
+        value="drag"
+        color="primary"
+        :active="!tracker.isDrawingMode"
+        prepend-icon="mdi-cursor-move"
+        :text="$t('Dragging')"
+        @click="disableDrawing"
+      />
+    </VBtnToggle>
     <VBtn
       v-if="tracker && tracker.isDrawingMode"
       v-tooltip="$t('New zone')"
-      variant="tonal"
-      density="comfortable"
+      class="mt-4"
       prepend-icon="mdi-plus"
-      class="ml-4"
       :text="$t('Add area')"
       @click="tracker.startNewPolygon()"
     />
@@ -263,7 +287,7 @@ export default {
                   </VCard>
                 </VSheet>
               </VMenu>
-              <PriorityMenu v-model.number="poly.priority" />
+              <PriorityMenu v-model.number="poly.priority"/>
               <VBtn
                 icon="mdi-trash-can"
                 variant="plain"
@@ -282,7 +306,7 @@ export default {
       prepend-icon="mdi-content-save"
       @click="saveAreas"
     />
-    <ConfirmationDialog ref="confirm" />
+    <ConfirmationDialog ref="confirm"/>
   </VSheet>
 </template>
 

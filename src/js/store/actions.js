@@ -227,13 +227,22 @@ export default {
     }
   },
   /** SETTINGS **/
-  async getConfiguration({commit}, data) {
+  async getConfiguration({commit}) {
     commit('setLoading', true)
-    const res = await axios.get(`${API}configuration`, data).finally(() => {
+    const res = await axios.get(`${API}configuration`).finally(() => {
       commit('setLoading', false)
     })
     if (res) {
       commit('setConfiguration', res.data)
+      return res.data
+    }
+  },
+  async getConfigurationStateByValues({commit}, data) {
+    commit('setLoading', true)
+    const res = await axios.post(`${API}configuration/state`, data).finally(() => {
+      commit('setLoading', false)
+    })
+    if (res) {
       return res.data
     }
   },

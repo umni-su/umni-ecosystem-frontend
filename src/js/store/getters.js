@@ -8,6 +8,12 @@ export default {
   getCurrentLanguage(state){
     return state.app.language
   },
+  isAlarm(state){
+    return state.alarmMode
+  },
+  isSecurity(state){
+    return state.securityMode
+  },
   getToken(state) {
     return state.token
   },

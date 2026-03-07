@@ -32,6 +32,8 @@ export default {
     }
   },
   languages:[],
+  alarmMode: null,
+  securityMode: null,
   configuration:[],
   loading: false,
   interval: 10000,

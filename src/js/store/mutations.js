@@ -8,6 +8,7 @@ const {
   removeNodes,
   removeEdges,
   nodes} = useVueFlow()
+
 export default {
   logout(state) {
     state.user = null
@@ -15,6 +16,12 @@ export default {
   },
   setLoading(state, loading) {
     state.loading = loading
+  },
+  setAlarmMode(state,mode){
+    state.alarmMode = mode === 'on'
+  },
+  setSecurityMode(state,mode){
+    state.securityMode = mode == 'on'
   },
   setTitle(state, title) {
     state.title = title

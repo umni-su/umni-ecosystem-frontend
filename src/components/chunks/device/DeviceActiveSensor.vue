@@ -108,10 +108,9 @@ export default {
         this.$nextTick(() => {
           this.chart = markRaw(echarts.init(this.$refs.chart.$el))
           window.addEventListener('resize', this.resize)
-          this.getSensorHistory().then(() => {
-            this.chart.setOption(this.options)
-            this.chart.setTheme(this.appTheme)
-          })
+          this.chart.setOption(this.options)
+          this.chart.setTheme(this.appTheme)
+          this.initializeFilter()
         })
       }
     }
@@ -122,6 +121,16 @@ export default {
   methods: {
     resize() {
       this.chart.resize()
+    },
+    async initializeFilter() {
+      // Устанавливаем диапазон по умолчанию
+      const start = this.$moment().add(-4, 'hours').format('YYYY-MM-DD HH:mm')
+      const end = this.$moment().format('YYYY-MM-DD HH:mm')
+
+      this.filter.range = [start, end]
+
+      // Вызываем загрузку истории
+      await this.getSensorHistory()
     },
     async getSensorHistory() {
       if (this.filter.range === null) {

@@ -5,14 +5,16 @@ import mutations from './mutations.js'
 import getters from './getters.js'
 import plugins from './modules/plugins/index.js'
 import logs from './modules/logs/index.js'
+import users from './modules/users/index.js'
 const store = createStore({
   actions,
   mutations,
   getters,
   state,
   modules:{
-    plugins: plugins,
-    logs: logs
+    plugins,
+    logs,
+    users
   }
 })
 export default store
