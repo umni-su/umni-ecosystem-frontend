@@ -1,4 +1,4 @@
-import { createStore } from 'vuex'
+import {createStore} from 'vuex'
 import actions from './actions.js'
 import state from './state.js'
 import mutations from './mutations.js'
@@ -6,15 +6,18 @@ import getters from './getters.js'
 import plugins from './modules/plugins/index.js'
 import logs from './modules/logs/index.js'
 import users from './modules/users/index.js'
+import notifications from './modules/notifications/index.js'
+
 const store = createStore({
   actions,
   mutations,
   getters,
   state,
-  modules:{
+  modules: {
     plugins,
     logs,
-    users
+    users,
+    notifications
   }
 })
 export default store

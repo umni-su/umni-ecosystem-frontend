@@ -7,7 +7,8 @@ const {
   findNode,
   removeNodes,
   removeEdges,
-  nodes} = useVueFlow()
+  nodes
+} = useVueFlow()
 
 export default {
   logout(state) {
@@ -17,10 +18,10 @@ export default {
   setLoading(state, loading) {
     state.loading = loading
   },
-  setAlarmMode(state,mode){
+  setAlarmMode(state, mode) {
     state.alarmMode = mode === 'on'
   },
-  setSecurityMode(state,mode){
+  setSecurityMode(state, mode) {
     state.securityMode = mode == 'on'
   },
   setTitle(state, title) {
@@ -62,21 +63,10 @@ export default {
     state.theme = theme
   },
   addNotification(state, notification) {
-    state.notifications.push(notification)
+    state.uiNotifications.push(notification)
   },
   removeNotification(state) {
-    state.notifications = state.notifications.filter(n => n.active === true)
-  },
-  setSystemNotifications(state, notifications) {
-    state.systemNotifications = notifications
-  },
-  addSystemNotification(state, notification) {
-    state.systemNotifications.push(notification)
-  },
-  removeSystemNotification(state, noty) {
-    state.systemNotifications = state.systemNotifications.filter(
-      n => n.id !== noty.id
-    )
+    state.uiNotifications = state.uiNotifications.filter(n => n.active === true)
   },
   setWsLastMessage(state, message) {
     state.ws.lastMessage = message
@@ -157,7 +147,7 @@ export default {
   },
   setFlowDragging(state, dragging) {
     state.flow.dragging = dragging
-    if(!dragging) {
+    if (!dragging) {
       state.flow.ruleIndex = null
       state.flow.ruleGroup = null
       state.flow.type = null
@@ -193,22 +183,22 @@ export default {
     }
     console.log(nodes.value)
   },
-  updateNodeData(state, {id,data}) {
+  updateNodeData(state, {id, data}) {
     const index = state.nodes.findIndex(n => n.id === id)
     if (index > -1) {
-      state.nodes[index].data = {...state.nodes[index].data,...data}
-      updateNodeData(id,state.nodes[index].data)
-      console.log(nodes.value,state.nodes[index].data)
+      state.nodes[index].data = {...state.nodes[index].data, ...data}
+      updateNodeData(id, state.nodes[index].data)
+      console.log(nodes.value, state.nodes[index].data)
     }
   },
-  updateNodeDataOptions(state, {id,options}) {
-    console.log({id,options})
+  updateNodeDataOptions(state, {id, options}) {
+    console.log({id, options})
     const index = state.nodes.findIndex(n => n.id === id)
     if (index > -1) {
       //state.nodes[index].data.options = {...state.nodes[index].data.options,...options}
       state.nodes[index].data.options = options
-      updateNodeData(id,state.nodes[index].data)
-      console.log(nodes.value,state.nodes[index])
+      updateNodeData(id, state.nodes[index].data)
+      console.log(nodes.value, state.nodes[index])
     }
   },
   removeNode(state, id) {
@@ -224,14 +214,14 @@ export default {
   selectNode(state, id) {
     state.selectedNode = findNode(id)
   },
-  destroySelectedNode(state){
+  destroySelectedNode(state) {
     state.selectedNode = null
   },
   addEdge(state, edge) {
     const index = state.edges.findIndex(e => e.target === edge.target && e.source === edge.source)
     edge.id = `e${edge.target}-${edge.source}-${edge.sourceHandle}`
     if (index > -1) {
-      state.edges = state.edges.filter((e,i)=>i!==index)
+      state.edges = state.edges.filter((e, i) => i !== index)
       state.edges.push(edge)
       console.log(edge)
     } else {
@@ -239,10 +229,10 @@ export default {
     }
   },
   /** RULES **/
-  setRules(state, rules){
+  setRules(state, rules) {
     state.rules = rules
   },
-  setActiveRule(state, rule){
+  setActiveRule(state, rule) {
     state.rule = rule
   },
   addRule(state, rule) {
@@ -253,7 +243,7 @@ export default {
       state.rules.push(rule)
     }
   },
-  removeRule(state, id){
+  removeRule(state, id) {
     state.rules = state.rules.filter(rule => rule.id !== id)
   }
 }

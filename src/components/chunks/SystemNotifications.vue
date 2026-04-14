@@ -36,7 +36,7 @@ export default {
   name: 'SystemNotifications',
   computed: {
     notifications() {
-      return this.$store.getters['getNotifications']
+      return this.$store.getters['getUiNotifications']
     },
     activeNotifications() {
       return this.notifications.filter(n => n.active === true)

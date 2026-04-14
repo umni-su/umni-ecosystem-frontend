@@ -7,71 +7,77 @@ import ConfigurationDynamicField from '../configuration/ConfigurationDynamicFiel
 export default {
   name: 'PluginCardItem',
   components: {ConfigurationDynamicField, ModalDialog, ConfirmationDialog},
-  props:{
-    plugin:{
-      type:Object,
-      required:true
+  props: {
+    plugin: {
+      type: Object,
+      required: true
     }
   },
-  data(){
+  data() {
     return {
-      src:null,
-      active:false,
+      src: null,
+      active: false,
       loading: false,
       opened: false,
-      config:{}
+      config: {}
     }
   },
-  async created(){
+  async created() {
     await this.getImage()
     this.active = this.plugin.active
   },
-  methods:{
-    async getImage(){
+  methods: {
+    async getImage() {
       this.src = await this.$store.dispatch('plugins/getPluginLogo', this.plugin.name)
     },
-    async togglePluginState(){
+    async togglePluginState() {
       const active = !this.active
       const ok = await this.$refs.confirm.show({
         title: this.$t('Change plugin state'),
         message: active ? this.$t('Plugin will be started') : this.$t('Plugin will be stopped'),
-        okText: active ?  this.$t('Enable') : this.$t('Disable'),
+        okText: active ? this.$t('Enable') : this.$t('Disable'),
         okIcon: active ? 'mdi-power' : 'mdi-power-off'
       })
-      if(ok){
+      if (ok) {
         this.loading = true
         const res = await this.$store.dispatch('plugins/toggleState', {
           plugin_id: this.plugin.id,
-          active:active
+          active: active
         }).catch((e) => {
           this.$store.commit('addNotification', createErrorNotification(e.response.data.message))
-        }).finally(()=>{
+        }).finally(() => {
           this.loading = false
         })
-        if (res){
+        if (res) {
           this.$store.commit('addNotification', createSuccessNotification(res.message))
           this.active = active
-          this.$store.commit('plugins/addPlugin', {...this.plugin,...{active:this.active}})
+          this.$store.commit('plugins/addPlugin', {...this.plugin, ...{active: this.active}})
         }
       }
     },
-    async getSchema(){
+    async getSchema() {
       this.config = await this.$store.dispatch('plugins/getPluginSchema', this.plugin.id)
       this.opened = true
     },
-    async savePluginSchema(){
+    async savePluginSchema() {
       const fields = {}
-      Object.keys(this.config.fields).map(key=>{
+      Object.keys(this.config.fields).map(key => {
         fields[key] = this.config.fields[key].value
         return key
       })
-      await this.$store.dispatch('plugins/savePluginSchema', {
+      const res = await this.$store.dispatch('plugins/savePluginSchema', {
         id: this.plugin.id,
         config: {
           name: this.config.model_name,
           schema: fields
         }
       })
+      if (res) {
+        this.$store.commit(
+          'addNotification',
+          createSuccessNotification(this.$t('Saved'))
+        )
+      }
     }
   }
 }
@@ -91,10 +97,10 @@ export default {
         max-height="70"
         :src="src"
       />
-      {{plugin.display_name}}
+      {{ plugin.display_name }}
     </VCardTitle>
     <VCardSubtitle>
-      {{plugin.description}}
+      {{ plugin.description }}
     </VCardSubtitle>
     <VCardSubtitle class="pt-2 d">
       <VBtn
@@ -146,12 +152,11 @@ export default {
       v-if="config.fields"
       v-model="opened"
     >
-      {{config.fields}}
+      {{ config.fields }}
       <ConfigurationDynamicField
         v-for="(field, key) in config.fields"
         v-model="config.fields[key].value"
         class="mb-4"
-        :field-key="key"
         :field="field"
       />
       <template #actions>

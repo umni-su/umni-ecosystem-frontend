@@ -1,9 +1,9 @@
 export default {
-  app:{
+  app: {
     language: null
   },
   chartOptions: {
-    backgroundColor:'transparent',
+    backgroundColor: 'transparent',
     grid: {
       left: '50px',
       right: '50px',
@@ -31,10 +31,10 @@ export default {
       scale: true
     }
   },
-  languages:[],
+  languages: [],
   alarmMode: null,
   securityMode: null,
-  configuration:[],
+  configuration: [],
   loading: false,
   interval: 10000,
   authenticated: false,
@@ -44,11 +44,10 @@ export default {
   title: null,
   theme: localStorage.getItem('theme') ?? 'light',
   fullWidth: false,
-  notifications: [],
   dateFormat: 'DD.MM.YYYY',
   timeFormat: 'HH:mm',
   systemInfo: null,
-  systemNotifications: [],
+  uiNotifications: [],
   devices: [],
   services: [],
   storages: [],
@@ -64,17 +63,17 @@ export default {
     show: false,
     options: {}
   },
-  flow:{
+  flow: {
     dragging: false,
     type: null,
     groupIndex: null,
     ruleIndex: null
   },
-  edges:[],
-  nodes:[],
-  rules:[],
+  edges: [],
+  nodes: [],
+  rules: [],
   rule: null,
-  selectedNode:null,
+  selectedNode: null,
   ws: {
     id: null,
     server: null,

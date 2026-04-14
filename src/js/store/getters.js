@@ -1,23 +1,23 @@
 export default {
-  getConfiguration(state){
+  getConfiguration(state) {
     return state.configuration
   },
-  getAvailableLanguages(state){
+  getAvailableLanguages(state) {
     return state.languages
   },
-  getCurrentLanguage(state){
+  getCurrentLanguage(state) {
     return state.app.language
   },
-  isAlarm(state){
+  isAlarm(state) {
     return state.alarmMode
   },
-  isSecurity(state){
+  isSecurity(state) {
     return state.securityMode
   },
   getToken(state) {
     return state.token
   },
-  getChartOptions(state){
+  getChartOptions(state) {
     return state.chartOptions
   },
   isLoading(state) {
@@ -47,11 +47,8 @@ export default {
   getTitle(state) {
     return state.title
   },
-  getNotifications(state) {
-    return state.notifications
-  },
-  getSystemNotifications(state) {
-    return state.systemNotifications
+  getUiNotifications(state) {
+    return state.uiNotifications
   },
   getWsServer(state) {
     return state.ws.server
@@ -98,28 +95,28 @@ export default {
   getPlayback(state) {
     return state.playback
   },
-  getFlow(state){
+  getFlow(state) {
     return state.flow
   },
-  getEdges(state){
+  getEdges(state) {
     return state.edges
   },
   getNodes(state) {
     return state.nodes
   },
-  getNode:(state) => id => {
+  getNode: (state) => id => {
     return state.nodes.find(node => node.id === id)
   },
   getSelectedNode(state) {
     return state.selectedNode
   },
-  getRules(state){
+  getRules(state) {
     return state.rules
   },
-  getRule:(state)=> id => {
+  getRule: (state) => id => {
     return state.rules.find(node => node.id === id)
   },
-  getCurrentRule(state){
+  getCurrentRule(state) {
     return state.rule
   }
 }

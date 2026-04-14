@@ -1,7 +1,7 @@
 <script>
 export default {
   name: 'DeviceCardCharacteristicItem',
-  props: { 
+  props: {
     icon: {
       type: String,
       default: null
@@ -43,7 +43,9 @@ export default {
       v-else
       class="value"
     >
-      {{ value }}
+      <slot name="value">
+        {{ value }}
+      </slot>
     </div>
   </div>
 </template>

@@ -2,7 +2,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'simplebar-vue/dist/simplebar.min.css'
 import 'vuetify/styles'
 import {createVuetify} from 'vuetify'
-import { en, ru} from 'vuetify/locale'
+import {en, ru} from 'vuetify/locale'
 
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
@@ -47,25 +47,30 @@ const vuetify = createVuetify({
   locale: {
     locale: 'en', // Устанавливаем английский по умолчанию для Vuetify
     fallback: 'en', // Фолбэк на английский
-    messages: {en,ru} // Передаем все локали
+    messages: {en, ru} // Передаем все локали
   },
   defaults: {
     global: {
       rounded: 'lg'
     },
+    VCard: {
+      VBtn: {
+        density: 'comfortable'
+      }
+    },
     VPagination: {
       density: 'compact'
     },
-    VDateInput:{
+    VDateInput: {
       density: 'compact',
       variant: 'outlined',
       hideDetails: true,
-      prependIcon:null,
-      prependInnerIcon:'mdi-calendar',
+      prependIcon: null,
+      prependInnerIcon: 'mdi-calendar',
       VSheet: {
         color: 'default'
       },
-      VBtn:{
+      VBtn: {
         color: 'default'
       }
     },

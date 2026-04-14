@@ -5,7 +5,7 @@ import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
 export default {
   name: 'DeviceUptimeCard',
   components: {DeviceCardCharacteristicItem},
-  emits:['refresh-device'],
+  emits: ['refresh-device'],
   computed: {
     device() {
       return this.$store.getters['getDevice']
@@ -26,7 +26,7 @@ export default {
       return 100 - (this.device?.free_heap * 100 / this.device.total_heap)
     },
     memoryColor() {
-      if (this.memoryUsage < 50) return 'green'
+      if (this.memoryUsage <= 50) return 'green'
       if (this.memoryUsage > 50 && this.memoryUsage < 75) return 'orange'
       if (this.memoryUsage > 75) return 'red'
       return 'grey'
@@ -66,10 +66,19 @@ export default {
     <template #text>
       <DeviceCardCharacteristicItem
         class="mb-2"
-        icon="mdi-code-block-tags"
+        icon="mdi-power"
         :title="$t('Status')"
-        :value="online ? $t('Online') : $t('Offline')"
-      />
+      >
+        <template #value>
+          <VChip
+            :color="online ? 'green' : 'red'"
+            rounded="pill"
+            density="comfortable"
+            prepend-icon="mdi-circle"
+            :text="online ? $t('Online') : $t('Offline')"
+          />
+        </template>
+      </DeviceCardCharacteristicItem>
       <DeviceCardCharacteristicItem
         class="mb-2"
         icon="mdi-code-block-tags"
@@ -98,6 +107,16 @@ export default {
           </div>
         </template>
       </DeviceCardCharacteristicItem>
+    </template>
+    <template #actions>
+      <VBtn
+        density="comfortable"
+        rounded="pill"
+        color="success"
+        variant="tonal"
+        :text="$t('Locate')"
+        prepend-icon="mdi-map-marker"
+      />
     </template>
   </VCard>
 </template>

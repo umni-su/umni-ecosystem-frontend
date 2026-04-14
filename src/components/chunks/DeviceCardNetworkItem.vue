@@ -17,7 +17,7 @@ export default {
 
 <template>
   <DeviceCardCharacteristicItem
-    :icon="adapter.name === 'Ethernet' ? 'mdi-ethernet' : 'mdi-wifi'"
+    :icon="adapter.name === 'ethernet' ? 'mdi-ethernet' : 'mdi-wifi'"
     :title="adapter.name"
     :value="adapter.ip"
   />

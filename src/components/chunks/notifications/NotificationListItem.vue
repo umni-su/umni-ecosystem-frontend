@@ -7,36 +7,36 @@ export default {
   name: 'NotificationListItem',
   components: {ConfigurationDynamicField, ModalDialog},
   props: {
-    notification:{
-      type:Object,
-      required:true
+    notification: {
+      type: Object,
+      required: true
     }
   },
-  data(){
+  data() {
     return {
-      show:false,
+      show: false,
       openTest: false,
-      schema:null,
+      schema: null,
       editedOptions: {},
-      queue:{
-        to:null,
-        subject:null,
-        message:null,
-        priority:2
+      queue: {
+        to: null,
+        subject: null,
+        message: null,
+        priority: 2
       }
     }
   },
   computed: {
-    loading(){
+    loading() {
       return this.$store.getters['isLoading']
     },
-    canSendTest(){
+    canSendTest() {
       return this.queue.message !== null
     }
   },
   methods: {
-    async getSchema(){
-      this.schema = await this.$store.dispatch('getNotificationSchema', this.notification.id)
+    async getSchema() {
+      this.schema = await this.$store.dispatch('notifications/getNotificationSchema', this.notification.id)
       // Копируем текущие options для редактирования
       this.editedOptions = {...this.notification.options}
       this.show = true
@@ -77,25 +77,25 @@ export default {
 
       return result
     },
-    async saveNotification(){
-      const data = {...this.notification,...{options:this.editedOptions}}
-      const res = await this.$store.dispatch('editNotification', data)
-      if(res){
+    async saveNotification() {
+      const data = {...this.notification, ...{options: this.editedOptions}}
+      const res = await this.$store.dispatch('notifications/editNotification', data)
+      if (res) {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
         this.show = false
       }
     },
-    async sendTest(){
-      const res = await this.$store.dispatch('sendNotification', {
-        notification_id:this.notification.id,
-        to:this.queue.to,
-        subject:this.queue.subject,
-        message:this.queue.message,
-        priority:this.queue.priority
-      }).catch(e=>{
+    async sendTest() {
+      const res = await this.$store.dispatch('notifications/sendNotification', {
+        notification_id: this.notification.id,
+        to: this.queue.to,
+        subject: this.queue.subject,
+        message: this.queue.message,
+        priority: this.queue.priority
+      }).catch(e => {
         this.$store.commit('addNotification', createErrorNotification(e.response.data.detail))
       })
-      if(res){
+      if (res) {
         this.$store.commit('addNotification', createSuccessNotification(res.message))
       }
     }
@@ -165,7 +165,6 @@ export default {
           <ConfigurationDynamicField
             v-model="editedOptions[fieldName]"
             :field="field"
-            :field-key="fieldName"
           />
         </VSheet>
         <template #actions>
@@ -178,7 +177,7 @@ export default {
       </ModalDialog>
       <ModalDialog
         v-model="openTest"
-        :title="$t('Отправить')"
+        :title="$t('Send')"
       >
         <VTextField
           v-model="queue.to"

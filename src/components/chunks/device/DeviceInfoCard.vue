@@ -1,5 +1,4 @@
 <script>
-import {mapType} from '../../../js/helpers/mapDeviceType.js'
 import ModalDialog from '../ModalDialog.vue'
 import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
 
@@ -27,7 +26,7 @@ export default {
       return this.$moment(this.device.last_sync).fromNow()
     },
     typeStr() {
-      return this.$t(mapType(this.device.type))
+      return this.device.type
     },
     name() {
       return this.device.title ? `${this.device.title.toUpperCase()} (${this.device.name.toUpperCase()})` : this.device.name.toUpperCase()

@@ -68,7 +68,7 @@ export default {
     const res = await axios.get(url)
       .catch(e => {
         const status = e.response.status
-        if(status === 401) {
+        if (status === 401) {
           commit('setInstalled', true)
         }
         commit('setAuthenticated', false)
@@ -153,7 +153,6 @@ export default {
 
   async getDevices({commit, state}) {
     commit('setLoading', true)
-    console.log(state.token)
     const res = await axios.get(`${API}devices`).finally(() => {
       commit('setLoading', false)
     })
@@ -209,7 +208,7 @@ export default {
   },
   async setRelayState({commit}, data) {
     commit('setLoading', true)
-    const res = await axios.post(`${API}sensors/${data.id}/state`, data).finally(() => {
+    const res = await axios.post(`${API}sensors/${data.id}/set`, data).finally(() => {
       commit('setLoading', false)
     })
     if (res) {
@@ -260,18 +259,18 @@ export default {
     const res = await axios.get(`${API}configuration/lang`, data)
     if (res) {
       commit('setAvailableLanguages', res.data)
-      const currentLanguage = res.data.find(l=>l.selected === true).key
-      if(currentLanguage === null || currentLanguage === undefined) {
+      const currentLanguage = res.data.find(l => l.selected === true).key
+      if (currentLanguage === null || currentLanguage === undefined) {
         commit('setCurrentLanguage', 'en')
-      }else {
+      } else {
         commit('setCurrentLanguage', currentLanguage)
       }
       return res.data
     }
   },
-  async getTranslationsForLang({_}, locale){
+  async getTranslationsForLang({_}, locale) {
     const translation = await axios.get(`${API}configuration/lang/${locale}`)
-    if(translation){
+    if (translation) {
       return translation.data
     }
   },
@@ -566,9 +565,9 @@ export default {
     }
   },
 
-  async updateRule({commit}, {id,nodes,edges}) {
+  async updateRule({commit}, {id, nodes, edges}) {
     commit('setLoading', true)
-    const res = await axios.put(`/api/rules/${id}/graph`, {nodes,edges}).finally(() => {
+    const res = await axios.put(`/api/rules/${id}/graph`, {nodes, edges}).finally(() => {
       commit('setLoading', false)
     })
     if (res) {
@@ -598,9 +597,9 @@ export default {
     }
   },
 
-  async getRuleNodeList({commit}, {id,filter}) {
+  async getRuleNodeList({commit}, {id, filter}) {
     commit('setLoading', true)
-    const res = await axios.post(`/api/rules/nodes/${id}/list`,filter).finally(() => {
+    const res = await axios.post(`/api/rules/nodes/${id}/list`, filter).finally(() => {
       commit('setLoading', false)
     })
     if (res) {
@@ -618,83 +617,15 @@ export default {
     }
   },
 
-  async getConditionsList({commit}){
+  async getConditionsList({commit}) {
     const res = await axios.get('/api/rules/conditions/list')
-    if(res){
+    if (res) {
       return res.data
     }
   },
-  async getConditionsEntities({commit}, filter){
+  async getConditionsEntities({commit}, filter) {
     const res = await axios.post('/api/rules/conditions/entities', filter.filter)
-    if(res){
-      return res.data
-    }
-  },
-  /**
-   * NOTIFICATIONS
-   */
-  async getNotifications({commit})
-  {
-    commit('setLoading', true)
-    const res = await axios.get(`${API}notifications`).finally(() => {
-      commit('setLoading', false)
-    })
-    if(res){
-      commit('setSystemNotifications', res.data)
-      return res.data
-    }
-  },
-
-  async getNotificationSchema({commit}, id)
-  {
-    commit('setLoading', true)
-    const res = await axios.get(`${API}notifications/${id}/schema`).finally(() => {
-      commit('setLoading', false)
-    })
-    if(res){
-
-      return res.data
-    }
-  },
-
-  async addNotification({commit}, data)
-  {
-    commit('setLoading', true)
-    const res = await axios.post(`${API}notifications`, data).finally(() => {
-      commit('setLoading', false)
-    })
-    if(res){
-      commit('addSystemNotification', res.data)
-      return res.data
-    }
-  },
-  async editNotification({commit}, data)
-  {
-    commit('setLoading', true)
-    const res = await axios.put(`${API}notifications/${data.id}`, data).finally(() => {
-      commit('setLoading', false)
-    })
-    if(res){
-      return res.data
-    }
-  },
-  async deleteNotification({commit}, id)
-  {
-    commit('setLoading', true)
-    const res = await axios.delete(`${API}notifications/${id}`).finally(() => {
-      commit('setLoading', false)
-    })
-    if(res){
-      return res.data
-    }
-  },
-  async sendNotification({commit}, data)
-  {
-    commit('setLoading', true)
-    const res = await axios.post(`${API}notifications/test`, data).finally(() => {
-      commit('setLoading', false)
-    })
-    if(res){
+    if (res) {
       return res.data
     }
   }

@@ -1,30 +1,30 @@
 <script>
-import NotificatioToField from './NotificationToField.vue'
+import NotificationToField from './NotificationToField.vue'
 
 export default {
   name: 'NotificationContentForm',
-  components: {NotificatioToField},
+  components: {NotificationToField},
   props: {
-    modelValue:{
-      type:Object,
-      default:{}
+    modelValue: {
+      type: Object,
+      default: {}
     }
   },
-  data(){
+  data() {
     return {
-      message:{}
+      message: {}
     }
   },
-  created () {
+  created() {
     this.message = this.modelValue
   },
   watch: {
-    modelValue(value){
+    modelValue(value) {
       this.message = value
     },
-    message:{
+    message: {
       deep: true,
-      handler(value){
+      handler(value) {
         this.$emit('update:model-value', value)
       }
     }
@@ -34,7 +34,7 @@ export default {
 
 <template>
   <VSheet>
-    <NotificatioToField
+    <NotificationToField
       v-model="message.to"
       class="mb-4"
     />

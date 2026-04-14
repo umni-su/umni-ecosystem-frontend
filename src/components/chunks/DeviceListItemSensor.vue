@@ -45,6 +45,9 @@ export default {
       return icon
     },
     value() {
+      if (isNaN(this.sensor.value)) {
+        return ''
+      }
       switch (this.sensor.type) {
       case SENSOR_GROUP.SENSOR_NTC :
       case SENSOR_GROUP.SENSOR_DS18B20:
@@ -106,9 +109,10 @@ export default {
     v-if="sensor"
     density="compact"
     variant="text"
-    rounded="lg"
+    rounded="pill"
     :value="modelValue"
     :class="disabled ? 'opacity-50' : ''"
+    class="pl-1"
     color="primary"
   >
     <template #prepend>
@@ -133,7 +137,7 @@ export default {
       </div>
     </template>
     <template #subtitle>
-      {{ sensor.identifier }}
+      #{{ sensor.capability }}.{{ sensor.identifier }}
     </template>
 
     <template #append>
@@ -147,6 +151,7 @@ export default {
         :false-value="0"
         @click.stop="changeRelayState"
       />
+
       <VBtn
         v-else
         readonly

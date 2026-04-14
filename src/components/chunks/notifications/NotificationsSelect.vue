@@ -7,30 +7,30 @@ export default {
       default: null
     }
   },
-  data(){
+  data() {
     return {
-      value:null
+      value: null
     }
   },
   async mounted() {
     await this.getNotifications()
   },
   methods: {
-    async getNotifications(){
-      await this.$store.dispatch('getNotifications')
+    async getNotifications() {
+      await this.$store.dispatch('notifications/getNotifications')
       this.value = this.modelValue
     }
   },
   computed: {
-    notifications(){
-      return this.$store.getters['getSystemNotifications']
+    notifications() {
+      return this.$store.getters['notifications/getNotifications']
     }
   },
   watch: {
-    value(v){
+    value(v) {
       this.$emit('update:model-value', v)
     },
-    modelValue(v){
+    modelValue(v) {
       this.value = v
     }
   }
@@ -58,7 +58,8 @@ export default {
         :color="item.raw.active ? 'success' : 'error'"
         size="x-small"
         class="mr-2"
-      />{{item.raw.name}}
+      />
+      {{ item.raw.name }}
     </template>
   </VSelect>
 </template>

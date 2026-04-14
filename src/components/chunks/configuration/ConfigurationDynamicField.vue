@@ -23,7 +23,8 @@
           icon="mdi-lock"
           color="info"
           size="small"
-        /></template>
+        />
+      </template>
     </VTextField>
 
     <!-- Text Input -->
@@ -121,7 +122,7 @@
       type="warning"
       variant="tonal"
     >
-      {{$t('Unknown field type')}} {{ field.ui_type }}
+      {{ $t('Unknown field type') }} {{ field.ui_type }}
     </VAlert>
   </div>
 </template>
@@ -137,10 +138,6 @@ export default {
       validator: (value) => {
         return value && typeof value === 'object' && 'ui_type' in value
       }
-    },
-    fieldKey: {
-      type: String,
-      required: true
     },
     modelValue: {
       type: [String, Number, Boolean, Array, Object],

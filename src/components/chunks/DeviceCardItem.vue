@@ -1,5 +1,4 @@
 <script>
-import {mapType} from '../../js/helpers/mapDeviceType.js'
 import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
 import DeviceCardNetworkItem from './DeviceCardNetworkItem.vue'
 
@@ -28,7 +27,7 @@ export default {
       return this.$store.getters['getDevices'].length
     },
     typeStr() {
-      return this.$t(mapType(this.device.type))
+      return this.device.type
     },
     format() {
       return this.$store.getters['getDateTimeFormat']
