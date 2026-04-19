@@ -54,7 +54,7 @@ export default {
           :md="sensors.length % 3 === 0 ? 4 : 6"
           sm="6"
         >
-          <DeviceSensor v-model="sensors[index]" />
+          <DeviceSensor v-model="sensors[index]"/>
         </VCol>
       </VRow>
     </VContainer>

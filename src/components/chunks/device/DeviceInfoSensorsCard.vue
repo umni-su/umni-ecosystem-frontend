@@ -33,6 +33,13 @@ export default {
     <template #title>
       {{ $t('Sensors') }}
     </template>
+    <template #append>
+      <VBtn
+        color="default"
+        variant="plain"
+        icon="mdi-magnify"
+      />
+    </template>
     <template #text>
       <SimpleBar
         class="hidden-list"

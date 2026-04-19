@@ -3,7 +3,6 @@ import * as echarts from 'echarts'
 import {markRaw} from 'vue'
 import SensorDateRangeFilter from '../SensorDateRangeFilter.vue'
 import {createErrorNotification} from '../../../js/helpers/notificationHelper.js'
-import {SENSOR_GROUP, SENSOR_TEXT} from '../../../js/helpers/sensorGroups.js'
 import ModalDialog from '../ModalDialog.vue'
 
 export default {
@@ -30,7 +29,7 @@ export default {
     }
   },
   created() {
-    this.options = {...this.$store.getters['getChartOptions'],...this.options}
+    this.options = {...this.$store.getters['getChartOptions'], ...this.options}
   },
   computed: {
     loading() {
@@ -45,44 +44,16 @@ export default {
     title() {
       return this.sensor?.visible_name !== null ? this.sensor?.visible_name?.toUpperCase() : this.sensor?.name?.toUpperCase()
     },
-    typeText() {
-      let t = 'Unknown'
-      switch (this.sensor.type) {
-      case SENSOR_GROUP.SENSOR_RF433:
-        t = SENSOR_TEXT.SENSOR_RF433
-        break
-      case SENSOR_GROUP.SENSOR_ADC:
-        t = SENSOR_TEXT.SENSOR_ADC
-        break
-      case SENSOR_GROUP.SENSOR_NTC:
-        t = SENSOR_TEXT.SENSOR_NTC
-        break
-      case  SENSOR_GROUP.SENSOR_INPUTS:
-        t = SENSOR_TEXT.SENSOR_INPUTS
-        break
-      case  SENSOR_GROUP.SENSOR_RELAYS:
-        t = SENSOR_TEXT.SENSOR_RELAYS
-        break
-      case SENSOR_GROUP.SENSOR_DS18B20:
-        t = SENSOR_TEXT.SENSOR_DS18B20
-        break
-      case SENSOR_GROUP.SENSOR_OPENTHERM:
-        t = SENSOR_TEXT.SENSOR_OPENTHERM
-        break
-      }
-
-      return this.$t(t)
-    },
-    appTheme(){
+    appTheme() {
       return this.$store.getters['getTheme']
     }
   },
   watch: {
-    appTheme(){
+    appTheme() {
       console.log(this.appTheme, this.chart)
       this.chart?.setTheme(this.appTheme)
     },
-    fullscreen(f){
+    fullscreen(f) {
       this.$nextTick(() => {
         const height = f ? this.$refs?.cardText?.$el?.offsetHeight ?? 300 : 400
         this.$refs.chart.$el.style.height = (height - 40) + 'px'
@@ -188,10 +159,6 @@ export default {
           {{ title }}
         </div>
         <div>
-          <VChip
-            :text="typeText"
-            inline
-          />
           <VBtn
             class="ml-2"
             color="default"
