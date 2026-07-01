@@ -102,8 +102,6 @@ export default {
     </template>
 
     <template #append>
-
-
       <DeviceSensorValue
         v-model="sensor.value"
         :sensor="sensor"

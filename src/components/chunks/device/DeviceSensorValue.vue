@@ -7,7 +7,6 @@ export default {
   name: 'DeviceSensorValue',
   props: {
     modelValue: {
-      type: String,
       default: null
     },
     sensor: {
@@ -32,7 +31,7 @@ export default {
     }
   },
   created() {
-    this.value = this.sensor.value
+    this.value = this.valueByType
   },
   watch: {
     value(val) {
@@ -62,12 +61,12 @@ export default {
   <VSwitch
     v-if="sensor.type === 100"
     v-model="value"
-    :color="colorByType"
+    color="primary"
     class="pa-0 mr-5"
     density="compact"
-    value="1"
-    true-value="1"
-    false-value="0"
+    :value="true"
+    :true-value="true"
+    :false-value="false"
     @click.stop
     @update:model-value="changeRelayState"
   />

@@ -11,7 +11,7 @@ export function useSensor(sensor, value) {
 
     // SWITCH, BOOLEAN - возвращаем boolean
     if (type === 100 || type === 104) {
-      return Boolean(Number(rawValue))
+      return Boolean(rawValue === 'True')
     }
 
     // NUMBER, SETPOINT - возвращаем number (целое)
