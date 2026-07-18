@@ -138,15 +138,6 @@ export default {
         @click="togglePluginState"
       />
       <VBtn
-        v-else
-        readonly
-        disabled
-        size="small"
-        density="comfortable"
-        icon="mdi-database"
-        color="default"
-      />
-      <VBtn
         size="small"
         density="comfortable"
         color="default"
