@@ -22,6 +22,11 @@ export default {
       config: {}
     }
   },
+  computed: {
+    isCore() {
+      return this.plugin.is_core
+    }
+  },
   async created() {
     await this.getImage()
     this.active = this.plugin.active
@@ -124,12 +129,22 @@ export default {
     </VCardSubtitle>
     <VCardActions class="px-4 justify-center">
       <VBtn
+        v-if="!isCore"
         size="small"
         density="comfortable"
         icon="mdi-power-standby"
         :color="active ? 'success' : 'grey'"
         :variant="active ? 'tonal' : 'plain'"
         @click="togglePluginState"
+      />
+      <VBtn
+        v-else
+        readonly
+        disabled
+        size="small"
+        density="comfortable"
+        icon="mdi-database"
+        color="default"
       />
       <VBtn
         size="small"

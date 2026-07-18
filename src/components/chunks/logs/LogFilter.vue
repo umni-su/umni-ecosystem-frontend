@@ -67,57 +67,57 @@ export default {
     <VContainer class="pa-0">
       <VRow>
         <VCol
-            cols="12"
-            md="6"
+          cols="12"
+          md="6"
         >
           <VDateInput
-              v-model="start"
-              autocomplete="off"
-              :label="$t('Select date')"
+            v-model="start"
+            autocomplete="off"
+            :label="$t('Select date')"
           />
         </VCol>
         <VCol
-            cols="12"
-            md="6"
+          cols="12"
+          md="6"
         >
           <VDateInput
-              v-model="end"
-              autocomplete="off"
-              :label="$t('Select date')"
+            v-model="end"
+            autocomplete="off"
+            :label="$t('Select date')"
           />
         </VCol>
       </VRow>
       <VRow>
         <VCol
-            cols="12"
-            md="6"
+          cols="12"
+          md="6"
         >
           <VTextField
-              v-model="term"
-              :label="$t('Search')"
-              autocomplete="off"
-              clearable
-              prepend-inner-icon="mdi-magnify"
+            v-model="term"
+            :label="$t('Search')"
+            autocomplete="off"
+            clearable
+            prepend-inner-icon="mdi-magnify"
           />
         </VCol>
         <VCol
-            cols="12"
-            md="6"
+          cols="12"
+          md="6"
         >
           <VSelect
-              v-model="level"
-              clearable
-              :label="$t('Level')"
-              :items="['INFO', 'DEBUG', 'ERROR', 'WARNING']"
+            v-model="level"
+            clearable
+            :label="$t('Level')"
+            :items="['INFO', 'DEBUG', 'ERROR', 'WARNING']"
           />
         </VCol>
       </VRow>
       <VRow>
         <VCol>
           <VBtn
-              :text="$t('Apply')"
-              prepend-icon="mdi-magnify"
-              @click="onSave"
+            :text="$t('Apply')"
+            prepend-icon="mdi-magnify"
+            @click="onSave"
           />
         </VCol>
       </VRow>

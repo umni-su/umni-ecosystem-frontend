@@ -78,7 +78,7 @@ export default {
         </VForm>
       </template>
     </VCard>
-    <div class="mini-slog">
+    <div class="mini-slog text-body-small opacity-50">
       {{ $t('Prostoy. Dostupniy. Umni.') }}
     </div>
   </VLayout>
@@ -93,7 +93,6 @@ export default {
 
   .mini-slog {
     position: absolute;
-    opacity: 0.5;
     bottom: 20px;
     left: 0;
     right: 0;

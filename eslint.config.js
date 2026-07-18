@@ -4,6 +4,18 @@ import globals from 'globals'
 import vueParser from 'vue-eslint-parser'
 
 export default [
+  // Добавляем базовые игнорирования
+  {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/coverage/**',
+      '**/*.min.js',
+      '**/*.d.ts'
+    ]
+  },
+  // Конфигурация для Vue файлов
   {
     files: ['**/*.vue'],
     languageOptions: {
@@ -11,15 +23,8 @@ export default [
         ...globals.browser,
         ...globals.node
       },
-      parser: vueParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        parser: {
-          js: '@babel/eslint-parser',
-          requireConfigFile: false
-        }
-      }
+      parser: vueParser
+     
     },
     plugins: {
       vue: vuePlugin
@@ -28,14 +33,13 @@ export default [
       // Vue-specific rules
       'vue/html-self-closing': 'error',
       'vue/multi-word-component-names': 'off',
-      // Правила для выравнивания атрибутов в Vue
       'vue/first-attribute-linebreak': ['error', {
-        singleline: 'ignore',    // Для однострочных элементов не проверять
-        multiline: 'below'       // Для многострочных - переносить атрибуты на новую строку
+        singleline: 'ignore',
+        multiline: 'below'
       }],
       'vue/max-attributes-per-line': ['error', {
-        singleline: 1,           // Максимум 3 атрибута в одной строке
-        multiline: 1             // Для многострочных - 1 атрибут на строку
+        singleline: 1,
+        multiline: 1
       }],
       'vue/attributes-order': ['error', {
         order: [
@@ -51,34 +55,26 @@ export default [
           'EVENTS',
           'CONTENT'
         ],
-        alphabetical: false      // Не сортировать атрибуты по алфавиту
+        alphabetical: false
       }],
       'vue/html-closing-bracket-newline': ['error', {
-        singleline: 'never',     // Для однострочных элементов - без переноса
-        multiline: 'always'      // Для многострочных - всегда перенос
+        singleline: 'never',
+        multiline: 'always'
       }],
       'vue/html-indent': ['error', 2, {
-        attribute: 1,            // Отступ для атрибутов
-        baseIndent: 1,           // Базовый отступ
-        closeBracket: 0,         // Отступ для закрывающего тега
-        alignAttributesVertically: true  // Выравнивать атрибуты вертикально
+        attribute: 1,
+        baseIndent: 1,
+        closeBracket: 0,
+        alignAttributesVertically: true
       }],
       // JavaScript rules
       'semi': ['error', 'never'],
       'comma-dangle': ['error', 'never'],
       'quotes': ['error', 'single'],
       'indent': ['error', 2]
-      // 'max-len': ['error', {
-      //   code: 130,                   // Максимальная длина строки
-      //   tabWidth: 2,                 // Ширина табуляции (совпадает с indent)
-      //   ignoreUrls: true,           // Игнорировать URL-адреса
-      //   ignoreStrings: true,         // Игнорировать строковые литералы
-      //   ignoreTemplateLiterals: true, // Игнорировать шаблонные строки
-      //   ignoreRegExpLiterals: true,  // Игнорировать регулярные выражения
-      //   ignoreComments: true         // Игнорировать комментарии
-      // }]
     }
   },
+  // Конфигурация для JS файлов
   {
     files: ['**/*.js'],
     languageOptions: {
@@ -98,7 +94,7 @@ export default [
       'indent': ['error', 2],
       'max-len': ['error', {
         code: 130,
-        tabWidth: 4,
+        tabWidth: 2,
         ignoreUrls: true,
         ignoreStrings: true,
         ignoreTemplateLiterals: true,

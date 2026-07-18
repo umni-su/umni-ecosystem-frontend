@@ -57,27 +57,27 @@ export default {
 
 <template>
   <VDateInput
-      v-model="internalDate"
-      autocomplete="off"
-      min-width="270"
+    v-model="internalDate"
+    autocomplete="off"
+    min-width="270"
   >
     <template #append-inner>
       <VMenu :close-on-content-click="false">
         <template #activator="{props}">
           <VBtn
-              v-bind="props"
-              density="comfortable"
-              variant="tonal"
-              prepend-icon="mdi-clock"
-              :text="internalTime"
+            v-bind="props"
+            density="comfortable"
+            variant="tonal"
+            prepend-icon="mdi-clock"
+            :text="internalTime"
           />
         </template>
         <VSheet class="pa-4">
           <VTimePicker
-              v-model="internalTime"
-              hide-header
-              hide-title
-              format="24hr"
+            v-model="internalTime"
+            hide-header
+            hide-title
+            format="24hr"
           />
         </VSheet>
       </VMenu>
