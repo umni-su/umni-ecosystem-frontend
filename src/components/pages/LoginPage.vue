@@ -4,7 +4,9 @@ import {createErrorNotification} from '../../js/helpers/notificationHelper.js'
 
 export default {
   name: 'LoginPage',
-  components: {UmniLogo},
+  components: {
+    UmniLogo
+  },
   data: () => {
     return {
       username: null,
@@ -35,19 +37,19 @@ export default {
 
 <template>
   <VLayout
-    class="login"
-    :class="theme ==='light' ?'bg-primary' : 'bg-grey-darken'"
+    class="login bg-primary"
   >
     <VCard
       width="350"
       class="py-3 px-8"
+      elevation="0"
+      color="primary-darken"
     >
       <template #text>
         <UmniLogo
           :short="false"
           :width="210"
-          class="d-block ma-auto mb-4"
-          :color="theme ==='light' ? '#008dd2' : '#ffffff'"
+          class="d-block opacity-70 ma-auto mb-4"
         />
         <VForm @keydown.enter="login">
           <VTextField
@@ -66,12 +68,13 @@ export default {
             prepend-inner-icon="mdi-key"
           />
           <VBtn
+            variant="flat"
             :loading="loading"
             :disabled="loading"
             class="w-100"
             :text="$t('Login')"
             prepend-icon="mdi-send"
-            color="primary-darken"
+            color="primary"
             size="large"
             @click="login"
           />
