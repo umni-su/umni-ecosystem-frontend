@@ -131,39 +131,36 @@ export default {
           @keyup="opened = true"
           @update:model-value="$emit('update-term', $event)"
         />
-        <VBtn
+        <VChip
           v-for="item in items"
           :key="item.id"
           rounded="pill"
           color="default"
           variant="tonal"
-          class="mt-2 mr-2 px-1"
+          class="mt-2 mr-2 pe-0"
           :prepend-icon="item.icon"
           :text="`${item.name} (${item.id})`"
-          size="small"
         >
           <template #append>
             <VBtn
               color="error"
               rounded="pill"
               variant="text"
-              size="small"
-              density="comfortable"
               icon="mdi-trash-can"
+              density="comfortable"
               @click="deleteEntity(item)"
             />
           </template>
           <template #prepend>
             <VBtn
               variant="text"
-              size="small"
               density="comfortable"
               readonly
               :color="item.color"
               :icon="item.icon"
             />
           </template>
-        </VBtn>
+        </VChip>
       </slot>
     </template>
     <template #default>

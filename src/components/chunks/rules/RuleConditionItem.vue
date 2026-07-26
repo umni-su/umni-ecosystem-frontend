@@ -4,7 +4,7 @@ import RuleConditionOperand from './RuleConditionOperand.vue'
 import RuleConditionGroupAction from './RuleConditionGroupAction.vue'
 
 export default {
-  name: 'RuleConditionItem' ,
+  name: 'RuleConditionItem',
   components: {
     RuleConditionGroupAction,
     RuleConditionOperand,
@@ -16,7 +16,7 @@ export default {
       default: {}
     }
   },
-  async mounted(){
+  async mounted() {
     // this.condition.group = null
     // this.condition.items = []
     // this.condition.key =  null
@@ -24,69 +24,69 @@ export default {
     this.condition = this.modelValue
 
   },
-  data(){
+  data() {
     return {
-      groups:[],
-      condition:{},
-      conditionKey:null,
-      page:1,
+      groups: [],
+      condition: {},
+      conditionKey: null,
+      page: 1,
       size: 20,
-      entitiesPaginated:null
+      entitiesPaginated: null
     }
   },
-  computed:{
-    itemsByGroup(){
+  computed: {
+    itemsByGroup() {
       return this.groups.find(_group => this.condition?.group === _group.key)
     },
-    currentItemByKey(){
-      return this.itemsByGroup?.items?.find(_item=>_item.key === this.condition.key)
+    currentItemByKey() {
+      return this.itemsByGroup?.items?.find(_item => _item.key === this.condition.key)
     }
   },
-  watch:{
-    conditionKey(){
+  watch: {
+    conditionKey() {
       this.entitiesPaginated = null
       this.page = 1
-      if(this.$refs.autocomplete){
+      if (this.$refs.autocomplete) {
         this.$refs.autocomplete.items = []
       }
     },
-    modelValue(val){
+    modelValue(val) {
       this.$emit('update:model-value', val)
     },
-    condition:{
-      handler(val){
+    condition: {
+      handler(val) {
         this.$emit('update:model-value', val)
       },
-      deep:true
+      deep: true
     }
   },
-  emits:['update:model-value','on-remove'],
-  methods:{
-    async updateTerm(c,e){
+  emits: ['update:model-value', 'on-remove'],
+  methods: {
+    async updateTerm(c, e) {
       this.page = 1
       this.term = e
       this.entitiesPaginated = null
       await this.getTargetEntities()
     },
-    async onLoad(condition, {done}){
+    async onLoad(condition, {done}) {
       await this.getTargetEntities(condition)
       this.page = this.page + 1
       return done(this.response.items.length > 0 ? 'ok' : 'empty')
     },
-    async getTargetEntities(condition){
-      const res = await this.$store.dispatch('getConditionsEntities',{
-        term:this.term,
-        category:condition.group,
-        condition:condition.key,
+    async getTargetEntities(condition) {
+      const res = await this.$store.dispatch('getConditionsEntities', {
+        term: this.term,
+        category: condition.group,
+        condition: condition.key,
         page: this.page,
         size: this.size
       })
-      if(res){
+      if (res) {
         this.response = res
-        if(this.entitiesPaginated === null){
+        if (this.entitiesPaginated === null) {
           this.entitiesPaginated = res
         } else {
-          this.entitiesPaginated.items = [...this.entitiesPaginated.items,...res.items]
+          this.entitiesPaginated.items = [...this.entitiesPaginated.items, ...res.items]
         }
       }
     }
@@ -149,15 +149,15 @@ export default {
         <template #selection="{item}">
           <VIcon
             class="mr-2"
-            :icon="item.raw.icon"
+            :icon="item.icon"
           />
-          {{item.raw.label}}
+          {{ item.label }}
         </template>
         <template #item="{props, item}">
           <VListItem
             v-bind="props"
-            :title="item.raw.label"
-            :prepend-icon="item.raw.icon"
+            :title="item.label"
+            :prepend-icon="item.icon"
           />
         </template>
       </VAutocomplete>
@@ -174,14 +174,15 @@ export default {
         <template #selection="{item}">
           <VIcon
             class="mr-2"
-            :icon="item.raw.icon"
-          /> {{item.raw.label}}
+            :icon="item.icon"
+          />
+          {{ item.label }}
         </template>
         <template #item="{props, item}">
           <VListItem
             v-bind="props"
-            :title="item.raw.label"
-            :prepend-icon="item.raw.icon"
+            :title="item.label"
+            :prepend-icon="item.icon"
           />
         </template>
       </VAutocomplete>

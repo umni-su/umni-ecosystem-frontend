@@ -12,7 +12,7 @@
         type="source"
         position="right"
         :connectable="true"
-        :style="{ top: '20%' }"
+        :style="{ top: '20%', backgroundColor: 'green' }"
       />
       <Handle
         id="output-false"
@@ -20,7 +20,7 @@
         type="source"
         position="right"
         :connectable="true"
-        :style="{ top: '80%' }"
+        :style="{ top: '80%', backgroundColor: 'red' }"
       />
       <!-- Target handle (вход) -->
       <Handle
@@ -29,6 +29,7 @@
         type="target"
         position="left"
         :connectable="true"
+        :style="{  backgroundColor: 'purple' }"
       />
     </template>
 
@@ -40,7 +41,7 @@
         variant="tonal"
         size="small"
       >
-        {{$t('{n} conditions',{n:conditions.length})}}
+        {{ $t('{n} conditions', {n: conditions.length}) }}
       </VChip>
     </VSheet>
 
@@ -78,26 +79,26 @@ export default {
       required: true
     }
   },
-  computed:{
-    selectedNode(){
+  computed: {
+    selectedNode() {
       return this.$store.getters['getSelectedNode']
     },
-    options(){
+    options() {
       return this.data.options
     },
-    conditions(){
+    conditions() {
       return this.options?.conditions ?? []
     },
-    flow(){
+    flow() {
       return this.data.flow
     }
   },
   mounted() {
     this.items = this.conditions
   },
-  methods:{
-    onUpdateConditions(items){
-      this.$store.commit('updateNodeData',{
+  methods: {
+    onUpdateConditions(items) {
+      this.$store.commit('updateNodeData', {
         id: this.selectedNode.id,
         data: {
           ...this.data,
@@ -110,9 +111,9 @@ export default {
       })
     }
   },
-  data(){
+  data() {
     return {
-      items:[],
+      items: [],
       opened: false,
       index: 0
     }
