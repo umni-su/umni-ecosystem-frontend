@@ -96,7 +96,7 @@ export default {
     async initializeFilter() {
       // Устанавливаем диапазон по умолчанию
       const start = this.$moment().add(-4, 'hours').format('YYYY-MM-DD HH:mm')
-      const end = this.$moment().format('YYYY-MM-DD HH:mm')
+      const end = this.$moment().add(4, 'hours').format('YYYY-MM-DD HH:mm')
 
       this.filter.range = [start, end]
 
@@ -130,7 +130,7 @@ export default {
     async saveSensor() {
       const data = {
         id: this.activeSensor.id,
-        name: this.activeSensor.visible_name,
+        visible_name: this.activeSensor.visible_name,
         cover: this.cover
       }
       if (await this.$store.dispatch('updateSensor', data)) {
@@ -155,7 +155,12 @@ export default {
       rounded="0"
     >
       <VCardTitle class="pl-6 bg-primary d-flex align-center justify-space-between">
+
         <div class="text-h6">
+          <VIcon
+            v-if="sensor.icon"
+            :icon="sensor.icon"
+          />
           {{ title }}
         </div>
         <div>

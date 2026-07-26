@@ -19,7 +19,7 @@ export default {
     SidebarPanel
   },
   computed: {
-    rules(){
+    rules() {
       return this.$store.getters['getRules']
     }
   },
@@ -34,8 +34,8 @@ export default {
     this.$store.commit('setTitle', this.$t('Rules'))
     await this.getRules()
   },
-  methods:{
-    empty(){
+  methods: {
+    empty() {
       this.model = {
         name: null,
         description: null,
@@ -43,10 +43,10 @@ export default {
         priority: 0
       }
     },
-    async getRules(){
+    async getRules() {
       await this.$store.dispatch('getRules')
     },
-    onSaveRule(){
+    onSaveRule() {
       this.open = false
       this.empty()
     }
@@ -79,20 +79,37 @@ export default {
         @rule-saved="onSaveRule"
       />
     </ModalDialog>
-    <VList>
+    <VList v-if="rules.length > 0">
       <RuleListItem
         v-for="rule in rules"
         :key="rule.id"
         :rule="rule"
       />
     </VList>
+    <VEmptyState v-else>
+      <template #media>
+        <VIcon
+          class="mb-4"
+          :size="100"
+          icon="mdi-source-branch"
+        />
+      </template>
+      <template #title>
+        {{ $t('No automations') }}
+      </template>
+      <template #text>
+        {{ $t('You haven\'t created any automation yet') }}
+      </template>
+      <template #actions>
+        <VBtn
+          :text="$t('Create')"
+          prepend-icon="mdi-plus"
+          size="large"
+          rounded="pill"
+          color="primary"
+          @click="open = true"
+        />
+      </template>
+    </VEmptyState>
   </VSheet>
 </template>
-
-<style scoped>
-.actions {
-  position: absolute;
-  top:0;
-  right:0;
-}
-</style>

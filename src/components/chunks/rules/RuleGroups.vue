@@ -1,12 +1,12 @@
 <script>
 export default {
   name: 'RuleGroups',
-  emits: ['on-drag-start'],
-  computed:{
-    flow(){
+  emits: ['on-drag-start', 'on-drag-end'],
+  computed: {
+    flow() {
       return this.$store.getters['getFlow']
     },
-    list(){
+    list() {
       return {
         triggers: {
           label: this.$t('Triggers'),
@@ -116,10 +116,8 @@ export default {
       }
     }
   },
-  data(){
-    return {
-
-    }
+  data() {
+    return {}
   },
   methods: {
     onDragStart(event, el, index, group) {
@@ -130,7 +128,7 @@ export default {
       this.$store.commit('setFlowType', el.type)
       this.$store.commit('setFlowRuleIndex', index)
       this.$store.commit('setFlowRuleGroup', group)
-      event.dataTransfer.setData('flow',JSON.stringify({
+      event.dataTransfer.setData('flow', JSON.stringify({
         el,
         index,
         group
@@ -142,15 +140,19 @@ export default {
 </script>
 
 <template>
-  <VSheet  @dragend="$store.commit('setFlowDragging', false)">
+  <VSheet @dragend="$store.commit('setFlowDragging', false)">
     <VList
       v-for="(item, _key) in list"
       density="compact"
     >
-      <VListItemSubtitle >{{item.label}}</VListItemSubtitle>
+      <VListItemSubtitle>{{ item.label }}</VListItemSubtitle>
       <VListItem
         v-for="(el, _index) in list[_key].items"
         :key="el.type"
+        slim
+        nav
+        density="compact"
+        class="li-hover"
         rounded="lg"
         :prepend-icon="el.icon"
         :active="flow.ruleIndex === _index && flow.groupIndex === _key"
@@ -165,5 +167,13 @@ export default {
 
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+.li-hover {
+  cursor: move;
+  transition: 0.8s;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
 </style>

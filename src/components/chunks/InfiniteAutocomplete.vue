@@ -1,33 +1,33 @@
 <script>
 export default {
   name: 'InfiniteAutocomplete',
-  props:{
-    icon:{
-      type:String,
-      default:'mdi-magnify'
+  props: {
+    icon: {
+      type: String,
+      default: 'mdi-magnify'
     },
-    storeAction:{
-      type:String,
-      required:true
+    storeAction: {
+      type: String,
+      required: true
     },
-    storeActionOptions:{
-      type:Object,
-      default:{}
+    storeActionOptions: {
+      type: Object,
+      default: {}
     },
-    storeFilterOptions:{
-      type:Object,
-      default:{}
+    storeFilterOptions: {
+      type: Object,
+      default: {}
     },
-    placeholder:{
-      type:String,
-      default:null
+    placeholder: {
+      type: String,
+      default: null
     },
-    modelValue:{
-      type:Array,
-      default:[]
+    modelValue: {
+      type: Array,
+      default: []
     }
   },
-  emits:[
+  emits: [
     'load',
     'update-term',
     'update:model-value'
@@ -37,67 +37,67 @@ export default {
     this.items = this.modelValue
   },
   watch: {
-    async term(){
+    async term() {
       this.page = 1
       this.responseList = []
       await this.gePaginated()
     },
-    items:{
+    items: {
       deep: true,
       handler(val) {
         this.$emit('update:model-value', val)
       }
     },
-    modelValue(val){
+    modelValue(val) {
       this.items = val
     }
   },
-  computed:{
-    label(){
-      if(this.placeholder === null){
+  computed: {
+    label() {
+      if (this.placeholder === null) {
         return this.$t('Type a text')
       }
     },
-    filter(){
-      return{
+    filter() {
+      return {
         page: this.page,
         size: this.size,
-        term:this.term
+        term: this.term
       }
     }
   },
-  data(){
+  data() {
     return {
-      response:null,
-      responseList:[],
+      response: null,
+      responseList: [],
       opened: false,
-      items:[],
-      page:1,
-      size:25,
-      term:null
+      items: [],
+      page: 1,
+      size: 25,
+      term: null
     }
   },
-  methods:{
-    addEntity(item){
-      const index = this.items.findIndex(v=>v.id === item.id)
-      if(index > -1){
+  methods: {
+    addEntity(item) {
+      const index = this.items.findIndex(v => v.id === item.id)
+      if (index > -1) {
         this.items[index] = item
       } else {
         this.items.push(item)
       }
     },
-    deleteEntity(item){
-      this.$nextTick(()=>{
+    deleteEntity(item) {
+      this.$nextTick(() => {
         console.log(item)
-        this.items = this.items.filter(v=>v.id !== item.id)
+        this.items = this.items.filter(v => v.id !== item.id)
         console.log(this.items)
       })
     },
-    async gePaginated(){
-      const paginatedResponse = await this.$store.dispatch(this.storeAction,{
+    async gePaginated() {
+      const paginatedResponse = await this.$store.dispatch(this.storeAction, {
         ...this.storeActionOptions,
         ...{
-          filter:{...this.filter,...this.storeFilterOptions}
+          filter: {...this.filter, ...this.storeFilterOptions}
         }
       })
       this.response = paginatedResponse
@@ -106,7 +106,7 @@ export default {
         ...paginatedResponse.items
       ]
     },
-    async onLoad({done}){
+    async onLoad({done}) {
       await this.gePaginated()
       this.page = this.page + 1
       return done(this.response.items.length > 0 ? 'ok' : 'empty')
@@ -182,8 +182,19 @@ export default {
                 :value="value"
                 :title="value.name"
                 :subtitle="value.description"
+                :prepend-icon="value.icon"
                 @click="addEntity(value)"
-              />
+              >
+                <template
+                  #append
+                  v-if="value.parent !== null"
+                >
+                  <div class="text-right">
+                    <div class="text-body-medium">{{ value.parent.title }}</div>
+                    <div class="text-body-small opacity-50">{{ value.parent.name }}</div>
+                  </div>
+                </template>
+              </VListItem>
             </VList>
           </template>
         </VInfiniteScroll>

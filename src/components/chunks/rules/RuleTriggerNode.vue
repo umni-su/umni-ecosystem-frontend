@@ -31,7 +31,7 @@
         variant="tonal"
         size="small"
       >
-        {{$t('{n} triggers',{n:nodeOptions.items.length})}}
+        {{ $t('{n} triggers', {n: nodeOptions.items.length}) }}
       </VChip>
     </VSheet>
     <ModalDialog
@@ -42,7 +42,7 @@
       <VSheet>
         <InfiniteAutocomplete
           v-model="nodeOptions.items"
-          :store-action-options="{id:selectedNode.id}"
+          :store-action-options="{id: selectedNode.id}"
           store-action="getRuleNodeList"
         />
         <!--        <RuleEntitySelect-->
@@ -77,81 +77,82 @@ export default {
   name: 'RuleTriggerNode',
   components: {
     InfiniteAutocomplete,
-    RuleEntitySelect, CameraSelect, CameraAreaSelect, ModalDialog, Handle, RuleNodeWrapper},
+    RuleEntitySelect, CameraSelect, CameraAreaSelect, ModalDialog, Handle, RuleNodeWrapper
+  },
   props: {
     data: {
       type: Object,
       required: true
     }
   },
-  data(){
+  data() {
     return {
-      page:1,
+      page: 1,
       term: null,
-      valuesList:[],
+      valuesList: [],
       camera: null,
-      area:null,
-      open:false,
-      nodeOptions:{
-        items:[]
+      area: null,
+      open: false,
+      nodeOptions: {
+        items: []
       }
     }
   },
   async created() {
     this.nodeOptions = this.options ?? []
-    if (this.nodeOptions.items === null){
+    if (this.nodeOptions.items === null) {
       this.nodeOptions.items = []
     }
     //this.valuesList = this.data?.items ?? []
   },
   computed: {
-    dataLoaded(){
+    dataLoaded() {
       return this.selectedItems?.indexOf(undefined) === -1
     },
-    selectedNode(){
+    selectedNode() {
       return this.$store.getters['getSelectedNode']
     },
-    flow(){
+    flow() {
       return this.data.flow
     },
-    cameras(){
+    cameras() {
       return this.$store.getters['getCameras']
     },
-    options(){
+    options() {
       return this.data.options ?? []
     },
-    selectedItems(){
+    selectedItems() {
       return this.options.items ?? []
     }
   },
-  watch:{
-    async open(val){
-      if(val){
+  watch: {
+    async open(val) {
+      if (val) {
         //await this.getRuleNodeList()
       }
     }
   },
   methods: {
-    saveNode(){
+    saveNode() {
       const _data = {
-        id:this.selectedNode.id,
+        id: this.selectedNode.id,
         data: {
           ...this.data,
           ...{options: this.nodeOptions}
         }
       }
-      this.$store.commit('updateNodeData',_data)
+      this.$store.commit('updateNodeData', _data)
     },
-    saveAndClose(){
+    saveAndClose() {
       this.saveNode()
       this.$nextTick(() => {
         this.valuesList = this.selectedItems
         this.open = false
       })
     },
-    deleteItem(id){
-      this.nodeOptions.ids=this.nodeOptions.ids.filter(_id=>_id!==id)
-      this.nodeOptions.items=this.nodeOptions.items.filter(item=>item.id!==id)
+    deleteItem(id) {
+      this.nodeOptions.ids = this.nodeOptions.ids.filter(_id => _id !== id)
+      this.nodeOptions.items = this.nodeOptions.items.filter(item => item.id !== id)
       this.saveNode()
     }
   }

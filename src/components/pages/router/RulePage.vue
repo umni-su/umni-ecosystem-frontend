@@ -8,81 +8,86 @@ import {createSuccessNotification} from '../../../js/helpers/notificationHelper.
 export default {
   name: 'RulePage',
   components: {NotFound, SidebarPanel, RuleGroups, RulesEditor},
-  props:{
-    id:Number
+  props: {
+    id: Number
   },
-  async created(){
+  async created() {
     await this.getRule()
   },
-  data(){
+  data() {
     return {
       open: true,
-      notFound:false,
-      message:null
+      notFound: false,
+      message: null
     }
   },
-  watch:{
-    async id(){
+  watch: {
+    async id() {
       await this.getRule()
     },
-    wsMessage:{
+    wsMessage: {
       deep: true,
-      handler(newVal){
-        if(newVal && newVal.topic === 'rule.executed'){
-          if(newVal.rule_id===this.rule.id) this.message = newVal
+      handler(newVal) {
+        if (newVal && newVal.topic === 'rule.executed') {
+          if (newVal.rule_id === this.rule.id) this.message = newVal
         }
         return null
       }
     },
-    message:{
+    message: {
       deep: true,
-      handler(newVal){
-        if(newVal && newVal.hasOwnProperty('edges')){
-          this.$store.commit('setEdges',newVal.edges)
+      handler(newVal) {
+        if (newVal && newVal.hasOwnProperty('edges')) {
+          this.$store.commit('setEdges', newVal.edges)
         }
       }
     }
   },
-  computed:{
-    rule(){
+  computed: {
+    rule() {
       return this.$store.getters['getCurrentRule']
     },
-    wsMessage(){
+    wsMessage() {
       return this.$store.getters['getWsLastMessage']
     }
   },
-  mounted(){
-    this.$store.commit('setFullWidth',true)
+  mounted() {
+    this.$store.commit('setFullWidth', true)
   },
   unmounted() {
-    this.$store.commit('setFullWidth',false)
+    this.$store.commit('setFullWidth', false)
   },
   methods: {
-    async getRule(){
-      const ok = await this.$store.dispatch('getRule', this.id).catch(e=>{
+    async getRule() {
+      const ok = await this.$store.dispatch('getRule', this.id).catch(e => {
         this.notFound = true
       })
-      if(ok){
-        this.$store.commit('setTitle',this.$t('Rule: {name}',{name:this.rule.name}))
+      if (ok) {
+        this.$store.commit('setTitle', this.$t('Rule: {name}', {name: this.rule.name}))
         this.notFound = false
       }
     },
-    async updateRule(){
+    async updateRule() {
       const ok = await this.$store.dispatch('updateRule', {
         id: this.id,
         nodes: this.$store.state.nodes,
         edges: this.$store.state.edges
       })
-      if (ok){
-        this.$store.commit('addNotification',createSuccessNotification(this.$t('Saved')))
+      if (ok) {
+        this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
       }
     },
-    onDragStart(){
-      if(this.$vuetify.display.mobile){
-        this.open = false
+    onDragStart() {
+      if (this.$vuetify.display.mobile) {
+        setTimeout(() => {
+          this.open = false
+        }, 100)
       }
     },
-    async executeRule(){
+    async onNodeAdd() {
+      await this.updateRule()
+    },
+    async executeRule() {
       await this.$store.dispatch('executeRule', this.id)
     }
   }
@@ -104,7 +109,10 @@ export default {
           @click="open = !open"
         />
       </VSheet>
-      <RulesEditor v-model="rule" />
+      <RulesEditor
+        v-model="rule"
+        @on-node-add="onNodeAdd"
+      />
       <SidebarPanel
         v-model="open"
         :title="$t('Rules elements')"
@@ -118,7 +126,9 @@ export default {
           />
         </template>
         <template #default>
-          <RuleGroups @on-drag-start="onDragStart"/>
+          <RuleGroups
+            @on-drag-start="onDragStart"
+          />
           <VSheet class="position-absolute bottom-0 left-0 right-0 pa-2">
             <VBtn
               variant="tonal"
@@ -139,8 +149,8 @@ export default {
 <style scoped>
 .actions {
   position: absolute;
-  top:0;
-  right:0;
+  top: 0;
+  right: 0;
 }
 </style>
 

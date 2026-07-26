@@ -22,26 +22,25 @@
         :show-fit-view="true"
         :show-interactive="true"
       />
-      <Background />
+      <Background/>
     </VueFlow>
-    <!--    <RuleEditDialog-->
-    <!--      v-model="edit"-->
-    <!--      @save="updateNode"-->
-    <!--    />-->
   </VSheet>
 </template>
 
 <script>
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
-import { VueFlow} from '@vue-flow/core'
-import { Controls, Background } from '@vue-flow/additional-components'
+import '@vue-flow/controls/dist/style.css'
+
+import {markRaw} from 'vue'
+import {VueFlow} from '@vue-flow/core'
+import {Controls} from '@vue-flow/controls'
+import {Background} from '@vue-flow/additional-components'
 import RuleConditionNode from './RuleConditionNode.vue'
 import RuleDeviceNode from './RuleDeviceNode.vue'
 import RuleCameraNode from './RuleCameraNode.vue'
 import RuleActionNode from './RuleActionNode.vue'
 import RuleEditDialog from './RuleEditDialog.vue'
-import {markRaw} from 'vue'
 import RuleStartNode from './RuleStartNode.vue'
 import RuleEndNode from './RuleEndNode.vue'
 import RuleTriggerNode from './RuleTriggerNode.vue'
@@ -55,47 +54,48 @@ export default {
     Controls,
     RuleEditDialog
   },
-  props:{
-    modelValue:{
-      type:Object,
-      required:true
+  props: {
+    modelValue: {
+      type: Object,
+      required: true
     }
   },
-  computed:{
-    nodes(){
+  emits: ['on-node-add'],
+  computed: {
+    nodes() {
       return this.$store.getters['getNodes']
     },
-    edges(){
+    edges() {
       return this.$store.getters['getEdges']
     },
-    isDragging(){
+    isDragging() {
       return this.$store.state.flow.dragging
     },
-    flowType(){
+    flowType() {
       return this.$store.state.flow.type
     },
-    selectedNode(){
+    selectedNode() {
       return this.$store.getters['getSelectedNode']
     }
   },
   data() {
     return {
       edit: false,
-      connectionPorts:{
+      connectionPorts: {
         output: ['input'],
-        input: ['output', 'output-true','output-false'],
-        'output-true':['input'],
-        'output-false':['input']
+        input: ['output', 'output-true', 'output-false'],
+        'output-true': ['input'],
+        'output-false': ['input']
       },
       connectionRules: {
         // Какие типы узлов можно соединять
         trigger: ['condition'],
-        end: ['start','condition','device', 'action', 'camera'],
-        start: ['end','trigger'],
-        condition: ['trigger','condition','device', 'action', 'camera','end'],
+        end: ['start', 'condition', 'device', 'action', 'camera'],
+        start: ['end', 'trigger'],
+        condition: ['trigger', 'condition', 'device', 'action', 'camera', 'end'],
         device: ['action'],
         camera: ['action'],
-        action: ['device', 'camera', 'condition','trigger']
+        action: ['device', 'camera', 'condition', 'trigger']
       },
       nodeTypes: markRaw({
         trigger: RuleTriggerNode,
@@ -115,13 +115,13 @@ export default {
     this.$store.commit('setEdges', this.rule.edges)
   },
   methods: {
-    onEdgesChanged(e){
-      console.log('edges changed',e)
-      if(e.length > 0){
-        const edges = this.edges.filter(edge=>{
+    onEdgesChanged(e) {
+      console.log('edges changed', e)
+      if (e.length > 0) {
+        const edges = this.edges.filter(edge => {
           let can_return = true
-          e.map(_edge =>{
-            if(_edge.id === edge.id && _edge.type === 'remove'){
+          e.map(_edge => {
+            if (_edge.id === edge.id && _edge.type === 'remove') {
               can_return = false
             }
           })
@@ -131,7 +131,7 @@ export default {
       }
       return true
     },
-    onNodeDragStop(event){
+    onNodeDragStop(event) {
       const node = event.node
       this.updateNode(node)
     },
@@ -181,7 +181,7 @@ export default {
       event.dataTransfer.dropEffect = 'move'
     },
 
-    checkStartExists(){
+    checkStartExists() {
       const index = this.nodes.findIndex(node => node.type === 'start')
       return index > -1 && this.flowType === 'start'
     },
@@ -221,7 +221,7 @@ export default {
         //   y: event.clientY - rect.top
         // }
 
-        const nodeData = {...{options:this.getInitialNodeData(this.flowType)},...{flow: objFlow}}
+        const nodeData = {...{options: this.getInitialNodeData(this.flowType)}, ...{flow: objFlow}}
 
         // Создаем новую ноду
         const newNode = {
@@ -233,9 +233,10 @@ export default {
 
         // Добавляем ноду в массив
         //this.nodes = [...this.nodes, newNode]
-        this.$nextTick(()=>{
+        this.$nextTick(() => {
           this.$store.commit('addNode', newNode)
           this.$store.commit('setFlowDragging', false)
+          this.$emit('on-node-add', newNode)
         })
       } catch (e) {
         console.error(e)
@@ -245,13 +246,13 @@ export default {
 
     getInitialNodeData(nodeType) {
       const dataMap = {
-        trigger: {  },
-        condition: { operand: 'and', items:[] },
-        device: { device: 'relay1', state: 'on' },
-        camera: { camera: 'cam1', action: 'record' },
-        action: {  },
-        start: { type: 'start'},
-        end: { }
+        trigger: {},
+        condition: {operand: 'and', items: []},
+        device: {device: 'relay1', state: 'on'},
+        camera: {camera: 'cam1', action: 'record'},
+        action: {},
+        start: {type: 'start'},
+        end: {}
       }
       return dataMap[nodeType] || {}
     }
