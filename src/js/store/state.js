@@ -48,11 +48,9 @@ export default {
   timeFormat: 'HH:mm',
   systemInfo: null,
   uiNotifications: [],
-  devices: [],
   services: [],
   storages: [],
   cameras: [],
-  device: null,
   sensor: null,
   tracker: null,
   playback: {

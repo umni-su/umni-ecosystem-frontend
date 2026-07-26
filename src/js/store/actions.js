@@ -150,62 +150,6 @@ export default {
       state.ws.lastMessage = null
     }
   },
-
-  async getDevices({commit, state}) {
-    commit('setLoading', true)
-    const res = await axios.get(`${API}devices`).finally(() => {
-      commit('setLoading', false)
-    })
-    if (res) {
-      commit('setDevices', res.data)
-      return res.data
-    }
-  },
-  async getDevice({commit}, id) {
-    commit('setLoading', true)
-    const res = await axios.get(`${API}devices/${id}`).finally(() => {
-      commit('setLoading', false)
-    })
-    if (res) {
-      commit('setDevice', res.data)
-      return res.data
-    }
-  },
-  async updateDevice({commit}, data) {
-    commit('setLoading', true)
-    const res = await axios.patch(`${API}devices/${data.id}`, data).finally(() => {
-      commit('setLoading', false)
-    })
-    if (res) {
-      commit('addDevice', res.data)
-      return res.data
-    }
-  },
-  async updateDeviceCover({commit, state}, data) {
-    const device = state.device
-    commit('setLoading', true)
-    const res = await axios.post(`${API}devices/${data.id}/cover`, data, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }).finally(() => {
-      commit('setLoading', false)
-    })
-    if (res) {
-      commit('setDevice', {...device, ...res.data})
-      return res.data
-    }
-  },
-  async getDeviceCover({state}, id) {
-    const res = await fetch(
-      `/api/devices/${id}/cover/600`,
-      {
-        headers: {
-          Authorization: `Bearer ${state.token}`
-        }
-      })
-    return await getBase64Image(res)
-  },
   async setRelayState({commit}, data) {
     commit('setLoading', true)
     const res = await axios.post(`${API}sensors/${data.id}/set`, data).finally(() => {

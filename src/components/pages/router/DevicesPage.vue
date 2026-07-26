@@ -8,7 +8,7 @@ export default {
   },
   computed: {
     devices() {
-      return this.$store.getters['getDevices']
+      return this.$store.getters['devices/getDevices']
     }
   },
   async mounted() {
@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     async getDevices() {
-      await this.$store.dispatch('getDevices')
+      await this.$store.dispatch('devices/getDevices')
     }
   }
 }

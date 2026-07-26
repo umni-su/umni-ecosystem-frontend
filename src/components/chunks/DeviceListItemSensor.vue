@@ -59,7 +59,7 @@ export default {
   },
   methods: {
     async getCover() {
-      this.src = await this.$store.dispatch('getDeviceSensorCover', {id: this.sensor.id, width: 200})
+      this.src = await this.$store.dispatch('devices/getDeviceSensorCover', {id: this.sensor.id, width: 200})
     }
   }
 }

@@ -24,10 +24,10 @@ export default {
       return this.device.online
     },
     deviceCount() {
-      return this.$store.getters['getDevices'].length
+      return this.$store.getters['devices/getDevices'].length
     },
     typeStr() {
-      return this.device.type
+      return this.device.plugin.name
     },
     format() {
       return this.$store.getters['getDateTimeFormat']
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     async getCover() {
-      this.src = await this.$store.dispatch('getDeviceCover', this.device.id)
+      this.src = await this.$store.dispatch('devices/getDeviceCover', this.device.id)
     }
   }
 }
@@ -97,6 +97,7 @@ export default {
           :title="$t('Last sync')"
           :value="lastSync"
         />
+
         <DeviceCardNetworkItem
           v-for="netif in device.network_interfaces"
           :key="netif.id"

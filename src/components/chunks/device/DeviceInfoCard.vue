@@ -1,10 +1,11 @@
 <script>
 import ModalDialog from '../ModalDialog.vue'
 import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+import DeviceCardCharacteristicItem from '../DeviceCardCharacteristicItem.vue'
 
 export default {
   name: 'DeviceInfoCard',
-  components: {ModalDialog},
+  components: {DeviceCardCharacteristicItem, ModalDialog},
   props: {
     device: {
       type: Object,
@@ -26,10 +27,22 @@ export default {
       return this.$moment(this.device.last_sync).fromNow()
     },
     typeStr() {
-      return this.device.type
+      return this.device.plugin.name
     },
     name() {
       return this.device.title ? `${this.device.title.toUpperCase()} (${this.device.name.toUpperCase()})` : this.device.name.toUpperCase()
+    },
+    online() {
+      return this.device?.online
+    },
+    memoryUsage() {
+      return 100 - (this.device?.free_heap * 100 / this.device.total_heap)
+    },
+    memoryColor() {
+      if (this.memoryUsage <= 50) return 'green'
+      if (this.memoryUsage > 50 && this.memoryUsage < 75) return 'orange'
+      if (this.memoryUsage > 75) return 'red'
+      return 'grey'
     }
   },
   watch: {
@@ -46,7 +59,7 @@ export default {
   methods: {
     async setCover(e) {
       this.cover = e.target.files[0]
-      const ok = await this.$store.dispatch('updateDeviceCover', {
+      const ok = await this.$store.dispatch('devices/updateDeviceCover', {
         id: this.device.id,
         cover: this.cover
       })
@@ -58,7 +71,7 @@ export default {
       this.showForm = !this.showForm
     },
     async save() {
-      const res = await this.$store.dispatch('updateDevice', {
+      const res = await this.$store.dispatch('devices/updateDevice', {
         id: this.device.id,
         title: this.device.title
       })
@@ -68,7 +81,16 @@ export default {
     },
     async getImage() {
       if (this.device) {
-        this.src = await this.$store.dispatch('getDeviceCover', this.device.id)
+        this.src = await this.$store.dispatch('devices/getDeviceCover', this.device.id)
+      }
+    },
+    async locateDevice() {
+      this.disabled = true
+      const success = await this.$store.dispatch('devices/locateDevice', this.device.id).finally(() => {
+        this.disabled = false
+      })
+      if (success) {
+        this.$store.commit('addNotification', createSuccessNotification(this.$t('Success')))
       }
     }
   }
@@ -97,9 +119,50 @@ export default {
           :src="src"
         />
       </VSheet>
+      <DeviceCardCharacteristicItem
+        class="mb-2"
+        icon="mdi-power"
+        :title="$t('Status')"
+      >
+        <template #value>
+          <VChip
+            :color="online ? 'green' : 'red'"
+            rounded="pill"
+            density="comfortable"
+            prepend-icon="mdi-circle"
+            :text="online ? $t('Online') : $t('Offline')"
+          />
+        </template>
+      </DeviceCardCharacteristicItem>
+      <DeviceCardCharacteristicItem
+        icon="mdi-memory"
+        :title="$t('Memory')"
+      >
+        <template #value>
+          <div class="d-flex align-center justify-between">
+            <VProgressLinear
+              :color="memoryColor"
+              :model-value="memoryUsage.toFixed(2)"
+            />
+            <div class="text-subtitle-2 ml-4 font-weight-bold opacity-50">
+              {{ memoryUsage.toFixed(2) }}%
+            </div>
+          </div>
+        </template>
+      </DeviceCardCharacteristicItem>
+      <VBtn
+        class="mt-4"
+        density="comfortable"
+        rounded="pill"
+        color="success"
+        variant="tonal"
+        :text="$t('Locate')"
+        prepend-icon="mdi-map-marker"
+        @click="locateDevice"
+      />
       <VEmptyState
         v-if="device.location_id === null"
-        class="text-center border-md border-dashed rounded-lg"
+        class="mt-4 text-center border-md border-dashed rounded-lg"
       >
         <template #text>
           {{ $t('Location provides order and expands the possibilities of interaction between device') }}

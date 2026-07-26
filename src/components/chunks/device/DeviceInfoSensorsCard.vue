@@ -69,7 +69,7 @@ export default {
 
 <style scoped lang="scss">
 .hidden-list {
-  height: 392px;
+  height: 492px;
 
   &.more {
     height: auto;

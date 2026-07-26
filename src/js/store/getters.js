@@ -62,12 +62,6 @@ export default {
   getWsLastMessage(state) {
     return state.ws.lastMessage
   },
-  getDevices(state) {
-    return state.devices
-  },
-  getDevice(state) {
-    return state.device
-  },
   getDateFormat(state) {
     return state.dateFormat
   },

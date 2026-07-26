@@ -29,13 +29,16 @@ export default {
   },
   computed: {
     device() {
-      return this.$store.getters['getDevice']
+      return this.$store.getters['devices/getDevice']
     },
     name() {
       return this.device.title ? this.device.title : this.device.name.toUpperCase()
     },
     type() {
       return this.device.type
+    },
+    sensors() {
+      return this.device?.sensors
     },
     online() {
       return this.device.online
@@ -66,7 +69,7 @@ export default {
   },
   methods: {
     async getDevice() {
-      await this.$store.dispatch('getDevice', this.id)
+      await this.$store.dispatch('devices/getDevice', this.id)
       this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
     }
   }
@@ -92,19 +95,18 @@ export default {
             class="mb-4"
             :text="$t('This device is probably disabled. Please check his condition.')"
           />
-          <DeviceInfoCard :device="deviceModel" />
-          <DeviceNetworkInfoCard :device="deviceModel" />
+          <DeviceInfoCard :device="deviceModel"/>
+          <DeviceNetworkInfoCard :device="deviceModel"/>
         </VCol>
         <VCol
           cols="12"
           md="6"
         >
-          <DeviceUptimeCard @refresh-device="getDevice" />
-          <DeviceInfoSensorsCard :device="deviceModel" />
+          <DeviceInfoSensorsCard :device="deviceModel"/>
         </VCol>
       </VRow>
     </VContainer>
-    <DeviceActiveSensor />
+    <DeviceActiveSensor/>
   </VSheet>
 </template>
 

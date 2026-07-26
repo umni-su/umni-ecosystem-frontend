@@ -8,10 +8,13 @@ export function useSensor(sensor, value) {
 
     if (rawValue === null || rawValue === undefined) return rawValue
 
-
     // SWITCH, BOOLEAN - возвращаем boolean
     if (type === 100 || type === 104) {
-      return Boolean(rawValue === 'True')
+      // Исправлено: проверяем на "1", "true", "True", "TRUE"
+      if (typeof rawValue === 'string') {
+        return rawValue === '1' || rawValue.toLowerCase() === 'true'
+      }
+      return Boolean(rawValue)
     }
 
     // NUMBER, SETPOINT - возвращаем number (целое)
@@ -56,5 +59,17 @@ export function useSensor(sensor, value) {
     }
   })
 
-  return {valueByType, colorByType}
+  // Добавляем computed для отображения в виде строки
+  const displayValue = computed(() => {
+    const val = valueByType.value
+
+    // Для булевых значений показываем On/Off
+    if (typeof val === 'boolean') {
+      return val ? 'On' : 'Off'
+    }
+
+    return val
+  })
+
+  return {valueByType, colorByType, displayValue}
 }

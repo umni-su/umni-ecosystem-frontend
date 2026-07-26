@@ -36,7 +36,7 @@ export default {
       return this.$store.getters['isLoading']
     },
     device() {
-      return this.$store.getters['getDevice']
+      return this.$store.getters['devices/getDevice']
     },
     sensor() {
       return this.$store.getters['getActiveSensor']
@@ -138,7 +138,7 @@ export default {
       }
     },
     async getCover() {
-      this.src = await this.$store.dispatch('getDeviceSensorCover', {id: this.sensor.id, width: 200})
+      this.src = await this.$store.dispatch('devices/getDeviceSensorCover', {id: this.sensor.id, width: 200})
     }
   }
 }

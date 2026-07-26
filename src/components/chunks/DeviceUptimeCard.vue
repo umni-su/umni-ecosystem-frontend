@@ -1,26 +1,26 @@
 <script>
 import microsecondsToUptime from '../../js/helpers/microsecondsToUptime.js'
 import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
+import {createSuccessNotification} from '../../js/helpers/notificationHelper.js'
 
 export default {
   name: 'DeviceUptimeCard',
   components: {DeviceCardCharacteristicItem},
   emits: ['refresh-device'],
+  data() {
+    return {
+      disabled: false
+    }
+  },
   computed: {
     device() {
-      return this.$store.getters['getDevice']
+      return this.$store.getters['devices/getDevice']
     },
     uptime() {
       return microsecondsToUptime(this.device.uptime)
     },
-    fwVer() {
-      return this.device?.fw_ver
-    },
     online() {
       return this.device?.online
-    },
-    uptimeStr() {
-      return `${this.uptime.d} ${this.$t('d')}. ${this.uptime.h} ${this.$t('h')}. ${this.uptime.m} ${this.$t('m')}.`
     },
     memoryUsage() {
       return 100 - (this.device?.free_heap * 100 / this.device.total_heap)
@@ -30,6 +30,17 @@ export default {
       if (this.memoryUsage > 50 && this.memoryUsage < 75) return 'orange'
       if (this.memoryUsage > 75) return 'red'
       return 'grey'
+    }
+  },
+  methods: {
+    async locateDevice() {
+      this.disabled = true
+      const success = await this.$store.dispatch('devices/locateDevice', this.device.id).finally(() => {
+        this.disabled = false
+      })
+      if (success) {
+        this.$store.commit('addNotification', createSuccessNotification(this.$t('Success')))
+      }
     }
   }
 }
@@ -80,18 +91,6 @@ export default {
         </template>
       </DeviceCardCharacteristicItem>
       <DeviceCardCharacteristicItem
-        class="mb-2"
-        icon="mdi-code-block-tags"
-        :title="$t('Firmware')"
-        :value="fwVer"
-      />
-      <DeviceCardCharacteristicItem
-        class="mb-2"
-        icon="mdi-timer"
-        :title="$t('Uptime')"
-        :value="uptimeStr"
-      />
-      <DeviceCardCharacteristicItem
         icon="mdi-memory"
         :title="$t('Memory')"
       >
@@ -115,7 +114,10 @@ export default {
         color="success"
         variant="tonal"
         :text="$t('Locate')"
+        :loading="disabled"
+        :disabled="disabled"
         prepend-icon="mdi-map-marker"
+        @click="locateDevice"
       />
     </template>
   </VCard>
