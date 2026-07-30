@@ -48,18 +48,18 @@ export default {
     <template #item="{props, item}">
       <VListItem
         v-bind="props"
-        :disabled="!item.raw.active"
-        :title="item.raw.name"
+        :disabled="!item.active"
+        :title="item.name"
       />
     </template>
     <template #selection="{item}">
       <VIcon
         icon="mdi-circle"
-        :color="item.raw.active ? 'success' : 'error'"
+        :color="item.active ? 'success' : 'error'"
         size="x-small"
         class="mr-2"
       />
-      {{ item.raw.name }}
+      {{ item.name }}
     </template>
   </VSelect>
 </template>

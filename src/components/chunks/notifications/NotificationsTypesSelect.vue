@@ -50,11 +50,11 @@ export default {
     <template #item="{item, props}">
       <VListItem
         v-bind="props"
-        :title="item.raw.description"
+        :title="item.description"
       />
     </template>
     <template #selection="{item}">
-      {{ item.raw.description }}
+      {{ item.description }}
     </template>
   </VSelect>
 </template>

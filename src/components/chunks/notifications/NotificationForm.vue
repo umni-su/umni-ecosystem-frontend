@@ -13,7 +13,11 @@ export default {
       required: true
     }
   },
-  emits: ['update:modelValue', 'update:model-value'],
+  emits: [
+    'update:modelValue',
+    'update:model-value',
+    'on-notification-form-saved'
+  ],
   data() {
     return {
       fields: null,
@@ -52,7 +56,8 @@ export default {
         this.$store.commit('addNotification', createErrorNotification(this.$t('Error')))
       })
       if (res) {
-        this.$store.commit('addNotification', createSuccessNotification($t('Saved')))
+        this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
+        this.$emit('on-notification-form-saved')
       }
     }
   }

@@ -137,10 +137,23 @@ export default {
           rounded="pill"
           color="default"
           variant="tonal"
-          class="mt-2 mr-2 pe-0"
+          class="mt-2 mr-2 px-0"
           :prepend-icon="item.icon"
-          :text="`${item.name} (${item.id})`"
         >
+          <template #default>
+            <VTooltip
+              v-if="item.parent"
+              open-on-hover
+            >
+              <template #activator="{props}">
+                <div v-bind="props">
+                  {{ `${item.name} (${item.id})` }}
+                </div>
+              </template>
+              ID {{ item.parent.id }}: {{ item.parent.title }}, {{ item.parent.name }}
+            </VTooltip>
+            <div v-else>{{ `${item.name} (${item.id})` }}</div>
+          </template>
           <template #append>
             <VBtn
               color="error"

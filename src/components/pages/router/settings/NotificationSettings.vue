@@ -54,7 +54,10 @@ export default {
         v-model="open"
         :title="$t('Add notification')"
       >
-        <NotificationForm v-model="notification"/>
+        <NotificationForm
+          v-model="notification"
+          @on-notification-form-saved="open = false"
+        />
       </ModalDialog>
     </template>
   </VCard>

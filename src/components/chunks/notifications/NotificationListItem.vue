@@ -106,7 +106,6 @@ export default {
 <template>
   <VListItem
     :title="notification.name"
-    :subtitle="notification.type_str"
   >
     <template #prepend>
       <VIcon
