@@ -61,6 +61,9 @@
           :label="$t('Webhook')"
         />
       </VSheet>
+      <VSheet v-if="flow.el.key === 'action.device'">
+        <DeviceSensorSelect/>
+      </VSheet>
 
       <template #actions>
         <VBtn
@@ -80,48 +83,49 @@ import {Handle} from '@vue-flow/core'
 import ModalDialog from '../ModalDialog.vue'
 import NotificationsSelect from '../notifications/NotificationsSelect.vue'
 import NotificationContentForm from '../notifications/NotificationContentForm.vue'
+import DeviceSensorSelect from '../device/DeviceSensorSelect.vue'
 
 export default {
   name: 'RuleActionNode',
-  components: {NotificationContentForm, NotificationsSelect, ModalDialog, Handle, RuleNodeWrapper},
+  components: {DeviceSensorSelect, NotificationContentForm, NotificationsSelect, ModalDialog, Handle, RuleNodeWrapper},
   props: {
     data: {
       type: Object,
       required: true
     }
   },
-  data(){
+  data() {
     return {
       opened: false,
-      selected:null,
-      action:{}
+      selected: null,
+      action: {}
     }
   },
   watch: {
-    selected:{
+    selected: {
       deep: true,
-      handler(){
+      handler() {
         this.action.notification_id = this.selected
       }
     }
   },
   computed: {
-    data_action(){
+    data_action() {
       return this.data.options.action
     },
-    flow(){
+    flow() {
       return this.data.flow
     },
-    selectedNode(){
+    selectedNode() {
       return this.$store.getters['getSelectedNode']
     }
   },
-  created(){
-    if(this.action){
+  created() {
+    if (this.action) {
 
       switch (this.flow.el.key) {
       case 'action.notification':
-        if(this.data_action?.notification_id) {
+        if (this.data_action?.notification_id) {
           this.selected = this.data_action.notification_id
           this.action = {
             to: this.data_action.to,
@@ -138,8 +142,8 @@ export default {
       }
     }
   },
-  methods:{
-    applyData(){
+  methods: {
+    applyData() {
       const _data = {
         id: this.selectedNode.id,
         options: null
@@ -153,7 +157,7 @@ export default {
         break
       case 'action.webhook':
         _data.options = {
-          action:{
+          action: {
             url: this.action.url
           }
         }
@@ -162,7 +166,7 @@ export default {
       this.$store.commit('updateNodeDataOptions', _data)
       this.opened = false
     },
-    isUrl(v){
+    isUrl(v) {
       const re = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/
       return re.test(v)
     }

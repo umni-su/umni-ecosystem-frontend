@@ -29,7 +29,7 @@
       density="compact"
       :variant="$attrs?.dragging ? 'tonal' :variant"
       :color="$attrs?.dragging ? 'secondary' : color"
-      class="node-wrapper"
+      class="node-wrapper px-2"
       :max-width="width"
       min-width="200"
     >
@@ -39,7 +39,7 @@
           :icon="icon"
           class="mr-2"
         />
-        {{title}}
+        {{ title }}
       </VCardSubtitle>
       <VCardText class="pa-0 pb-3">
         <slot/>
@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { Handle} from '@vue-flow/core'
+import {Handle} from '@vue-flow/core'
 import ConfirmationDialog from '../ConfirmationDialog.vue'
 
 export default {
@@ -60,16 +60,16 @@ export default {
     ConfirmationDialog,
     Handle
   },
-  emits:['on-edit-node'],
+  emits: ['on-edit-node'],
   props: {
     id: String,
     title: String,
     icon: String,
     color: String,
     variant: String,
-    edit:{
-      type:Boolean,
-      default:true
+    edit: {
+      type: Boolean,
+      default: true
     },
     width: {
       type: Number,
@@ -84,7 +84,7 @@ export default {
         okText: this.$t('Delete'),
         okIcon: 'mdi-trash-can'
       })
-      if(ok){
+      if (ok) {
         this.$store.commit('removeNode', this.id)
       }
     },
@@ -99,16 +99,18 @@ export default {
 <style scoped>
 .close {
   position: absolute;
-  top:-10px;
-  right:calc(50% - 12px);
+  top: -10px;
+  right: calc(50% - 12px);
   z-index: 100;
 }
+
 .edit {
   position: absolute;
-  bottom:-10px;
-  right:calc(50% - 12px);
+  bottom: -10px;
+  right: calc(50% - 12px);
   z-index: 100;
 }
+
 ::v-deep(.handler) {
   padding: 8px;
   border-radius: 50%

@@ -18,6 +18,9 @@ export default {
   methods: {
     async getDevices() {
       await this.$store.dispatch('devices/getDevices')
+    },
+    triggerScanModal() {
+      this.$store.commit('devices/setScanMode', true)
     }
   }
 }
@@ -29,6 +32,18 @@ export default {
     fluid
   >
     <VRow>
+      <VCol cols="12">
+        <VSpacer/>
+        <VBtn
+          :text="$t('Add device')"
+          variant="elevated"
+          prepend-icon="mdi-plus"
+          color="primary"
+          @click="triggerScanModal"
+        />
+      </VCol>
+    </VRow>
+    <VRow>
       <DeviceCardItem
         v-for="device in devices"
         :key="device.id"
@@ -37,6 +52,19 @@ export default {
       />
     </VRow>
   </VContainer>
+  <VEmptyState v-else>
+    <template #title>{{ $t('Empty') }}</template>
+    <template #text>{{ $t('No devices available. Start a scan to find devices.') }}</template>
+    <template #actions>
+      <VBtn
+        :text="$t('Scan')"
+        variant="elevated"
+        prepend-icon="mdi-magnify"
+        color="primary"
+        @click="triggerScanModal"
+      />
+    </template>
+  </VEmptyState>
 </template>
 
 <style scoped>

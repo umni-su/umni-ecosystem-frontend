@@ -5,10 +5,12 @@ import LeftMenu from '../../components/chunks/LeftMenu.vue'
 import NotificationsPanel from '../../components/chunks/NotificationsPanel.vue'
 import PageTitle from '../../components/chunks/PageTitle.vue'
 import UserMenu from '../../components/chunks/UserMenu.vue'
+import ScanDeviceModal from '../chunks/device/ScanDeviceModal.vue'
 
 export default {
   name: 'PageLayout',
   components: {
+    ScanDeviceModal,
     UserMenu,
     PageTitle,
     NotificationsPanel,
@@ -61,14 +63,14 @@ export default {
     await this.$store.dispatch('getStorages')
   },
   methods: {
-    async getAlarmSecurityStates(){
+    async getAlarmSecurityStates() {
       const res = await this.$store.dispatch('getConfigurationStateByValues', [
         'app.mode_alarm',
         'app.mode_security'
       ])
-      if(res){
-        const alarm = res.data?.find(c=>c.key === 'app.mode_alarm')
-        const security = res.data?.find(c=>c.key === 'app.mode_security')
+      if (res) {
+        const alarm = res.data?.find(c => c.key === 'app.mode_alarm')
+        const security = res.data?.find(c => c.key === 'app.mode_security')
         this.$store.commit('setAlarmMode', alarm?.value)
         this.$store.commit('setSecurityMode', security?.value)
       }
@@ -92,7 +94,7 @@ export default {
       rounded="0"
       :color="theme === 'light' ? 'primary' : 'primary-darken'"
     >
-      <LeftMenu />
+      <LeftMenu/>
       <template #prepend>
         <VBtn
           size="large"
@@ -104,7 +106,7 @@ export default {
           :active="false"
           @click="rail = !rail"
         >
-          <UmniLogo :width="44" />
+          <UmniLogo :width="44"/>
         </VBtn>
       </template>
       <template #append>
@@ -148,15 +150,15 @@ export default {
         />
       </template>
       <template #title>
-        <PageTitle />
+        <PageTitle/>
       </template>
       <template #append>
-        <NotificationsPanel />
+        <NotificationsPanel/>
         <ThemeSwitcher
           density="comfortable"
           class="mr-2"
         />
-        <UserMenu :color="opened ? 'primary' : 'white'" />
+        <UserMenu :color="opened ? 'primary' : 'white'"/>
       </template>
     </VAppBar>
     <VMain class="fill-height">
@@ -170,10 +172,11 @@ export default {
           :max-width="isFullWidth ? 'none' : 1200"
           class="mx-auto pa-4 fill-height"
         >
-          <RouterView />
+          <RouterView/>
         </VSheet>
       </VSheet>
     </VMain>
+    <ScanDeviceModal/>
   </VSheet>
 </template>
 

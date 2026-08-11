@@ -70,6 +70,9 @@ export default {
         const status = e.response.status
         if (status === 401) {
           commit('setInstalled', true)
+        } else if (status === 423) {
+          console.log('Ecosystem started successfully, but not installed')
+          commit('setInstalled', false)
         }
         commit('setAuthenticated', false)
         commit('setUser', null)
@@ -220,27 +223,7 @@ export default {
   },
 
   /** SENSORS */
-  async updateSensor({commit}, data) {
-    commit('setLoading', true)
-    const res = await axios.patch(`${API}sensors/${data.id}`, data, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }).finally(() => {
-      commit('setLoading', false)
-    })
-    return res.data
-  },
-  async getDeviceSensorCover({state}, {id, width}) {
-    const res = await fetch(
-      `/api/sensors/${id}/cover/${width}`,
-      {
-        headers: {
-          Authorization: `Bearer ${state.token}`
-        }
-      })
-    return await getBase64Image(res)
-  },
+
 
   /**
      * SERVICES

@@ -19,13 +19,22 @@
         @click="onClose(false, notification)"
       />
     </template>
-    <span v-if="typeof notification.text === 'string'">{{ notification.text }}</span>
-    <div v-else-if="typeof notification.text === 'object'">
+    <!-- Для строк с переносами используем white-space: pre-line -->
+    <span
+      v-if="typeof notification.text === 'string'"
+      class="notification-text"
+      style="white-space: pre-line;"
+    >
+      {{ notification.text }}
+    </span>
+
+    <!-- Для массивов оставляем как есть -->
+    <div v-else-if="Array.isArray(notification.text)">
       <div
-        v-for="n in notification.text"
-        :key="n"
+        v-for="(item, idx) in notification.text"
+        :key="idx"
       >
-        {{ n }}
+        {{ item.message }}
       </div>
     </div>
   </VSnackbar>

@@ -21,5 +21,8 @@ export default {
   },
   removeDevice(state, device) {
     state.devices = state.devices.filter(d => d.id !== device.id)
+  },
+  setScanMode(state, scanMode) {
+    state.scanMode = scanMode
   }
 }

@@ -9,8 +9,7 @@ export default {
   emits: ['on-account-updated'],
   data() {
     return {
-      installStep: 1,
-      canInstall: false,
+      canInstall: true,
       showPassword: false,
       account: {
         firstname: null,
@@ -42,32 +41,16 @@ export default {
       handler() {
         this.$emit('on-account-updated', this.account)
       }
-    },
-    mqtt: {
-      deep: true,
-      handler() {
-        this.canInstall = false
-      }
     }
   },
   methods: {
-    async checkMqttConnection() {
-      const res = await this.$store.dispatch('checkMqttConnection', this.mqtt).catch(e => {
-        this.canInstall = false
-        this.$store.commit('addNotification', createErrorNotification(this.$t('Error to connect. Please check your credentials or MQTT broker settings.')))
-      })
-      if (res) {
-        this.canInstall = true
-      }
-    },
     async installEcosystem() {
       const data = {
         account: this.account,
         mqtt: this.mqtt
       }
       const ok = await this.$store.dispatch('install', data).catch(e => {
-        console.log(e.response.data.error)
-        this.$store.commit('addNotification', createManyNotifications('error', e.response.data.error))
+        this.$store.commit('addNotification', createManyNotifications('error', e.response.data.errors))
       })
     }
   }
@@ -92,25 +75,15 @@ export default {
         />
       </VCardTitle>
       <VCardTitle
-        v-if="installStep === 1"
         class="text-center"
       >
         {{ $t('Account settings') }}
       </VCardTitle>
-      <VCardTitle
-        v-if="installStep === 2"
-        class="text-center"
-      >
-        {{ $t('MQTT settings') }}
-      </VCardTitle>
       <VCardText>
         <VWindow
-          v-model="installStep"
           class="pt-4"
         >
-          <VWindowItem
-            :value="1"
-          >
+          <VWindowItem>
             <VForm>
               <VTextField
                 v-model="account.firstname"
@@ -169,101 +142,25 @@ export default {
               />
             </VForm>
           </VWindowItem>
-          <VWindowItem :value="2">
-            <VForm>
-              <VTextField
-                v-model="mqtt.host"
-                autocomplete="new-password"
-                inputmode="none"
-                class="mb-4"
-                :label="$t('Host')"
-              />
-              <VTextField
-                v-model.number="mqtt.port"
-                autocomplete="new-password"
-                inputmode="none"
-                class="mb-4"
-                :label="$t('Host')"
-              />
-              <VTextField
-                v-model.number="mqtt.user"
-                autocomplete="new-password"
-                inputmode="none"
-                class="mb-4"
-                :label="$t('User')"
-              />
-              <VTextField
-                v-model.number="mqtt.password"
-                autocomplete="new-password"
-                inputmode="none"
-                type="password"
-                class="mb-4"
-                :label="$t('Password')"
-              />
-            </VForm>
-          </VWindowItem>
         </VWindow>
       </VCardText>
-      <VCardActions v-show="installStep === 1">
-        <VSpacer />
+
+      <VCardActions class="text-center">
         <VBtn
           color="default"
-          variant="plain"
-          :text="$t('Next')"
-          append-icon="mdi-chevron-right"
-          @click="installStep =2"
-        />
-      </VCardActions>
-      <VCardActions v-show="installStep === 2">
-        <VBtn
-          density="comfortable"
-          color="default"
-          variant="plain"
-          icon="mdi-chevron-left"
-          @click="installStep = 1"
-        />
-        <VSpacer />
-        <VBtn
-          v-if="canInstall"
-          color="default"
-          variant="plain"
+          variant="tonal"
+          size="large"
+          block
           :text="$t('Install')"
           prepend-icon="mdi-send"
           @click="installEcosystem"
         />
-        <VBtn
-          v-else
-          :loading="loading"
-          :disabled="loading"
-          color="default"
-          variant="plain"
-          :text="$t('Check')"
-          prepend-icon="mdi-checkbox-blank-circle-outline"
-          @click="checkMqttConnection"
-        />
       </VCardActions>
     </VCard>
     <VSheet class="pa-4 bottom-nav">
-      <VBtn
-        color="default"
-        variant="plain"
-        :disabled="installStep === 1"
-        :text="$t('Account settings')"
-        icon="mdi-chevron-left"
-        @click="installStep = 1"
-      />
       <ThemeSwitcher
         density="comfortable"
         class="mx-3"
-      />
-
-      <VBtn
-        color="default"
-        variant="plain"
-        :disabled="installStep === 2"
-        :text="$t('MQTT settings')"
-        icon="mdi-chevron-right"
-        @click="installStep = 2"
       />
     </VSheet>
   </VSheet>

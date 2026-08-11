@@ -65,7 +65,7 @@ export default {
   },
   unmounted() {
     clearInterval(this.handler)
-    this.$store.commit('setDevice', null)
+    this.$store.commit('devices/setDevice', null)
   },
   methods: {
     async getDevice() {

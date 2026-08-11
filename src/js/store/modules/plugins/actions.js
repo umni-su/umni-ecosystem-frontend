@@ -2,48 +2,44 @@ import axios from 'axios'
 import {getBase64Image} from '../../../helpers/resToBase64.js'
 
 export default {
-  async getPlugins({commit}, data)
-  {
+  async getPlugins({commit}, data) {
     commit('setLoading', true)
     const res = await axios.get('/api/plugins', data).finally(() => {
       commit('setLoading', false)
     })
 
-    if(res){
+    if (res) {
       commit('setPlugins', res.data)
       return res.data
     }
   },
-  async getPluginSchema({commit}, id)
-  {
+  async getPluginSchema({commit}, id) {
     commit('setLoading', true)
     const res = await axios.get(`/api/plugins/${id}/schema`).finally(() => {
       commit('setLoading', false)
     })
 
-    if(res){
+    if (res) {
       return res.data
     }
   },
-  async savePluginSchema({commit}, data)
-  {
+  async savePluginSchema({commit}, data) {
     commit('setLoading', true)
     const res = await axios.post(`/api/plugins/${data.id}/schema`, data).finally(() => {
       commit('setLoading', false)
     })
 
-    if(res){
+    if (res) {
       return res.data
     }
   },
-  async toggleState({commit}, data)
-  {
+  async toggleState({commit}, data) {
     commit('setLoading', true)
     const res = await axios.post(`/api/plugins/${data.plugin_id}/toggle`, data).finally(() => {
       commit('setLoading', false)
     })
 
-    if(res){
+    if (res) {
       return res.data
     }
   },
@@ -56,5 +52,17 @@ export default {
         }
       })
     return await getBase64Image(res)
+  },
+  async scanPluginDevices({state, rootState}, id) {
+    const res = await axios.post(`/api/plugins/${id}/scan`)
+    if (res) {
+      return res.data
+    }
+  },
+  async addPluginDevice({state, rootState}, {id, external_id}) {
+    const res = await axios.post(`/api/plugins/${id}/devices`, {external_id})
+    if (res) {
+      return res.data
+    }
   }
 }

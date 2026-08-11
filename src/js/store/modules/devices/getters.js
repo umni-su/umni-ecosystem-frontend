@@ -4,5 +4,8 @@ export default {
   },
   getDevice(state) {
     return state.device
+  },
+  isScanning(state) {
+    return state.scanMode
   }
 }
