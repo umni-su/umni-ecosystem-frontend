@@ -54,10 +54,11 @@ export default {
 
 <template>
   <VCol
-    :md="deviceCount % 3 === 0 ? 4 : 6"
+    :md="6"
     :sm="12"
   >
     <VCard
+      class="fill-height"
       variant="elevated"
       hover
     >

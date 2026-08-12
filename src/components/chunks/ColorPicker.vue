@@ -14,9 +14,6 @@ export default {
     }
   },
   watch: {
-    color() {
-      this.$emit('update:model-value', this.color)
-    },
     modelValue() {
       this.color = this.modelValue
     }
@@ -43,6 +40,7 @@ export default {
     >
       <VColorPicker
         v-model="color"
+        @update:model-value="$emit('update:model-value', this.color)"
       />
     </VSheet>
   </VMenu>

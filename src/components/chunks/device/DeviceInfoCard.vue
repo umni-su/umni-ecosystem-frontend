@@ -100,6 +100,7 @@ export default {
 <template>
   <VCard
     v-if="device"
+    :disabled="!online"
     width="100%"
   >
     <template #title>
@@ -134,22 +135,22 @@ export default {
           />
         </template>
       </DeviceCardCharacteristicItem>
-      <DeviceCardCharacteristicItem
-        icon="mdi-memory"
-        :title="$t('Memory')"
-      >
-        <template #value>
-          <div class="d-flex align-center justify-between">
-            <VProgressLinear
-              :color="memoryColor"
-              :model-value="memoryUsage.toFixed(2)"
-            />
-            <div class="text-subtitle-2 ml-4 font-weight-bold opacity-50">
-              {{ memoryUsage.toFixed(2) }}%
-            </div>
-          </div>
-        </template>
-      </DeviceCardCharacteristicItem>
+      <!--      <DeviceCardCharacteristicItem-->
+      <!--        icon="mdi-memory"-->
+      <!--        :title="$t('Memory')"-->
+      <!--      >-->
+      <!--        <template #value>-->
+      <!--          <div class="d-flex align-center justify-between">-->
+      <!--            <VProgressLinear-->
+      <!--              :color="memoryColor"-->
+      <!--              :model-value="memoryUsage.toFixed(2)"-->
+      <!--            />-->
+      <!--            <div class="text-subtitle-2 ml-4 font-weight-bold opacity-50">-->
+      <!--              {{ memoryUsage.toFixed(2) }}%-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!--        </template>-->
+      <!--      </DeviceCardCharacteristicItem>-->
       <VBtn
         class="mt-4"
         density="comfortable"

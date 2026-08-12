@@ -29,7 +29,8 @@ export default {
   },
   data() {
     return {
-      value: null
+      value: null,
+      init: false
     }
   },
   computed: {
@@ -63,49 +64,63 @@ export default {
   },
   watch: {
     value(val) {
-      this.$emit('update:model-value', val)
+      if (this.init) {
+        this.$emit('update:model-value', val)
+      }
     },
     modelValue(val) {
       this.value = val
     }
   },
   created() {
+    this.init = false
     this.value = this.valueByType
     this.debouncedSetColor = debounce((e) => {
-      this.$store.dispatch('setRelayState', {
+      this.$store.dispatch('setSensorState', {
         id: this.sensor.id,
         value: e
       })
     }, 500)
     this.debouncedSetBrightness = debounce((e) => {
-      this.$store.dispatch('setRelayState', {
+      this.$store.dispatch('setSensorState', {
         id: this.sensor.id,
         value: e
       })
     }, 400)
     this.debouncedSetColorTemp = debounce((e) => {
-      this.$store.dispatch('setRelayState', {
+      this.$store.dispatch('setSensorState', {
         id: this.sensor.id,
         value: e
       })
     }, 400)
+    this.$nextTick(() => {
+      this.init = true
+    })
 
   },
   methods: {
     async changeRelayState(e) {
-      await this.$store.dispatch('setRelayState', {
+      await this.$store.dispatch('setSensorState', {
         id: this.sensor.id,
         value: e
       })
     },
     changeBrightness(e) {
-      this.debouncedSetBrightness(e)
+      if (this.init) {
+        this.debouncedSetBrightness(e)
+      }
+
     },
     changeColorTemp(e) {
-      this.debouncedSetColorTemp(e)
+      if (this.init) {
+        this.debouncedSetColorTemp(e)
+      }
     },
     changeColor(e) {
-      this.debouncedSetColor(e)
+      if (this.init) {
+        this.debouncedSetColor(e)
+      }
+
     }
   }
 }

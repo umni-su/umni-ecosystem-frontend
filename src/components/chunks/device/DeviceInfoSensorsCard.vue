@@ -20,6 +20,11 @@ export default {
       sensors: []
     }
   },
+  computed: {
+    online() {
+      return this.device.online
+    }
+  },
   created() {
     if (this.device?.sensors !== null && this.device?.sensors !== undefined) {
       this.sensors = this.device?.sensors
@@ -34,7 +39,10 @@ export default {
 </script>
 
 <template>
-  <VCard v-if="device !== null && device !== undefined">
+  <VCard
+    v-if="device !== null && device !== undefined"
+    :disabled="!online"
+  >
     <template #title>
       {{ $t('Sensors') }}
     </template>

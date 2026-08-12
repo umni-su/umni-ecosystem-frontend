@@ -153,7 +153,7 @@ export default {
       state.ws.lastMessage = null
     }
   },
-  async setRelayState({commit}, data) {
+  async setSensorState({commit}, data) {
     commit('setLoading', true)
     const res = await axios.post(`${API}sensors/${data.id}/set`, data).finally(() => {
       commit('setLoading', false)
