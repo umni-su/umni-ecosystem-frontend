@@ -35,7 +35,7 @@ export default {
         density="compact"
         icon="mdi-brush-variant"
         :color="color"
-        @click="$emit('update:on-click')"
+        @click.stop="$emit('update:on-click')"
       />
     </template>
     <VSheet

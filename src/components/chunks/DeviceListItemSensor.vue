@@ -1,6 +1,7 @@
 <script>
 
 import DeviceSensorValue from './device/DeviceSensorValue.vue'
+import {getSensorIcon} from '../../js/composables/useSensor.js'
 
 export default {
   name: 'DeviceListItemSensor',
@@ -30,7 +31,7 @@ export default {
       return 'default'
     },
     icon() {
-      return this.sensor.icon ?? 'mdi-help-circle'
+      return this.sensor.icon ?? getSensorIcon(this.sensor.type)
     },
     hasCover() {
       return this.sensor.photo !== null

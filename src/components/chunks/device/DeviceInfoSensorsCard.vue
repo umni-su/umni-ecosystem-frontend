@@ -24,6 +24,11 @@ export default {
     if (this.device?.sensors !== null && this.device?.sensors !== undefined) {
       this.sensors = this.device?.sensors
     }
+  },
+  async mounted() {
+    if (!this.$store.state.sensors.sensorTypes || this.$store.state.sensors.sensorTypes.length === 0) {
+      await this.$store.dispatch('sensors/getSensorTypes')
+    }
   }
 }
 </script>

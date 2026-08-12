@@ -1,10 +1,12 @@
 <script>
-import {useSensor} from '../../../js/composables/useSensor.js'
+import {useSensor, getSensorUiComponent} from '../../../js/composables/useSensor.js'
 import {computed} from 'vue'
-
+import {debounce} from '../../../js/helpers/debounce.js'
+import ColorPicker from '../ColorPicker.vue'
 
 export default {
   name: 'DeviceSensorValue',
+  components: {ColorPicker},
   props: {
     modelValue: {
       default: null
@@ -30,8 +32,34 @@ export default {
       value: null
     }
   },
-  created() {
-    this.value = this.valueByType
+  computed: {
+    icon() {
+      return this.sensor.icon ?? 'mdi-help-circle'
+    },
+    component() {
+      return getSensorUiComponent(this.sensor.type)
+    },
+    isToggle() {
+      return this.component === 'switch' || this.component === 'lock'
+    },
+    isBrightness() {
+      return this.component === 'brightness'
+    },
+    isColorTemp() {
+      return this.component === 'color_temp'
+    },
+    isColor() {
+      return this.component === 'color_hex' ||
+          ((this.component === 'rgb' || this.component === 'rgba') &&
+              typeof this.sensor.value === 'string' &&
+              /^#?[0-9a-f]{6}/i.test(this.sensor.value))
+    },
+    colorTempMin() {
+      return this.sensor.options?.values?.min ?? 0
+    },
+    colorTempMax() {
+      return this.sensor.options?.values?.max ?? 1000
+    }
   },
   watch: {
     value(val) {
@@ -41,10 +69,27 @@ export default {
       this.value = val
     }
   },
-  computed: {
-    icon() {
-      return this.sensor.icon ?? 'mdi-help-circle'
-    }
+  created() {
+    this.value = this.valueByType
+    this.debouncedSetColor = debounce((e) => {
+      this.$store.dispatch('setRelayState', {
+        id: this.sensor.id,
+        value: e
+      })
+    }, 500)
+    this.debouncedSetBrightness = debounce((e) => {
+      this.$store.dispatch('setRelayState', {
+        id: this.sensor.id,
+        value: e
+      })
+    }, 400)
+    this.debouncedSetColorTemp = debounce((e) => {
+      this.$store.dispatch('setRelayState', {
+        id: this.sensor.id,
+        value: e
+      })
+    }, 400)
+
   },
   methods: {
     async changeRelayState(e) {
@@ -52,6 +97,15 @@ export default {
         id: this.sensor.id,
         value: e
       })
+    },
+    changeBrightness(e) {
+      this.debouncedSetBrightness(e)
+    },
+    changeColorTemp(e) {
+      this.debouncedSetColorTemp(e)
+    },
+    changeColor(e) {
+      this.debouncedSetColor(e)
     }
   }
 }
@@ -59,7 +113,7 @@ export default {
 
 <template>
   <VSwitch
-    v-if="sensor.type === 100"
+    v-if="isToggle"
     v-model="value"
     color="primary"
     class="pa-0 mr-5"
@@ -69,6 +123,84 @@ export default {
     :false-value="false"
     @click.stop
     @update:model-value="changeRelayState"
+  />
+  <VMenu
+    v-else-if="isBrightness"
+    :close-on-content-click="false"
+    width="100%"
+    max-width="500"
+  >
+    <template #activator="{props}">
+      <VBtn
+        v-bind="props"
+        density="compact"
+        variant="text"
+        class="mr-5 brightness-btn"
+        @click.stop
+      >
+        <VIcon
+          icon="mdi-brightness-7"
+          class="mr-1"
+        />
+        <span class="text-caption">{{ valueByType }}</span>
+      </VBtn>
+    </template>
+    <VSheet
+      color="default"
+      class="pa-4"
+    >
+      <VSlider
+        v-model="value"
+        min="0"
+        max="100"
+        step="1"
+        density="compact"
+        class="brightness-slider"
+        @update:model-value="changeBrightness"
+      />
+    </VSheet>
+  </VMenu>
+  <VMenu
+    v-else-if="isColorTemp"
+    :close-on-content-click="false"
+    width="100%"
+    max-width="500"
+  >
+    <template #activator="{props}">
+      <VBtn
+        v-bind="props"
+        density="compact"
+        variant="text"
+        class="mr-5 brightness-btn"
+        @click.stop
+      >
+        <VIcon
+          icon="mdi-white-balance-sunny"
+          class="mr-1"
+        />
+        <span class="text-caption">{{ valueByType }}</span>
+      </VBtn>
+    </template>
+    <VSheet
+      color="default"
+      class="pa-4"
+    >
+      <VSlider
+        v-model="value"
+        :min="colorTempMin"
+        :max="colorTempMax"
+        step="1"
+        density="compact"
+        class="brightness-slider"
+        @update:model-value="changeColorTemp"
+      />
+    </VSheet>
+  </VMenu>
+  <ColorPicker
+    v-else-if="isColor"
+    v-model="value"
+    class="mr-5"
+    @update:model-value="changeColor"
   />
   <VBtn
     v-else
@@ -81,5 +213,7 @@ export default {
 </template>
 
 <style scoped>
-
+.brightness-slider {
+  min-width: 180px;
+}
 </style>

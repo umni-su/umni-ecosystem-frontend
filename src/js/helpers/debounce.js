@@ -1,0 +1,19 @@
+export function debounce(fn, wait) {
+  let timer = null
+  const debounced = function (...args) {
+    if (timer !== null) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(() => {
+      timer = null
+      fn.apply(this, args)
+    }, wait)
+  }
+  debounced.cancel = function () {
+    if (timer !== null) {
+      clearTimeout(timer)
+      timer = null
+    }
+  }
+  return debounced
+}

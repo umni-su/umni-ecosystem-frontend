@@ -1,9 +1,11 @@
 <script>
 import DeviceCardItem from '../../../components/chunks/DeviceCardItem.vue'
+import PageActions from '../../chunks/PageActions.vue'
 
 export default {
   name: 'DevicesPage',
   components: {
+    PageActions,
     DeviceCardItem
   },
   computed: {
@@ -32,23 +34,21 @@ export default {
     fluid
   >
     <VRow>
-      <VCol cols="12">
-        <VSpacer/>
-        <VBtn
-          :text="$t('Add device')"
-          variant="elevated"
-          prepend-icon="mdi-plus"
-          color="primary"
-          @click="triggerScanModal"
-        />
-      </VCol>
-    </VRow>
-    <VRow>
       <DeviceCardItem
         v-for="device in devices"
         :key="device.id"
         :device="device"
         @click="$router.push({name: 'device', params: {id:device.id}})"
+      />
+      <VBtn
+        v-tooltip="$t('Add device')"
+        class="abs"
+        size="x-large"
+        rounded="pill"
+        variant="elevated"
+        icon="mdi-plus"
+        color="primary"
+        @click="triggerScanModal"
       />
     </VRow>
   </VContainer>
@@ -68,5 +68,10 @@ export default {
 </template>
 
 <style scoped>
-
+.abs {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 10;
+}
 </style>

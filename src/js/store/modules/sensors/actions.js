@@ -22,6 +22,14 @@ export default {
     return res.data
   },
 
+  async getSensorTypes({commit}) {
+    const res = await axios.get('/api/sensors/types')
+    if (res) {
+      commit('setSensorTypes', res.data)
+    }
+    return res.data
+  },
+
   async updateSensor({commit}, data) {
     commit('setLoading', true, {root: true})
     const res = await axios.patch(`/api/sensors/${data.id}`, data, {

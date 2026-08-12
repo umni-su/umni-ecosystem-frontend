@@ -44,7 +44,7 @@ export default {
           class="py-1"
           icon="mdi-circle-medium"
           :title="$t('Name')"
-          :value="net.name"
+          :value="net.name?.toUpperCase()"
         />
         <DeviceCardCharacteristicItem
           class="py-1"
@@ -63,24 +63,24 @@ export default {
             />
           </template>
         </DeviceCardCharacteristicItem>
-        <DeviceCardCharacteristicItem
-          class="py-1"
-          icon="mdi-circle-medium"
-          :title="$t('MAC address')"
-          :value="net.mac.toUpperCase()"
-        />
-        <DeviceCardCharacteristicItem
-          class="py-1"
-          icon="mdi-circle-medium"
-          :title="$t('Netmask')"
-          :value="net.mask"
-        />
-        <DeviceCardCharacteristicItem
-          class="py-1"
-          icon="mdi-circle-medium"
-          :title="$t('Gateway')"
-          :value="net.gw"
-        />
+        <!--        <DeviceCardCharacteristicItem-->
+        <!--          class="py-1"-->
+        <!--          icon="mdi-circle-medium"-->
+        <!--          :title="$t('MAC address')"-->
+        <!--          :value="net.mac.toUpperCase()"-->
+        <!--        />-->
+        <!--        <DeviceCardCharacteristicItem-->
+        <!--          class="py-1"-->
+        <!--          icon="mdi-circle-medium"-->
+        <!--          :title="$t('Netmask')"-->
+        <!--          :value="net.mask"-->
+        <!--        />-->
+        <!--        <DeviceCardCharacteristicItem-->
+        <!--          class="py-1"-->
+        <!--          icon="mdi-circle-medium"-->
+        <!--          :title="$t('Gateway')"-->
+        <!--          :value="net.gw"-->
+        <!--        />-->
         <VDivider
           v-if="index !== network.length - 1"
           class="my-4"

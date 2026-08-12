@@ -1,4 +1,5 @@
 export default {
   sensors: [],
-  sensor: null
+  sensor: null,
+  sensorTypes: []
 }
