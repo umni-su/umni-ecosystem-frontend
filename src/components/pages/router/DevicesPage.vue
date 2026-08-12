@@ -1,5 +1,5 @@
 <script>
-import DeviceCardItem from '../../../components/chunks/DeviceCardItem.vue'
+import DeviceCardItem from '../../chunks/device/DeviceCardItem.vue'
 import PageActions from '../../chunks/PageActions.vue'
 
 export default {

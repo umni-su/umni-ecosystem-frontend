@@ -1,7 +1,7 @@
 <script>
-import microsecondsToUptime from '../../js/helpers/microsecondsToUptime.js'
+import microsecondsToUptime from '../../../js/helpers/microsecondsToUptime.js'
 import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
-import {createSuccessNotification} from '../../js/helpers/notificationHelper.js'
+import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
 
 export default {
   name: 'DeviceUptimeCard',

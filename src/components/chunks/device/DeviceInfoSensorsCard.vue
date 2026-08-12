@@ -1,5 +1,5 @@
 <script>
-import DeviceListItemSensor from '../DeviceListItemSensor.vue'
+import DeviceListItemSensor from '../device/DeviceListItemSensor.vue'
 import SimpleBar from 'simplebar-vue'
 
 export default {

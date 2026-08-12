@@ -1,5 +1,5 @@
 <script>
-import DeviceCardCharacteristicItem from '../DeviceCardCharacteristicItem.vue'
+import DeviceCardCharacteristicItem from '../device/DeviceCardCharacteristicItem.vue'
 
 export default {
   name: 'DeviceNetworkInfoCard',

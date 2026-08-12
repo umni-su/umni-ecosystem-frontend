@@ -3,7 +3,7 @@ import DeviceInfoCard from '../../chunks/device/DeviceInfoCard.vue'
 import DeviceNetworkInfoCard from '../../chunks/device/DeviceNetworkInfoCard.vue'
 import DeviceInfoSensorsCard from '../../chunks/device/DeviceInfoSensorsCard.vue'
 import DeviceActiveSensor from '../../chunks/device/DeviceActiveSensor.vue'
-import DeviceUptimeCard from '../../chunks/DeviceUptimeCard.vue'
+import DeviceUptimeCard from '../../chunks/device/DeviceUptimeCard.vue'
 
 export default {
   name: 'DevicePage',

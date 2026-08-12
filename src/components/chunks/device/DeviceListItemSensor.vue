@@ -1,7 +1,7 @@
 <script>
 
-import DeviceSensorValue from './device/DeviceSensorValue.vue'
-import {getSensorIcon} from '../../js/composables/useSensor.js'
+import DeviceSensorValue from './DeviceSensorValue.vue'
+import {getSensorIcon} from '../../../js/composables/useSensor.js'
 
 export default {
   name: 'DeviceListItemSensor',

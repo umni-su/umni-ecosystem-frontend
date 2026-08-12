@@ -1,7 +1,7 @@
 <script>
 import ModalDialog from '../ModalDialog.vue'
 import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
-import DeviceCardCharacteristicItem from '../DeviceCardCharacteristicItem.vue'
+import DeviceCardCharacteristicItem from './DeviceCardCharacteristicItem.vue'
 
 export default {
   name: 'DeviceInfoCard',
