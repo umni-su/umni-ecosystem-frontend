@@ -121,46 +121,69 @@ export default {
   },
   /** WEBSOCKETS**/
   wsConnect({commit, state}) {
-    if (state.ws.server === null) {
+    if (state.ws.server === null && state.ws.shouldReconnect) {
       const token = state.token
       const url = `${document.location.protocol}//${document.location.host}/api/ws/notifications?token=${token}`
-      state.ws.server = new WebSocket(url)
-      state.ws.server.onopen = () => {
-        console.log('Connection opened')
-      }
-      state.ws.server.onerror = ws => {
-        console.log('Error raised', ws)
-      }
-      state.ws.server.onmessage = (message) => {
-        try {
-          message = JSON.parse(message.data)
-        } catch (e) {
-          message = message.data
-          console.error(e)
+
+      const connect = () => {
+        state.ws.server = new WebSocket(url)
+
+        state.ws.server.onopen = () => {
+          console.log('Connection opened')
+          state.ws.connecting = false
+          state.ws.connected = true
         }
-        commit('setWsLastMessage', message)
+
+        state.ws.server.onerror = ws => {
+          console.log('Error raised', ws)
+          state.ws.connecting = false
+          state.ws.connected = false
+        }
+
+        state.ws.server.onmessage = (message) => {
+          try {
+            message = JSON.parse(message.data)
+          } catch (e) {
+            message = message.data
+            console.error(e)
+          }
+          commit('setWsLastMessage', message)
+        }
+
+        state.ws.server.onclose = (e) => {
+          console.log('Connection was closed', e)
+          state.ws.connecting = false
+          state.ws.connected = false
+          state.ws.server = null
+
+          // Переподключение только если флаг разрешает
+          if (state.ws.shouldReconnect && state.token) {
+            setTimeout(() => {
+              connect()
+            }, 3000)
+          }
+        }
       }
-      state.ws.server.onclose = (e) => {
-        console.log('Connection was closed', e)
-      }
+
+      connect()
     }
   },
-  wsDisconnect() {
+  wsDisconnect({commit, state}) {
+    // Устанавливаем флаг, что отключаемся преднамеренно
+    state.ws.shouldReconnect = false
+
     if (state.ws.server !== null) {
       state.ws.server.close()
+      state.ws.server = null
       state.ws.connecting = false
       state.ws.connected = false
       state.ws.lastMessage = null
     }
-  },
-  async setSensorState({commit}, data) {
-    commit('setLoading', true)
-    const res = await axios.post(`${API}sensors/${data.id}/set`, data).finally(() => {
-      commit('setLoading', false)
-    })
-    if (res) {
-      return res.data
-    }
+
+    // Сбрасываем флаг через небольшую задержку, чтобы можно было переподключиться при следующем монтировании
+    setTimeout(() => {
+      state.ws.shouldReconnect = true
+    }, 500)
   },
   /** HISTORY **/
   async getSensorHistory({commit}, data) {

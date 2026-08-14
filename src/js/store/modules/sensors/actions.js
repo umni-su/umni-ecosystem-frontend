@@ -42,6 +42,14 @@ export default {
     return res.data
   },
 
+  async setSensorState({commit}, data) {
+    commit('setLoading', true)
+    const res = await axios.post(`/api/sensors/${data.id}/set`, data).finally(() => {
+      commit('setLoading', false)
+    })
+    return res.data
+  },
+
   async getDeviceSensorCover({state, dispatch}, {id, width}) {
     const res = await fetch(
       `/api/sensors/${id}/cover/${width}`,

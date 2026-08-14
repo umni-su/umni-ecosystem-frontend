@@ -77,6 +77,7 @@ export default {
     server: null,
     connecting: false,
     connected: true,
-    lastMessage: null
+    lastMessage: null,
+    shouldReconnect: true
   }
 }

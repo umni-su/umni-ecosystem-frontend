@@ -76,19 +76,19 @@ export default {
     this.init = false
     this.value = this.valueByType
     this.debouncedSetColor = debounce((e) => {
-      this.$store.dispatch('setSensorState', {
+      this.$store.dispatch('sensors/setSensorState', {
         id: this.sensor.id,
         value: e
       })
     }, 500)
     this.debouncedSetBrightness = debounce((e) => {
-      this.$store.dispatch('setSensorState', {
+      this.$store.dispatch('sensors/setSensorState', {
         id: this.sensor.id,
         value: e
       })
     }, 400)
     this.debouncedSetColorTemp = debounce((e) => {
-      this.$store.dispatch('setSensorState', {
+      this.$store.dispatch('sensors/setSensorState', {
         id: this.sensor.id,
         value: e
       })
@@ -100,7 +100,7 @@ export default {
   },
   methods: {
     async changeRelayState(e) {
-      await this.$store.dispatch('setSensorState', {
+      await this.$store.dispatch('sensors/setSensorState', {
         id: this.sensor.id,
         value: e
       })
