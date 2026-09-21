@@ -30,7 +30,7 @@
     "@babel/eslint-parser": "^8.0.1",
     "@eslint/js": "^10.0.1",
     "@types/drawflow": "^0.0.12",
-    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitejs/plugin-vue": "^6.0.9",
     "eslint": "^10.10.0",
     "eslint-plugin-vue": "^10.10.0",
     "globals": "^17.12.0",
