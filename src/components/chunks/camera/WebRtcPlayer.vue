@@ -8,12 +8,13 @@
       class="webrtc-video d-block w-100"
       autoplay
       playsinline
-      :muted="muted"
+      controls
+      muted
       :poster="poster || undefined"
     />
 
     <!-- Оверлей рисования (canvas) поверх видео -->
-    <slot />
+    <slot/>
 
     <!-- Заглушка: старт / потеря сигнала / остановка -->
     <div
@@ -35,16 +36,42 @@
       </template>
     </div>
 
-    <!-- Управление звуком: видео стартует как muted (autoplay) -->
-    <VBtn
-      v-if="connected && audio"
-      class="webrtc-audio-btn"
-      :icon="muted ? 'mdi-volume-off' : 'mdi-volume-high'"
-      size="small"
-      variant="tonal"
-      density="comfortable"
-      @click="toggleMute"
-    />
+    <VSheet class="position-absolute right-0 top-0 overflow-hidden pa-2">
+      <VMenu :close-on-content-click="false">
+        <template #activator="{props}">
+          <VBtn
+            class="mr-2"
+            color="default"
+            variant="elevated"
+            density="comfortable"
+            :icon="selectedQuality?.icon ?? 'mdi-video-standard-definition'"
+            v-bind="props"
+          />
+        </template>
+        <VSheet>
+          <VList width="200">
+            <VListItem
+              v-for="item in qualityOptions"
+              :key="item"
+              :prepend-icon="item.icon"
+              :active="item.width === quality"
+              :title="item.label"
+              @click="changeQuality(item.width)"
+            />
+          </VList>
+        </VSheet>
+      </VMenu>
+      <!-- Управление звуком: видео стартует как muted (autoplay) -->
+      <!--      <VBtn-->
+      <!--        v-if="connected && audio"-->
+      <!--        :icon="muted ? 'mdi-volume-off' : 'mdi-volume-high'"-->
+      <!--        variant="elevated"-->
+      <!--        density="comfortable"-->
+      <!--        @click="toggleMute"-->
+      <!--      />-->
+    </VSheet>
+
+
   </div>
 </template>
 
@@ -68,6 +95,11 @@ export default {
       type: Number,
       default: 0
     },
+    // Запрашиваемая ширина видеострима от сервера (клипится server max_width)
+    streamWidth: {
+      type: Number,
+      default: 640
+    },
     // Воспроизводить ли звук камеры
     audio: {
       type: Boolean,
@@ -81,15 +113,44 @@ export default {
   },
   data() {
     return {
+      client: null,
       state: 'connecting',
       connected: false,
       muted: true,
       session: null,
       mediaStream: null,
-      retryTimer: null
+      retryTimer: null,
+      quality: 640,
+      qualityOptions: [
+        {
+          label: this.$t('Minimum quality'),
+          icon: 'mdi-quality-low',
+          width: 320
+        },
+        {
+          label: this.$t('Medium quality'),
+          icon: 'mdi-quality-medium',
+          width: 640
+        },
+        {
+          label: this.$t('High quality'),
+          icon: 'mdi-quality-high',
+          width: 1280
+        },
+        {
+          label: this.$t('Ultra quality'),
+          icon: 'mdi-crown',
+          width: 1920
+        }
+      ]
     }
   },
   computed: {
+    selectedQuality() {
+      return this.qualityOptions.find(item => {
+        return item.width === this.quality
+      })
+    },
     token() {
       return this.$store.getters['getToken']
     },
@@ -123,8 +184,8 @@ export default {
       this.mediaStream = new MediaStream()
 
       try {
-        const client = WebRtcClient.get(this.token)
-        this.session = await client.createSession(this.camera.id, {
+        this.client = WebRtcClient.get(this.token)
+        this.session = await this.client.createSession(this.camera.id, {
           onTrack: track => this._onTrack(track),
           onState: state => this._onState(state),
           onError: message => {
@@ -151,6 +212,15 @@ export default {
       this.connected = false
       this.state = 'stopped'
     },
+    async changeQuality(q) {
+      this.quality = q
+      if (this.client !== null) {
+        await this.client.setVideoWidth(
+          this.session.sessionId,
+          this.quality
+        )
+      }
+    },
 
     _onTrack(track) {
       if (!this.mediaStream) {
@@ -168,7 +238,8 @@ export default {
         this.state = 'connected'
         if (video) {
           const onPlay = () => {
-            video.play().catch(() => {})
+            video.play().catch(() => {
+            })
             this.$emit('ready', video)
           }
           if (video.readyState >= 2) {
@@ -243,10 +314,4 @@ export default {
   pointer-events: none;
 }
 
-.webrtc-audio-btn {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  z-index: 20;
-}
 </style>

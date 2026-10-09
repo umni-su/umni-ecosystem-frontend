@@ -24,7 +24,8 @@ export default {
     return {
       cover: null,
       handler: null,
-      deviceModel: undefined
+      deviceModel: undefined,
+      loading: false
     }
   },
   computed: {
@@ -60,6 +61,7 @@ export default {
   async created() {
     await this.getDevice()
     this.handler = setInterval(async () => {
+      if (this.loading) return
       await this.getDevice()
     }, this.interval)
   },
@@ -69,7 +71,10 @@ export default {
   },
   methods: {
     async getDevice() {
-      await this.$store.dispatch('devices/getDevice', this.id)
+      this.loading = true
+      await this.$store.dispatch('devices/getDevice', this.id).finally(() => {
+        this.loading = false
+      })
       this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
     }
   }

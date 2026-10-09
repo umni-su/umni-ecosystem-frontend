@@ -29,6 +29,7 @@ export class WebRtcClient {
     // sessionId -> { pc, cameraId, handlers }
     this.sessions = new Map()
     this.iceServers = []
+    this.maxWidth = 0
     this.configLoaded = false
   }
 
@@ -51,6 +52,7 @@ export class WebRtcClient {
       if (res.ok) {
         const data = await res.json()
         this.iceServers = data.ice_servers || []
+        this.maxWidth = data.max_width || 0
       }
     } catch (e) {
       console.warn('WebRTC: failed to load ICE config', e)
@@ -130,8 +132,9 @@ export class WebRtcClient {
   }
 
   // Создаёт peer-сессию для камеры и отправляет offer.
+  // options.videoWidth — желаемая ширина видео (клипится по server max_width).
   // Возвращает { sessionId, close }.
-  async createSession(cameraId, handlers = {}) {
+  async createSession(cameraId, handlers = {}, options = {}) {
     await this.loadConfig()
     await this.connect()
 
@@ -161,18 +164,44 @@ export class WebRtcClient {
     const offer = await pc.createOffer()
     await pc.setLocalDescription(offer)
 
-    this._send({
+    const payload = {
       type: 'offer',
       session_id: sessionId,
       camera_id: cameraId,
       sdp: pc.localDescription.sdp,
       sdp_type: 'offer'
-    })
+    }
+
+    let width = options.videoWidth || 0
+    if (width < 0) {
+      width = 0
+    }
+    if (width > 0 && this.maxWidth > 0) {
+      width = Math.min(width, this.maxWidth)
+    }
+    if (width > 0) {
+      payload.width = Math.round(width)
+    }
+
+    this._send(payload)
 
     return {
       sessionId,
       close: () => this.closeSession(sessionId)
     }
+  }
+
+  // Меняет разрешение видео на лету (без пересоединения).
+  async setVideoWidth(sessionId, width) {
+    if (!width || width <= 0) {
+      return
+    }
+    await this.loadConfig().catch(() => {})
+    let w = width
+    if (this.maxWidth > 0) {
+      w = Math.min(w, this.maxWidth)
+    }
+    this._send({type: 'set_width', session_id: sessionId, width: Math.round(w)})
   }
 
   closeSession(sessionId) {

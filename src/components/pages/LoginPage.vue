@@ -39,50 +39,81 @@ export default {
   <VLayout
     class="login bg-primary"
   >
-    <VCard
-      width="350"
-      class="py-3 px-8"
-      elevation="0"
-      color="primary-darken"
+    <VSheet
+      width="500"
+      rounded="0"
+      class="login-sheet fill-height d-flex justify-center align-center"
     >
-      <template #text>
-        <UmniLogo
-          :short="false"
-          :width="210"
-          class="d-block opacity-70 ma-auto mb-4"
-        />
-        <VForm @keydown.enter="login">
-          <VTextField
-            v-model="username"
-            :label="$t('Username')"
-            class="mb-4"
-            autocomplete="off"
-            prepend-inner-icon="mdi-account"
+      <VCard
+        rounded="0"
+        width="350"
+        class="py-3 px-8"
+        elevation="0"
+        variant="text"
+      >
+        <template #text>
+          <UmniLogo
+            :short="false"
+            :width="210"
+            class="d-block opacity-70 ma-auto mb-4"
           />
-          <VTextField
-            v-model="password"
-            autocomplete="off"
-            :label="$t('Password')"
-            type="password"
-            class="mb-4"
-            prepend-inner-icon="mdi-key"
-          />
-          <VBtn
-            variant="flat"
-            :loading="loading"
-            :disabled="loading"
-            class="w-100"
-            :text="$t('Login')"
-            prepend-icon="mdi-send"
-            color="primary"
-            size="large"
-            @click="login"
-          />
-        </VForm>
-      </template>
-    </VCard>
-    <div class="mini-slog text-body-small opacity-50">
-      {{ $t('Prostoy. Dostupniy. Umni.') }}
+          <VForm @keydown.enter="login">
+            <VTextField
+              v-model="username"
+              :label="$t('Username')"
+              class="mb-4"
+              autocomplete="off"
+              prepend-inner-icon="mdi-account"
+            />
+            <VTextField
+              v-model="password"
+              autocomplete="off"
+              :label="$t('Password')"
+              type="password"
+              class="mb-4"
+              prepend-inner-icon="mdi-key"
+            />
+            <VBtn
+              variant="tonal"
+              color="default"
+              :loading="loading"
+              :disabled="loading"
+              class="w-100"
+              :text="$t('Login')"
+              prepend-icon="mdi-send"
+              size="large"
+              @click="login"
+            />
+          </VForm>
+        </template>
+      </VCard>
+      <div class="mini-slog text-body-small opacity-50">
+        {{ $t('Prostoy. Dostupniy. Umni.') }}
+      </div>
+    </VSheet>
+    <div class="position-absolute right-0 bottom-0 pa-6">
+      <VBtn
+        variant="plain"
+        color="default"
+        icon="mdi-web"
+        href="https://umni.su/"
+        target="_blank"
+      />
+      <VBtn
+        variant="plain"
+        color="default"
+        icon="mdi-book"
+        href="https://docs.umni.su/"
+        target="_blank"
+      />
+      <VBtn
+        variant="plain"
+        color="default"
+        icon="mdi-github"
+        href="https://github.com/umni-su"
+        target="_blank"
+      />
+
     </div>
   </VLayout>
 </template>
@@ -92,14 +123,21 @@ export default {
 .login {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
+  background: url("../../assets/img/eco-bg.jpg") no-repeat 0 center;
+  background-size: cover;
 
-  .mini-slog {
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    text-align: center;
+  .login-sheet {
+    position: relative;
+    background: rgba(3, 80, 108, 0.4);
+
+    .mini-slog {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
   }
 }
 </style>

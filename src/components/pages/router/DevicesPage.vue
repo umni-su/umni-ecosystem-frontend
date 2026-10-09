@@ -69,7 +69,7 @@ export default {
 
 <style scoped>
 .abs {
-  position: absolute;
+  position: fixed;
   bottom: 16px;
   right: 16px;
   z-index: 10;
