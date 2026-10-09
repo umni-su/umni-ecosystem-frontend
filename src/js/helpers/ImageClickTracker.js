@@ -29,7 +29,15 @@ export class ImageClickTracker {
     this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this))
     this.canvas.addEventListener('contextmenu', this.handleContextMenu.bind(this))
     this.canvas.addEventListener('dblclick', this.handleDoubleClick.bind(this))
-    window.addEventListener('resize', this.resizeCanvas.bind(this))
+    this._onResize = this.resizeCanvas.bind(this)
+    window.addEventListener('resize', this._onResize)
+  }
+
+  destroy() {
+    if (this._onResize) {
+      window.removeEventListener('resize', this._onResize)
+      this._onResize = null
+    }
   }
 
   setColor(color) {
@@ -532,10 +540,19 @@ export class ImageClickTracker {
   }
 
   scaleX() {
-    return this.image.getBoundingClientRect().width / this.image.naturalWidth
+    return this.image.getBoundingClientRect().width / this.naturalWidth()
   }
 
   scaleY() {
-    return this.image.getBoundingClientRect().height / this.image.naturalHeight
+    return this.image.getBoundingClientRect().height / this.naturalHeight()
+  }
+
+  // Поддержка и <img> (naturalWidth/Height), и <video> (videoWidth/Height)
+  naturalWidth() {
+    return this.image.videoWidth || this.image.naturalWidth || this.image.clientWidth || 1
+  }
+
+  naturalHeight() {
+    return this.image.videoHeight || this.image.naturalHeight || this.image.clientHeight || 1
   }
 }

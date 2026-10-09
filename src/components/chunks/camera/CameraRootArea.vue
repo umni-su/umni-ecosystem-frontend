@@ -1,8 +1,10 @@
 <script>
 import {ImageClickTracker} from '../../../js/helpers/ImageClickTracker.js'
+import WebRtcPlayer from './WebRtcPlayer.vue'
 
 export default {
   name: 'CameraRootArea',
+  components: {WebRtcPlayer},
   props: {
     camera: {
       type: Object,
@@ -11,12 +13,21 @@ export default {
     hideDrawings: {
       type: Boolean,
       default: false
+    },
+    // Ограничение ширины видео (px), 0 — на всю ширину контейнера
+    maxWidth: {
+      type: Number,
+      default: 1000
+    },
+    // Воспроизводить звук камеры (стартует как muted из-за autoplay)
+    audio: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
     return {
       tracker: null,
-      url: null,
       src: null
     }
   },
@@ -26,34 +37,38 @@ export default {
     }
   },
   async mounted() {
-    this.createUrl()
     await this.getCameraCover()
     this.$store.commit('destroyTracker')
-    setTimeout(() => {
-      this.createTracker(this.camera)
-    }, 1000)
+  },
+  beforeUnmount() {
+    this.destroyTracker()
   },
   methods: {
-    createTracker(camera) {
+    onPlayerReady(videoEl) {
+      this.createTracker(videoEl)
+    },
+    createTracker(imageEl) {
+      this.destroyTracker()
       this.tracker = new ImageClickTracker(
-        this.$refs.image,
-        this.$refs.output,
+        imageEl,
+        null,
         this.$refs.draw
       )
-      this.tracker.importFromJSON(camera.areas)
+      this.tracker.importFromJSON(this.camera.areas || [])
       this.$store.commit('setTracker', this.tracker)
     },
+    destroyTracker() {
+      if (this.tracker) {
+        this.tracker.destroy()
+        this.tracker = null
+      }
+      this.$store.commit('destroyTracker')
+    },
     stop() {
-      //this.url = null
-      window.stop()
-      this.url = this.src
+      this.$refs.player?.stop()
     },
     async start() {
-      this.createUrl()
-      await this.getCameraCover()
-    },
-    createUrl() {
-      this.url = `/api/cameras/${this.camera.id}/stream?token=${this.token}`
+      this.$refs.player?.start()
     },
     async getCameraCover() {
       this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700})
@@ -63,22 +78,21 @@ export default {
 </script>
 
 <template>
-  <VSheet
-    v-if="src"
-    class="frame position-relative"
-    width="1000"
-  >
-    <img
-      id="targetImage"
-      ref="image"
-      class="d-block video w-100"
-      :src="url"
+  <VSheet class="frame position-relative">
+    <WebRtcPlayer
+      ref="player"
+      :camera="camera"
+      :poster="src"
+      :max-width="maxWidth"
+      :audio="audio"
+      @ready="onPlayerReady"
     >
-    <canvas
-      id="canvas"
-      ref="draw"
-      :class="hideDrawings?'d-none':'d-block'"
-    />
+      <canvas
+        id="canvas"
+        ref="draw"
+        :class="hideDrawings?'d-none':'d-block'"
+      />
+    </WebRtcPlayer>
   </VSheet>
 </template>
 
@@ -94,5 +108,4 @@ export default {
     cursor: default;
   }
 }
-
 </style>
