@@ -61,17 +61,7 @@
           </VList>
         </VSheet>
       </VMenu>
-      <!-- Управление звуком: видео стартует как muted (autoplay) -->
-      <!--      <VBtn-->
-      <!--        v-if="connected && audio"-->
-      <!--        :icon="muted ? 'mdi-volume-off' : 'mdi-volume-high'"-->
-      <!--        variant="elevated"-->
-      <!--        density="comfortable"-->
-      <!--        @click="toggleMute"-->
-      <!--      />-->
     </VSheet>
-
-
   </div>
 </template>
 
@@ -80,32 +70,28 @@ import {WebRtcClient} from '../../../js/helpers/WebRtcClient.js'
 
 export default {
   name: 'WebRtcPlayer',
+  emits: ['on-connected', 'ready', 'resize'],
   props: {
     camera: {
       type: Object,
       required: true
     },
-    // Кадр-заглушка (обложка), показывается до появления видео
     poster: {
       type: String,
       default: null
     },
-    // Максимальная ширина контейнера в px (0 — без ограничения)
     maxWidth: {
       type: Number,
       default: 0
     },
-    // Запрашиваемая ширина видеострима от сервера (клипится server max_width)
     streamWidth: {
       type: Number,
       default: 640
     },
-    // Воспроизводить ли звук камеры
     audio: {
       type: Boolean,
       default: true
     },
-    // Задержка авто-переподключения, мс (0 — выключено)
     reconnectDelay: {
       type: Number,
       default: 3000
@@ -142,14 +128,17 @@ export default {
           icon: 'mdi-crown',
           width: 1920
         }
-      ]
+      ],
+      // наблюдатели за размером видео
+      _rvfcHandle: null,
+      _resizeObserver: null,
+      _lastMediaW: 0,
+      _lastMediaH: 0
     }
   },
   computed: {
     selectedQuality() {
-      return this.qualityOptions.find(item => {
-        return item.width === this.quality
-      })
+      return this.qualityOptions.find(item => item.width === this.quality)
     },
     token() {
       return this.$store.getters['getToken']
@@ -175,6 +164,7 @@ export default {
   beforeUnmount() {
     this.stop()
     this._clearRetry()
+    this._stopSizeWatchers()
   },
   methods: {
     async start() {
@@ -201,6 +191,7 @@ export default {
 
     stop() {
       this._clearRetry()
+      this._stopSizeWatchers()
       if (this.session) {
         this.session.close()
         this.session = null
@@ -212,13 +203,11 @@ export default {
       this.connected = false
       this.state = 'stopped'
     },
+
     async changeQuality(q) {
       this.quality = q
-      if (this.client !== null) {
-        await this.client.setVideoWidth(
-          this.session.sessionId,
-          this.quality
-        )
+      if (this.client !== null && this.session) {
+        await this.client.setVideoWidth(this.session.sessionId, this.quality)
       }
     },
 
@@ -240,6 +229,7 @@ export default {
           const onPlay = () => {
             video.play().catch(() => {
             })
+            this._startSizeWatchers(video)
             this.$emit('ready', video)
           }
           if (video.readyState >= 2) {
@@ -248,7 +238,68 @@ export default {
             video.addEventListener('loadeddata', onPlay, {once: true})
           }
         }
+        this.$nextTick(() => {
+          this.$emit('on-connected', video)
+        })
       }
+    },
+
+    /**
+     * Следим за изменением размеров <video> двумя способами:
+     *  - ResizeObserver — ловит изменение CSS-размера элемента;
+     *  - requestVideoFrameCallback — ловит изменение videoWidth/videoHeight
+     *    (метаданные каждого декодированного кадра).
+     * При любом изменении эмитим 'resize', чтобы родитель пересчитал canvas.
+     */
+    _startSizeWatchers(video) {
+      this._stopSizeWatchers()
+      if (!video) return
+
+      this._lastMediaW = video.videoWidth
+      this._lastMediaH = video.videoHeight
+
+      // 1) CSS-размер
+      if (typeof ResizeObserver !== 'undefined') {
+        this._resizeObserver = new ResizeObserver(() => {
+          this.$emit('resize', {
+            width: video.videoWidth,
+            height: video.videoHeight,
+            clientWidth: video.clientWidth,
+            clientHeight: video.clientHeight
+          })
+        })
+        this._resizeObserver.observe(video)
+      }
+
+      // 2) Натуральный размер кадра — rVFC срабатывает на каждый кадр
+      if (typeof video.requestVideoFrameCallback === 'function') {
+        const cb = (now, meta) => {
+          if (meta.mediaWidth !== this._lastMediaW || meta.mediaHeight !== this._lastMediaH) {
+            this._lastMediaW = meta.mediaWidth
+            this._lastMediaH = meta.mediaHeight
+            this.$emit('resize', {
+              width: meta.mediaWidth,
+              height: meta.mediaHeight,
+              clientWidth: video.clientWidth,
+              clientHeight: video.clientHeight
+            })
+          }
+          this._rvfcHandle = video.requestVideoFrameCallback(cb)
+        }
+        this._rvfcHandle = video.requestVideoFrameCallback(cb)
+      }
+    },
+
+    _stopSizeWatchers() {
+      if (this._resizeObserver) {
+        this._resizeObserver.disconnect()
+        this._resizeObserver = null
+      }
+      const video = this.$refs.video
+      if (video && this._rvfcHandle != null && typeof video.cancelVideoFrameCallback === 'function') {
+        video.cancelVideoFrameCallback(this._rvfcHandle)
+      }
+      this._rvfcHandle = null
     },
 
     _onState(state) {
@@ -305,6 +356,7 @@ export default {
   width: 100%;
   height: auto;
   background: #000;
+  display: block;
 }
 
 .webrtc-placeholder {
@@ -313,5 +365,4 @@ export default {
   background: rgba(0, 0, 0, 0.45);
   pointer-events: none;
 }
-
 </style>

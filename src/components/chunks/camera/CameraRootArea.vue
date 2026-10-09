@@ -6,24 +6,13 @@ export default {
   name: 'CameraRootArea',
   components: {WebRtcPlayer},
   props: {
-    camera: {
-      type: Object,
-      required: true
-    },
-    hideDrawings: {
-      type: Boolean,
-      default: false
-    },
-    // Ограничение ширины видео (px), 0 — на всю ширину контейнера
-    maxWidth: {
-      type: Number,
-      default: 1000
-    },
-    // Воспроизводить звук камеры (стартует как muted из-за autoplay)
-    audio: {
-      type: Boolean,
-      default: true
-    }
+    camera: {type: Object, required: true},
+    hideDrawings: {type: Boolean, default: false},
+    maxWidth: {type: Number, default: 1000},
+    audio: {type: Boolean, default: true},
+    // Пространство, в котором хранятся точки полигонов камеры
+    referenceWidth: {type: Number, default: 640},
+    referenceHeight: {type: Number, default: 480}
   },
   data() {
     return {
@@ -44,19 +33,40 @@ export default {
     this.destroyTracker()
   },
   methods: {
-    onPlayerReady(videoEl) {
-      this.createTracker(videoEl)
+    onConnected() {
+      console.log('Connected')
     },
+
+    onPlayerReady(videoEl) {
+      if (this.tracker && this.tracker.image === videoEl) {
+        // тот же <video> — просто пересчитываем геометрию
+        this.tracker.resizeCanvas()
+      } else {
+        this.createTracker(videoEl)
+      }
+    },
+
+    onPlayerResize() {
+      if (this.tracker) {
+        this.tracker.resizeCanvas()
+      }
+    },
+
     createTracker(imageEl) {
       this.destroyTracker()
       this.tracker = new ImageClickTracker(
         imageEl,
         null,
-        this.$refs.draw
+        this.$refs.draw,
+        {
+          referenceWidth: this.referenceWidth,
+          referenceHeight: this.referenceHeight
+        }
       )
       this.tracker.importFromJSON(this.camera.areas || [])
       this.$store.commit('setTracker', this.tracker)
     },
+
     destroyTracker() {
       if (this.tracker) {
         this.tracker.destroy()
@@ -64,12 +74,15 @@ export default {
       }
       this.$store.commit('destroyTracker')
     },
+
     stop() {
       this.$refs.player?.stop()
     },
+
     async start() {
       this.$refs.player?.start()
     },
+
     async getCameraCover() {
       this.src = await this.$store.dispatch('getCameraCover', {id: this.camera.id, w: 700})
     }
@@ -85,7 +98,9 @@ export default {
       :poster="src"
       :max-width="maxWidth"
       :audio="audio"
+      @on-connected="onConnected"
       @ready="onPlayerReady"
+      @resize="onPlayerResize"
     >
       <canvas
         id="canvas"
@@ -104,6 +119,8 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: auto;
     cursor: default;
   }

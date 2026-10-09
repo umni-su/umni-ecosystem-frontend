@@ -1,10 +1,13 @@
 export class ImageClickTracker {
-  constructor(image, output, canvas) {
+  constructor(image, output, canvas, options = {}) {
     console.log('Init ImageClickTracker')
     this.image = image
     this.canvas = canvas
     this.ctx = this.canvas.getContext('2d')
     this.output = output
+
+    this.referenceWidth = options.referenceWidth || 640
+    this.referenceHeight = options.referenceHeight || 480
 
     // this.modeIndicator = document.getElementById('modeIndicator');
     // this.polygonsContainer = document.getElementById('polygonsContainer');
@@ -540,19 +543,19 @@ export class ImageClickTracker {
   }
 
   scaleX() {
-    return this.image.getBoundingClientRect().width / this.naturalWidth()
+    return this.image.getBoundingClientRect().width / this.referenceWidth
   }
 
   scaleY() {
-    return this.image.getBoundingClientRect().height / this.naturalHeight()
+    return this.image.getBoundingClientRect().height / this.referenceHeight
   }
 
   // Поддержка и <img> (naturalWidth/Height), и <video> (videoWidth/Height)
   naturalWidth() {
-    return this.image.videoWidth || this.image.naturalWidth || this.image.clientWidth || 1
+    return this.referenceWidth
   }
 
   naturalHeight() {
-    return this.image.videoHeight || this.image.naturalHeight || this.image.clientHeight || 1
+    return this.referenceHeight
   }
 }
