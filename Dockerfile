@@ -1,5 +1,6 @@
 # Сборка фронтенда
-FROM node:22-alpine AS build
+#FROM node:22-alpine AS build
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build
 
 WORKDIR /app
 
