@@ -106,7 +106,7 @@ export default {
       session: null,
       mediaStream: null,
       retryTimer: null,
-      quality: 640,
+      quality: 1280,
       qualityOptions: [
         {
           label: this.$t('Minimum quality'),
@@ -182,7 +182,7 @@ export default {
             console.error('WebRTC error:', message)
             this._onState('error')
           }
-        })
+        }, {videoWidth: this.quality})
       } catch (e) {
         console.error('WebRTC: failed to start session', e)
         this._onState('error')
