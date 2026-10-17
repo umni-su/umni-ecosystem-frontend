@@ -160,28 +160,31 @@ export default {
 </script>
 
 <template>
-  <VSheet>
+  <VSheet width="100%">
     <VBtnToggle
       v-if="tracker"
       v-model="mode"
+      class="w-100"
       variant="tonal"
       density="compact"
     >
       <VBtn
-        color="primary"
-        :active="tracker.isDrawingMode"
-        value="edit"
-        prepend-icon="mdi-pencil"
-        :text="$t('Editing')"
-        @click="enableDrawing"
-      />
-      <VBtn
+        width="50%"
         value="drag"
         color="primary"
         :active="!tracker.isDrawingMode"
         prepend-icon="mdi-cursor-move"
         :text="$t('Dragging')"
         @click="disableDrawing"
+      />
+      <VBtn
+        color="primary"
+        :active="tracker.isDrawingMode"
+        value="edit"
+        width="50%"
+        prepend-icon="mdi-pencil"
+        :text="$t('Editing')"
+        @click="enableDrawing"
       />
     </VBtnToggle>
     <VSheet>

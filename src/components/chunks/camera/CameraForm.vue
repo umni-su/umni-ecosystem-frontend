@@ -159,10 +159,12 @@ export default {
     <VTabs
       v-model="tab"
       align-tabs="center"
+      grow
     >
       <VTab
         v-for="t in tabs"
         :key="t"
+        rounded="0"
         :value="t.key"
         :text="t.name"
         :prepend-icon="t.icon"
@@ -283,13 +285,13 @@ export default {
               prepend-icon="mdi-content-save"
               @click="saveCamera"
             />
-            <VBtn
-              color="default"
-              class="mr-4"
-              :prepend-icon="asLink ? 'mdi-text-box' : 'mdi-link'"
-              :text="asLink ? $t('Form mode') : $t('Link mode')"
-              @click="toggleView"
-            />
+            <!--            <VBtn-->
+            <!--              color="default"-->
+            <!--              class="mr-4"-->
+            <!--              :prepend-icon="asLink ? 'mdi-text-box' : 'mdi-link'"-->
+            <!--              :text="asLink ? $t('Form mode') : $t('Link mode')"-->
+            <!--              @click="toggleView"-->
+            <!--            />-->
           </VSheet>
         </VSheet>
       </VTabsWindowItem>
