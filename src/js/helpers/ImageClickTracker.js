@@ -45,7 +45,7 @@ export class ImageClickTracker {
 
   init() {
     this.canvas.style.touchAction = 'none'
-    this._updateRect()
+    this.resizeCanvas()
 
     this._handlers.pointerdown = this.handlePointerDown.bind(this)
     this._handlers.pointermove = this.handlePointerMove.bind(this)
@@ -919,17 +919,26 @@ export class ImageClickTracker {
   }
 
   _updateRect() {
-    this.rect = this.canvas.getBoundingClientRect()
+    const target = this.image || this.canvas
+    const rect = target.getBoundingClientRect()
+    if (rect.width >= 1 && rect.height >= 1) {
+      this.rect = rect
+    } else if (!this.rect) {
+      this.rect = rect
+    }
     this.dpr = window.devicePixelRatio || 1
   }
 
   resizeCanvas() {
     this._updateRect()
-    const rect = this.rect
-    this.canvas.width = Math.max(1, Math.round(rect.width * this.dpr))
-    this.canvas.height = Math.max(1, Math.round(rect.height * this.dpr))
-    this.canvas.style.width = `${rect.width}px`
-    this.canvas.style.height = `${rect.height}px`
+    if (!this.rect || this.rect.width < 1 || this.rect.height < 1) {
+      this.redraw()
+      return
+    }
+    this.canvas.width = Math.round(this.rect.width * this.dpr)
+    this.canvas.height = Math.round(this.rect.height * this.dpr)
+    this.canvas.style.width = `${this.rect.width}px`
+    this.canvas.style.height = `${this.rect.height}px`
     this.redraw()
   }
 
