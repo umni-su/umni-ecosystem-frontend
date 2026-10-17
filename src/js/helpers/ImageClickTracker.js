@@ -37,8 +37,6 @@ export class ImageClickTracker {
     this._ctxButton = null
     this._ctxState = null
     this._ctxHideTimer = null
-    this._ctxHoverTimer = null
-    this._ctxHoverPos = null
 
     this.init()
   }
@@ -78,7 +76,10 @@ export class ImageClickTracker {
       window.removeEventListener('resize', this._onResize)
       this._onResize = null
     }
-    this._clearCtxTimers()
+    if (this._ctxHideTimer) {
+      clearTimeout(this._ctxHideTimer)
+      this._ctxHideTimer = null
+    }
     if (this._raf != null) {
       cancelAnimationFrame(this._raf)
       this._raf = null
@@ -253,12 +254,6 @@ export class ImageClickTracker {
     this._cursor = pos
     this._updateHoverFromPos(pos)
     this._updateCursorStyle(event.ctrlKey || event.metaKey)
-
-    if (this.isDrawingMode) {
-      this._syncHoverContextButton(event)
-    } else {
-      this.hideContextButton()
-    }
     this.redraw()
   }
 
@@ -640,9 +635,11 @@ export class ImageClickTracker {
   }
 
   hideContextButton() {
-    this._clearCtxTimers()
+    if (this._ctxHideTimer) {
+      clearTimeout(this._ctxHideTimer)
+      this._ctxHideTimer = null
+    }
     this._ctxState = null
-    this._ctxHoverPos = null
     if (this._ctxButton) {
       this._ctxButton.style.display = 'none'
     }
@@ -654,17 +651,6 @@ export class ImageClickTracker {
       this._ctxHideTimer = null
       this.hideContextButton()
     }, delay)
-  }
-
-  _clearCtxTimers() {
-    if (this._ctxHideTimer) {
-      clearTimeout(this._ctxHideTimer)
-      this._ctxHideTimer = null
-    }
-    if (this._ctxHoverTimer) {
-      clearTimeout(this._ctxHoverTimer)
-      this._ctxHoverTimer = null
-    }
   }
 
   _performContextAction() {
@@ -684,59 +670,6 @@ export class ImageClickTracker {
     }
 
     this.hideContextButton()
-  }
-
-  _syncHoverContextButton(event) {
-    if (!this.isDrawingMode) {
-      this.hideContextButton()
-      return
-    }
-
-    if (this._ctxHoverTimer) {
-      clearTimeout(this._ctxHoverTimer)
-      this._ctxHoverTimer = null
-    }
-
-    if (this.hoveredPoint) {
-      this.showContextButton(
-        {kind: 'delete', polygon: this.hoveredPoint.polygon, pointIndex: this.hoveredPoint.pointIndex},
-        event.clientX,
-        event.clientY
-      )
-      return
-    }
-
-    if (this.hoveredSegment) {
-      this.showContextButton(
-        {
-          kind: 'insert',
-          polygon: this.hoveredSegment.polygon,
-          segmentIndex: this.hoveredSegment.segmentIndex,
-          x: Math.round(this._cursor.x),
-          y: Math.round(this._cursor.y)
-        },
-        event.clientX,
-        event.clientY
-      )
-      return
-    }
-
-    const x = Math.round(this._cursor.x)
-    const y = Math.round(this._cursor.y)
-    if (this._ctxState && this._ctxState.kind === 'add' && this._ctxButton && this._ctxButton.style.display === 'flex') {
-      this._ctxState.x = x
-      this._ctxState.y = y
-      this._positionContextButton(event.clientX, event.clientY)
-      return
-    }
-
-    this._ctxHoverPos = {clientX: event.clientX, clientY: event.clientY, x, y}
-    this._ctxHoverTimer = setTimeout(() => {
-      this._ctxHoverTimer = null
-      const p = this._ctxHoverPos
-      if (!p || !this.isDrawingMode || this.hoveredPoint || this.hoveredSegment) return
-      this.showContextButton({kind: 'add', x: p.x, y: p.y}, p.clientX, p.clientY)
-    }, 250)
   }
 
   _updateHoverFromPos(pos) {
