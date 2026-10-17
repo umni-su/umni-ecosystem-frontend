@@ -72,7 +72,10 @@ export default {
             :text="internalTime"
           />
         </template>
-        <VSheet class="pa-4">
+        <VSheet
+          class="pa-4"
+          color="default"
+        >
           <VTimePicker
             v-model="internalTime"
             hide-header

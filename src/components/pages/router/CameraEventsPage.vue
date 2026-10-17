@@ -1,10 +1,11 @@
 <script>
 import CameraEventItem from '../../chunks/camera/CameraEventItem.vue'
 import PageActions from '../../chunks/PageActions.vue'
+import CameraEventsFilter from '../../chunks/camera/CameraEventsFilter.vue'
 
 export default {
   name: 'CameraEventsPage',
-  components: {PageActions, CameraEventItem},
+  components: {CameraEventsFilter, PageActions, CameraEventItem},
   props: {
     id: {
       type: Number,
@@ -15,6 +16,7 @@ export default {
     return {
       camera: null,
       events: [],
+      selected: [],
       total: 0,
       pages: 0,
       filter: {
@@ -69,6 +71,13 @@ export default {
       this.events = []
       this.filter.page = 1
       await this.getEvents()
+    },
+    onEventCheck(id, state) {
+      if (state) {
+        this.selected.push(id)
+      } else {
+        this.selected.splice(this.selected.indexOf(id), 1)
+      }
     }
   }
 }
@@ -77,6 +86,7 @@ export default {
 <template>
   <VSheet
     v-if="camera"
+    elevation="1"
     color="default"
   >
     <VInfiniteScroll
@@ -104,7 +114,20 @@ export default {
         <template #title>
           {{ $t('Events total: {count}', {count: total}) }}
         </template>
+        <template #subtitle>
+          <RouterLink
+            class="text-primary text-decoration-none"
+            :to="{name:'camera', params: {id:camera.id}}"
+          >
+            <VIcon
+              icon="mdi-arrow-left"
+              size="small"
+            />
+            {{ camera.name }}
+          </RouterLink>
+        </template>
         <template #append>
+          <CameraEventsFilter/>
           <VBtnToggle
             v-model="filter.type"
             rounded="pill"
@@ -147,22 +170,43 @@ export default {
           />
         </template>
       </PageActions>
-      <VContainer>
-        <VRow>
-          <VCol
+      <VTable
+        hover
+        striped="even"
+      >
+        <thead>
+          <tr>
+            <th width="50"/>
+            <th
+              width="100"
+            />
+            <th class="font-weight-bold">
+              ID
+            </th>
+            <th class="font-weight-bold">
+              {{ $t('Area') }} / {{ $t('Storage') }}
+            </th>
+            <th class="text-right font-weight-bold">
+              {{ $t('Details') }}
+            </th>
+            <th/>
+          </tr>
+        </thead>
+        <tbody>
+          <CameraEventItem
             v-for="event in events"
             :key="event.id"
-            cols="12"
-            sm="6"
-            md="4"
-            lg="3"
+            :event="event"
+            mode="row"
+            @on-check="onEventCheck(event.id,$event)"
           >
-            <CameraEventItem
-              :event="event"
-            />
-          </VCol>
-        </VRow>
-      </VContainer>
+            <td>
+              {{ event.id }}
+            </td>
+
+          </CameraEventItem>
+        </tbody>
+      </VTable>
       <template #empty>
         <VBtn
           color="default"

@@ -28,6 +28,11 @@ export default {
       this.$emit('update:model-value', this.open)
     }
   },
+  computed: {
+    mobile() {
+      return this.$vuetify.display.mobile
+    }
+  },
   created() {
     this.open = this.modelValue
   }
@@ -35,11 +40,12 @@ export default {
 </script>
 
 <template>
-  <VNavigationDrawer
+  <component
+    :is="mobile ? 'VSheet' : 'VNavigationDrawer'"
     v-model="open"
     rounded="0"
-    width="500"
-    location="right"
+    :width="mobile ? '100%' :500"
+    :location="mobile ? null : 'right'"
   >
     <template #default>
       <VSheet
@@ -47,12 +53,21 @@ export default {
         color="default"
       >
         <VSheet class="text-h6 mb-4 d-flex justify-space-between">
-          <div>{{ title }}</div>
+          <div class="font-weight-bold">{{ title }}</div>
           <div>
-            <slot name="prepend" />
+            <slot name="prepend">
+              <VBtn
+                v-if="!mobile"
+                icon="mdi-close"
+                variant="plain"
+                color="default"
+                density="compact"
+                @click="open = !open"
+              />
+            </slot>
           </div>
         </VSheet>
-        <slot />
+        <slot/>
       </VSheet>
     </template>
     <template #append>
@@ -60,10 +75,10 @@ export default {
         v-if="$slots.append"
         class="pa-4"
       >
-        <slot name="append" />
+        <slot name="append"/>
       </VSheet>
     </template>
-  </VNavigationDrawer>
+  </component>
 </template>
 
 <style scoped>

@@ -53,11 +53,6 @@ const vuetify = createVuetify({
     global: {
       rounded: 'lg'
     },
-    VCard: {
-      VBtn: {
-        density: 'comfortable'
-      }
-    },
     VPagination: {
       density: 'compact'
     },
@@ -67,9 +62,6 @@ const vuetify = createVuetify({
       hideDetails: true,
       prependIcon: null,
       prependInnerIcon: 'mdi-calendar',
-      VSheet: {
-        color: 'default'
-      },
       VBtn: {
         color: 'default'
       }
@@ -88,9 +80,6 @@ const vuetify = createVuetify({
       density: 'compact',
       variant: 'outlined',
       hideDetails: true
-    },
-    VSheet: {
-      color: 'transparent'
     },
     VSelect: {
       variant: 'outlined',

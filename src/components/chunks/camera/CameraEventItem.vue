@@ -1,22 +1,36 @@
 <script>
 import secondsToHms from '../../../js/helpers/secondsToHms.js'
+import CameraEventImage from './CameraEventImage.vue'
 
 export default {
   name: 'CameraEventItem',
+  components: {CameraEventImage},
+  emits: ['on-check'],
   props: {
     event: {
       type: Object,
       required: true
+    },
+    mode: {
+      type: String,
+      default: 'card'
     }
   },
   data() {
     return {
-      src: null
+      src: null,
+      selected: false
     }
   },
   computed: {
     area() {
       return this.event?.area
+    },
+    hasEnd() {
+      return this.event?.end !== null
+    },
+    format() {
+      return this.$store.getters['getDateTimeFormat'] + ':ss'
     },
     recording() {
       return this.event?.recording
@@ -43,6 +57,9 @@ export default {
     this.getPreview()
   },
   methods: {
+    onUpdateCheckbox(e) {
+      this.$emit('on-check', e)
+    },
     getPreview() {
       this.$store.dispatch('getCameraEventScreenshot', {id: this.event.id, type: 'resized'}).then(res => {
         this.src = res
@@ -54,7 +71,7 @@ export default {
 
 <template>
   <VCard
-    v-if="event"
+    v-if="event && mode==='card'"
     variant="text"
     hover
     @click="$router.push({name:'event', params:{id: event.id}})"
@@ -101,7 +118,7 @@ export default {
           variant="text"
           color="white"
           rounded="pill"
-          icon="mdi-map-marker"
+          icon="mdi-texture-box"
         />
         <VBtn
           v-if="recording !== null"
@@ -114,6 +131,110 @@ export default {
       </VAlert>
     </VCardText>
   </VCard>
+  <tr
+    v-else-if="event && mode==='row'"
+  >
+    <td>
+      <VCheckbox
+        v-model="selected"
+        @update:model-value="onUpdateCheckbox"
+      />
+    </td>
+    <td>
+      <VSheet
+        class="position-relative mt-2"
+        width="110"
+        height="60"
+      >
+        <CameraEventImage
+          v-if="src"
+          :download="false"
+          :event="event"
+        />
+        <VSkeletonLoader
+          v-else
+          width="90"
+          height="60"
+        />
+      </VSheet>
+    </td>
+    <td>
+      {{ event.id }}
+    </td>
+    <td>
+      <VBtn
+        v-if="area"
+        readonly
+        density="comfortable"
+        variant="flat"
+        rounded="pill"
+        :color="area.color"
+        prepend-icon="mdi-texture-box"
+        :text="area.name"
+      />
+      <span v-else>
+        {{ recording.path }}
+      </span>
+    </td>
+    <td
+      class="text-right"
+      style="min-width:250px"
+    >
+      <VBtn
+        v-if="recording !== null"
+        readonly
+        density="compact"
+        variant="text"
+        color="red"
+        size="small"
+        class="mb-1"
+        rounded="pill"
+        icon="mdi-record"
+      />
+      <VBtn
+        density="compact"
+        size="small"
+        variant="plain"
+        readonly
+        color="default"
+        class="mr-1 mb-1"
+        :icon="isImage?'mdi-camera':'mdi-video'"
+      />
+      {{ $moment(event.start).fromNow() }}
+      <span v-if="duration">
+        ({{ duration.h }}:
+        {{ duration.m }}:
+        {{ duration.s }})
+      </span>
+      <div
+        v-if="format"
+        class="text-body-small opacity-70"
+      >
+        <span v-if="hasEnd">
+          {{ $moment(event.start).format(format) }} - {{ $moment(event.end).format(format) }}
+        </span>
+        <span v-else>
+          {{ $moment(event.start).format(format) }}
+        </span>
+      </div>
+    </td>
+    <td class="text-center">
+      <VBtn
+        density="compact"
+        variant="text"
+        color="default"
+        :to="{name:'event', params:{id: event.id}}"
+        icon="mdi-chevron-right"
+        class="mr-4"
+      />
+      <VBtn
+        density="compact"
+        variant="text"
+        icon="mdi-trash-can"
+        color="error"
+      />
+    </td>
+  </tr>
 </template>
 
 <style lang="scss" scoped>

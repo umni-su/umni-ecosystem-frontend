@@ -26,17 +26,20 @@ export default {
   emits: ['on-camera-save', 'on-show-areas'],
   data() {
     return {
-      tab: 'connection',
+      tab: 'detection',
       editCredentials: false,
       asLink: false,
       auth: false,
       link: null,
       model: null,
       showDrawings: false,
-      areasLoaded:false
+      areasLoaded: false
     }
   },
   computed: {
+    tracker() {
+      return this.$store.getters['getTracker']
+    },
     tabs() {
       return [
         {
@@ -49,7 +52,8 @@ export default {
           key: 'detection',
           icon: 'mdi-motion-sensor'
         }
-      ]},
+      ]
+    },
     disabled() {
       return this.model?.storage_id === undefined
           || this.model?.name?.length === undefined
@@ -70,9 +74,8 @@ export default {
       this.showDrawings = this.tab === 'detection'
       this.$emit('on-show-areas', this.showDrawings)
     },
-    auth(){
+    auth() {
       this.editCredentials = !this.modelHasCredentials
-
     },
     cameraModel: {
       deep: true,
@@ -85,9 +88,14 @@ export default {
     document.addEventListener('on-redraw', e => {
       this.areasLoaded = true
     })
+    if (!this.areasLoaded && this.tracker !== null) {
+      this.areasLoaded = true
+    }
+    console.log('CameraForm Component mounted')
   },
   unmounted() {
-    this.$store.commit('destroyTracker')
+    //this.$store.commit('destroyTracker')
+    //console.log('ImageClickTracker was destroyed')
   },
   created() {
     this.init()
@@ -288,7 +296,7 @@ export default {
         v-if="model.id && areasLoaded"
         value="detection"
       >
-        <CameraAreas :camera="model" />
+        <CameraAreas :camera="model"/>
       </VTabsWindowItem>
     </VTabsWindow>
   </VSheet>

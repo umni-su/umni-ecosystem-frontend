@@ -10,13 +10,16 @@ export default {
     color="default"
   >
     <template #prepend>
-      <slot name="prepend" />
+      <slot name="prepend"/>
     </template>
     <template #title>
-      <slot name="title" />
+      <slot name="title"/>
+    </template>
+    <template #subtitle>
+      <slot name="subtitle"/>
     </template>
     <template #append>
-      <slot name="append" />
+      <slot name="append"/>
     </template>
   </VCard>
 </template>

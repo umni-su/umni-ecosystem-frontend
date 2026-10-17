@@ -50,6 +50,7 @@ export default {
         class="py-3 px-8"
         elevation="0"
         variant="text"
+        color="white"
       >
         <template #text>
           <UmniLogo
@@ -74,8 +75,8 @@ export default {
               prepend-inner-icon="mdi-key"
             />
             <VBtn
+              color="white"
               variant="tonal"
-              color="default"
               :loading="loading"
               :disabled="loading"
               class="w-100"
@@ -124,7 +125,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: start;
-  background: url("../../assets/img/eco-bg.jpg") no-repeat 0 center;
+  background: url("../../assets/img/eco-bg.jpg") no-repeat center center;
   background-size: cover;
 
   .login-sheet {

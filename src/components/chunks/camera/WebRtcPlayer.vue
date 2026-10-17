@@ -36,7 +36,10 @@
       </template>
     </div>
 
-    <VSheet class="position-absolute right-0 top-0 overflow-hidden pa-2">
+    <VSheet
+      class="position-absolute right-0 top-0 overflow-hidden pa-2"
+      color="transparent"
+    >
       <VMenu :close-on-content-click="false">
         <template #activator="{props}">
           <VBtn
@@ -49,7 +52,7 @@
           />
         </template>
         <VSheet>
-          <VList width="200">
+          <VList width="270">
             <VListItem
               v-for="item in qualityOptions"
               :key="item"
@@ -106,7 +109,7 @@ export default {
       session: null,
       mediaStream: null,
       retryTimer: null,
-      quality: 1280,
+      quality: 640,
       qualityOptions: [
         {
           label: this.$t('Minimum quality'),

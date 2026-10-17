@@ -164,11 +164,13 @@ export default {
     <VMain class="fill-height">
       <VSheet
         ref="page"
+        color="transparent"
         rounded="0"
         class="overflow-hidden fill-height position-relative"
         full-height
       >
         <VSheet
+          color="transparent"
           :max-width="isFullWidth ? 'none' : 1200"
           class="mx-auto pa-4 fill-height"
         >

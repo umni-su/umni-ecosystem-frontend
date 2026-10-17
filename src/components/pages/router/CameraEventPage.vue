@@ -26,7 +26,7 @@ export default {
       url: null,
       event: null,
       open: true,
-      notFound:false
+      notFound: false
     }
   },
   computed: {
@@ -50,8 +50,8 @@ export default {
       this.$store.commit('setTitle', this.$t('Event {id}', {id: this.id}))
     },
     async getEvent() {
-      this.event = await this.$store.dispatch('getCameraEvent', this.id).catch(e =>{
-        if(e.response.status === 404){
+      this.event = await this.$store.dispatch('getCameraEvent', this.id).catch(e => {
+        if (e.response.status === 404) {
           this.notFound = true
         }
       })
@@ -71,6 +71,7 @@ export default {
     color="default"
   >
     <VSheet
+      color="rgba(0,0,0,0.5)"
       class="mode-switcher"
     >
       <VBtn
@@ -103,7 +104,7 @@ export default {
         style="z-index: 10"
         :event="event"
       />
-      <CameraEventDetails :event="event" />
+      <CameraEventDetails :event="event"/>
     </SidebarPanel>
     <CameraVideoPlayer
       v-if="url"
