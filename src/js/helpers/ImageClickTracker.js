@@ -88,6 +88,7 @@ export class ImageClickTracker {
       this._ctxButton.remove()
       this._ctxButton = null
     }
+    this._ctxActionButton = null
     this._ctxState = null
     this._cancelInteractions()
   }
@@ -581,55 +582,84 @@ export class ImageClickTracker {
   _ensureContextButton() {
     if (this._ctxButton) return this._ctxButton
 
-    const btn = document.createElement('button')
-    btn.type = 'button'
-    btn.style.cssText = 'position:fixed;display:none;align-items:center;justify-content:center;' +
-      'width:44px;height:44px;border-radius:50%;border:none;padding:0;cursor:pointer;' +
-      'background:#ffffff;box-shadow:0 2px 8px rgba(0,0,0,.35);z-index:10000;font-size:22px;' +
-      'transform:translate(-50%,-50%);touch-action:manipulation;-webkit-tap-highlight-color:transparent'
+    const btnCss = 'display:flex;align-items:center;justify-content:center;width:44px;height:44px;' +
+      'border-radius:50%;border:none;padding:0;cursor:pointer;background:#ffffff;' +
+      'box-shadow:0 2px 8px rgba(0,0,0,.35);font-size:22px;' +
+      'touch-action:manipulation;-webkit-tap-highlight-color:transparent'
 
-    btn.addEventListener('pointerdown', e => {
+    const wrap = document.createElement('div')
+    wrap.style.cssText = 'position:fixed;display:none;align-items:center;justify-content:center;gap:8px;' +
+      'transform:translate(-50%,-50%);z-index:10000'
+
+    const action = document.createElement('button')
+    action.type = 'button'
+    action.style.cssText = btnCss
+
+    const cancel = document.createElement('button')
+    cancel.type = 'button'
+    cancel.className = 'mdi mdi-close'
+    cancel.title = 'Cancel'
+    cancel.style.cssText = btnCss + ';color:#616161'
+
+    cancel.addEventListener('pointerdown', e => {
       e.preventDefault()
       e.stopPropagation()
     })
-    btn.addEventListener('click', e => {
+    cancel.addEventListener('click', e => {
+      e.preventDefault()
+      e.stopPropagation()
+      this.hideContextButton()
+    })
+
+    action.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    action.addEventListener('click', e => {
       e.preventDefault()
       e.stopPropagation()
       this._performContextAction()
     })
-    btn.addEventListener('pointerenter', () => {
+
+    wrap.appendChild(action)
+    wrap.appendChild(cancel)
+
+    wrap.addEventListener('pointerenter', () => {
       if (this._ctxHideTimer) {
         clearTimeout(this._ctxHideTimer)
         this._ctxHideTimer = null
       }
     })
-    btn.addEventListener('pointerleave', () => {
+    wrap.addEventListener('pointerleave', () => {
       this.scheduleContextHide()
     })
 
-    document.body.appendChild(btn)
-    this._ctxButton = btn
-    return btn
+    document.body.appendChild(wrap)
+    this._ctxButton = wrap
+    this._ctxActionButton = action
+    return wrap
   }
 
   showContextButton(state, clientX, clientY) {
     if (!this.isDrawingMode) return
-    const btn = this._ensureContextButton()
+    const wrap = this._ensureContextButton()
 
     this._ctxState = state
-    btn.className = state.kind === 'delete' ? 'mdi mdi-trash-can-outline' : 'mdi mdi-plus'
-    btn.title = state.kind === 'delete' ? 'Delete point' : (state.kind === 'insert' ? 'Insert point' : 'Add point')
-    btn.style.color = state.kind === 'delete' ? '#c62828' : '#1565c0'
-    btn.style.display = 'flex'
+    this._ctxActionButton.className = state.kind === 'delete' ? 'mdi mdi-trash-can-outline' : 'mdi mdi-plus'
+    this._ctxActionButton.title = state.kind === 'delete' ? 'Delete point' :
+      (state.kind === 'insert' ? 'Insert point' : 'Add point')
+    this._ctxActionButton.style.color = state.kind === 'delete' ? '#c62828' : '#1565c0'
+    wrap.style.display = 'flex'
     this._positionContextButton(clientX, clientY)
+    this.redraw()
   }
 
   _positionContextButton(clientX, clientY) {
     if (!this._ctxButton) return
     const margin = 8
-    const half = 22
+    const half = 50
     const left = Math.max(half + margin, Math.min(window.innerWidth - half - margin, clientX))
-    const top = Math.max(half + margin, Math.min(window.innerHeight - half - margin, clientY - 46))
+    const top = Math.max(28 + margin, Math.min(window.innerHeight - 28 - margin, clientY - 46))
     this._ctxButton.style.left = `${left}px`
     this._ctxButton.style.top = `${top}px`
   }
@@ -639,9 +669,13 @@ export class ImageClickTracker {
       clearTimeout(this._ctxHideTimer)
       this._ctxHideTimer = null
     }
+    const hadState = !!this._ctxState
     this._ctxState = null
     if (this._ctxButton) {
       this._ctxButton.style.display = 'none'
+    }
+    if (hadState) {
+      this.redraw()
     }
   }
 
@@ -730,6 +764,57 @@ export class ImageClickTracker {
       const point = this.mergeTarget.polygon.points[this.mergeTarget.pointIndex]
       this._drawMarker(point, 'rgba(0,160,0,0.8)', 10, 'rgba(255,255,255,0.85)', 3)
     }
+
+    this._drawPendingGhost()
+  }
+
+  _drawPendingGhost() {
+    const state = this._ctxState
+    if (!state || !this.isDrawingMode) return
+
+    let point = null
+    if (state.kind === 'add' || state.kind === 'insert') {
+      point = [state.x, state.y]
+    } else if (state.kind === 'delete' && state.polygon && state.polygon.points[state.pointIndex]) {
+      point = state.polygon.points[state.pointIndex]
+    }
+    if (!point) return
+
+    const ctx = this.ctx
+    const x = this.px(point[0])
+    const y = this.py(point[1])
+
+    ctx.save()
+
+    if (state.kind === 'delete') {
+      ctx.setLineDash([4, 3])
+      ctx.fillStyle = 'rgba(200, 40, 40, 0.35)'
+      ctx.strokeStyle = 'rgba(200, 40, 40, 0.95)'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.arc(x, y, 10, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.stroke()
+
+      ctx.setLineDash([])
+      ctx.beginPath()
+      ctx.moveTo(x - 6, y - 6)
+      ctx.lineTo(x + 6, y + 6)
+      ctx.moveTo(x + 6, y - 6)
+      ctx.lineTo(x - 6, y + 6)
+      ctx.stroke()
+    } else {
+      ctx.setLineDash([4, 3])
+      ctx.fillStyle = 'rgba(0, 170, 90, 0.4)'
+      ctx.strokeStyle = 'rgba(0, 200, 100, 0.95)'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.arc(x, y, 9, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.stroke()
+    }
+
+    ctx.restore()
   }
 
   _drawRubberBand() {
