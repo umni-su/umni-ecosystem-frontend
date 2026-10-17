@@ -41,6 +41,7 @@ export default {
       immediate: true,
       handler(val) {
         this.updateDisabled()
+        this.syncEnabledFlags()
       }
     },
     areas: {
@@ -83,6 +84,17 @@ export default {
         }
       })
       this.disabled = ok
+    },
+    syncEnabledFlags() {
+      if (!this.tracker) return
+      this.polygons.forEach((polygon, i) => {
+        const target = this.tracker.polygons[i]
+        if (!target || !polygon.options || polygon.options.enabled === undefined) return
+        if (!target.options) target.options = {}
+        if (target.options.enabled !== polygon.options.enabled) {
+          this.tracker.setPolygonEnabled(i, polygon.options.enabled)
+        }
+      })
     },
     async deleteArea(i) {
       const ok = await this.$refs.confirm.show({

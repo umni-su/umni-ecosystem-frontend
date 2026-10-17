@@ -878,9 +878,11 @@ export class ImageClickTracker {
   drawPolygon(polygon, isSelected) {
     if (!polygon.points || polygon.points.length < 1) return
     const ctx = this.ctx
+    const disabled = polygon.options && polygon.options.enabled === false
+    const color = disabled ? '#9e9e9e' : polygon.color
 
     if (polygon.points.length >= 3 && polygon.isClosed) {
-      ctx.fillStyle = this.adjustAlpha(polygon.color, 0.3)
+      ctx.fillStyle = this.adjustAlpha(color, 0.3)
       ctx.beginPath()
       ctx.moveTo(this.px(polygon.points[0][0]), this.py(polygon.points[0][1]))
 
@@ -892,7 +894,7 @@ export class ImageClickTracker {
       ctx.fill()
     }
 
-    ctx.strokeStyle = this.adjustAlpha(polygon.color, isSelected ? 0.9 : 0.5)
+    ctx.strokeStyle = this.adjustAlpha(color, isSelected ? 0.9 : 0.5)
     ctx.lineWidth = isSelected ? 4 : 2
     ctx.beginPath()
     ctx.moveTo(this.px(polygon.points[0][0]), this.py(polygon.points[0][1]))
@@ -907,11 +909,20 @@ export class ImageClickTracker {
     ctx.stroke()
 
     polygon.points.forEach(point => {
-      this._drawMarker(point, polygon === this.currentPolygon ? '#ff0000' : '#aa0000', 5, '#ffffff', 1)
+      const markerColor = disabled ? '#8a8a8a' : (polygon === this.currentPolygon ? '#ff0000' : '#aa0000')
+      this._drawMarker(point, markerColor, 5, '#ffffff', 1)
     })
   }
 
   // Вспомогательные методы
+  setPolygonEnabled(index, enabled) {
+    const polygon = this.polygons[index]
+    if (!polygon) return
+    if (!polygon.options) polygon.options = {}
+    polygon.options.enabled = enabled
+    this.redraw()
+  }
+
   changePolygonColor(i, color) {
     if (this.polygons[i]) {
       this.polygons[i].color = color
