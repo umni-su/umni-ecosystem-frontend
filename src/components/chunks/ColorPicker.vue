@@ -5,6 +5,10 @@ export default {
     modelValue: {
       type: String,
       default: '#ffffff43'
+    },
+    density: {
+      type: String,
+      default: 'compact'
     }
   },
   emits: ['update:model-value', 'update:on-click'],
@@ -29,7 +33,7 @@ export default {
     <template #activator="{props}">
       <VBtn
         v-bind="props"
-        density="compact"
+        :density="density"
         icon="mdi-brush-variant"
         :color="color"
         @click.stop="$emit('update:on-click')"

@@ -395,11 +395,14 @@ export default {
     return await getBase64Image(res)
   },
 
-  async saveCameraAreas(_, data) {
+  async saveCameraAreas({commit}, data) {
+    commit('setLoading', true)
     const res = await axios.post(
       `/api/cameras/${data.id}/areas`,
       data.areas
-    )
+    ).finally(() => {
+      commit('setLoading', false)
+    })
     if (res) {
       return res.data
     }

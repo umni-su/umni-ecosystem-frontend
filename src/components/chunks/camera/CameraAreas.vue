@@ -30,6 +30,9 @@ export default {
     },
     drawingMode() {
       return this.tracker.isDrawingMode
+    },
+    loading() {
+      return this.$store.getters['isLoading']
     }
   },
   watch: {
@@ -169,14 +172,16 @@ export default {
         @click="disableDrawing"
       />
     </VBtnToggle>
-    <VBtn
-      v-if="tracker && tracker.isDrawingMode"
-      v-tooltip="$t('New zone')"
-      class="mt-4"
-      prepend-icon="mdi-plus"
-      :text="$t('Add area')"
-      @click="tracker.startNewPolygon()"
-    />
+    <VSheet>
+      <VBtn
+        v-if="tracker && tracker.isDrawingMode"
+        v-tooltip="$t('New zone')"
+        class="mt-4"
+        prepend-icon="mdi-plus"
+        :text="$t('Add area')"
+        @click="tracker.startNewPolygon()"
+      />
+    </VSheet>
     <VSheet class="mt-2">
       <VList
         v-model="selected"
@@ -247,42 +252,96 @@ export default {
                         <template #prepend>
                           <ColorPicker
                             v-model="poly.color"
+                            density="comfortable"
                             @update:model-value="updateColor(i,poly.color)"
                           />
                         </template>
                       </VTextField>
-                      <VSlider
-                        v-model="polygons[i].options.sensitivity"
-                        thumb-label
-                        :label="$t('Sensitivity')"
-                        :step="0.1"
-                        :min="0.1"
-                        :max="5"
-                      />
-                      <VSlider
-                        v-model="polygons[i].options.min_area"
-                        thumb-label
-                        :label="$t('Min area')"
-                        :step="1"
-                        :min="10"
-                        :max="2000"
-                      />
-                      <VSlider
-                        v-model="polygons[i].options.min_aspect_ratio"
-                        thumb-label
-                        :label="$t('Min aspect ratio')"
-                        :step="0.1"
-                        :min="0.1"
-                        :max="5"
-                      />
-                      <VSlider
-                        v-model="polygons[i].options.max_aspect_ratio"
-                        thumb-label
-                        :label="$t('Max aspect ratio')"
-                        :step="0.1"
-                        :min="0.1"
-                        :max="5"
-                      />
+
+                      <VSheet class="mt-4">
+                        <div class="text-body-small opacity-50">
+                          {{ $t('Sensitivity') }}
+                        </div>
+                        <VSlider
+                          v-model="polygons[i].options.sensitivity"
+                          thumb-label
+                          :step="0.1"
+                          :min="0.1"
+                          :max="5"
+                        >
+                          <template #append>
+                            <VSheet
+                              width="40"
+                              class="text-right"
+                            >
+                              {{ polygons[i].options.sensitivity }}
+                            </VSheet>
+                          </template>
+                        </VSlider>
+                      </VSheet>
+                      <VSheet class="mt-4">
+                        <div class="text-body-small opacity-50">
+                          {{ $t('Min area') }}
+                        </div>
+                        <VSlider
+                          v-model="polygons[i].options.min_area"
+                          thumb-label
+                          :step="1"
+                          :min="10"
+                          :max="2000"
+                        >
+                          <template #append>
+                            <VSheet
+                              width="40"
+                              class="text-right"
+                            >
+                              {{ polygons[i].options.min_area }}
+                            </VSheet>
+                          </template>
+                        </VSlider>
+                      </VSheet>
+                      <VSheet class="mt-4">
+                        <div class="text-body-small opacity-50">
+                          {{ $t('Min aspect ratio') }}
+                        </div>
+                        <VSlider
+                          v-model="polygons[i].options.min_aspect_ratio"
+                          thumb-label
+                          :step="0.1"
+                          :min="0.1"
+                          :max="5"
+                        >
+                          <template #append>
+                            <VSheet
+                              width="40"
+                              class="text-right"
+                            >
+                              {{ polygons[i].options.min_aspect_ratio }}
+                            </VSheet>
+                          </template>
+                        </VSlider>
+                      </VSheet>
+                      <VSheet class="mt-4">
+                        <div class="text-body-small opacity-50">
+                          {{ $t('Min aspect ratio') }}
+                        </div>
+                        <VSlider
+                          v-model="polygons[i].options.max_aspect_ratio"
+                          thumb-label
+                          :step="0.1"
+                          :min="0.1"
+                          :max="5"
+                        >
+                          <template #append>
+                            <VSheet
+                              width="40"
+                              class="text-right"
+                            >
+                              {{ polygons[i].options.max_aspect_ratio }}
+                            </VSheet>
+                          </template>
+                        </VSlider>
+                      </VSheet>
                     </template>
                   </VCard>
                 </VSheet>
@@ -301,6 +360,7 @@ export default {
       </VList>
     </VSheet>
     <VBtn
+      :loading="loading"
       :disabled="disabled"
       :text="$t('Save')"
       prepend-icon="mdi-content-save"

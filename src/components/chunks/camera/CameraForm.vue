@@ -26,7 +26,7 @@ export default {
   emits: ['on-camera-save', 'on-show-areas'],
   data() {
     return {
-      tab: 'detection',
+      tab: 'connection',
       editCredentials: false,
       asLink: false,
       auth: false,
@@ -277,6 +277,7 @@ export default {
           />
           <VSheet class="py-4">
             <VBtn
+              :loading="loading"
               :disabled="loading || disabled"
               :text="$t('Save')"
               prepend-icon="mdi-content-save"

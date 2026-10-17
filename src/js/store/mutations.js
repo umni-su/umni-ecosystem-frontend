@@ -22,7 +22,7 @@ export default {
     state.alarmMode = mode === 'on'
   },
   setSecurityMode(state, mode) {
-    state.securityMode = mode == 'on'
+    state.securityMode = mode === 'on'
   },
   setTitle(state, title) {
     state.title = title
