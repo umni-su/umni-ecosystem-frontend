@@ -1,6 +1,5 @@
 export class ImageClickTracker {
   constructor(image, output, canvas, options = {}) {
-    console.log('Init ImageClickTracker')
     this.image = image
     this.canvas = canvas
     this.ctx = this.canvas.getContext('2d')
@@ -9,66 +8,129 @@ export class ImageClickTracker {
     this.referenceWidth = options.referenceWidth || 640
     this.referenceHeight = options.referenceHeight || 480
 
-    // this.modeIndicator = document.getElementById('modeIndicator');
-    // this.polygonsContainer = document.getElementById('polygonsContainer');
-    // this.polygonCountElement = document.getElementById('polygonCount');
-
     this.polygons = []
     this.currentPolygon = null
-    this.hoveredPoint = null
-    this.draggedPoint = null
-    this.hoveredSegment = null
     this.selectedPolygonIndex = -1
     this.isDrawingMode = false
+
+    this.hoveredPoint = null
+    this.hoveredSegment = null
+    this._cursor = null
+
+    this.draggedPoint = null
+    this.draggedPolygon = null
+    this.mergeTarget = null
+    this.pointerStart = null
+    this._activePointerId = null
+    this._lastPointerType = 'mouse'
+
+    this.snapThreshold = options.snapThreshold || 12
+    this.pointThreshold = options.pointThreshold || 14
+    this.segmentThreshold = options.segmentThreshold || 18
+    this.dragThresholdPx = 6
+
+    this.rect = null
+    this.dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1
+
+    this._raf = null
+    this._handlers = {}
+    this._ctxButton = null
+    this._ctxState = null
+    this._ctxHideTimer = null
+    this._ctxHoverTimer = null
+    this._ctxHoverPos = null
 
     this.init()
   }
 
   init() {
-    this.resizeCanvas()
-    // Обработчики событий
-    this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this))
-    this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this))
-    this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this))
-    this.canvas.addEventListener('contextmenu', this.handleContextMenu.bind(this))
-    this.canvas.addEventListener('dblclick', this.handleDoubleClick.bind(this))
+    this.canvas.style.touchAction = 'none'
+    this._updateRect()
+
+    this._handlers.pointerdown = this.handlePointerDown.bind(this)
+    this._handlers.pointermove = this.handlePointerMove.bind(this)
+    this._handlers.pointerup = this.handlePointerUp.bind(this)
+    this._handlers.pointercancel = this.handlePointerCancel.bind(this)
+    this._handlers.pointerleave = this.handlePointerLeave.bind(this)
+    this._handlers.contextmenu = this.handleContextMenu.bind(this)
+    this._handlers.dblclick = this.handleDoubleClick.bind(this)
+
+    this.canvas.addEventListener('pointerdown', this._handlers.pointerdown)
+    this.canvas.addEventListener('pointermove', this._handlers.pointermove)
+    this.canvas.addEventListener('pointerup', this._handlers.pointerup)
+    this.canvas.addEventListener('pointercancel', this._handlers.pointercancel)
+    this.canvas.addEventListener('pointerleave', this._handlers.pointerleave)
+    this.canvas.addEventListener('contextmenu', this._handlers.contextmenu)
+    this.canvas.addEventListener('dblclick', this._handlers.dblclick)
+
     this._onResize = this.resizeCanvas.bind(this)
     window.addEventListener('resize', this._onResize)
   }
 
   destroy() {
+    if (this.canvas && this._handlers) {
+      Object.keys(this._handlers).forEach(name => {
+        this.canvas.removeEventListener(name, this._handlers[name])
+      })
+    }
+    this._handlers = {}
     if (this._onResize) {
       window.removeEventListener('resize', this._onResize)
       this._onResize = null
     }
+    this._clearCtxTimers()
+    if (this._raf != null) {
+      cancelAnimationFrame(this._raf)
+      this._raf = null
+    }
+    if (this._ctxButton) {
+      this._ctxButton.remove()
+      this._ctxButton = null
+    }
+    this._ctxState = null
+    this._cancelInteractions()
   }
 
   setColor(color) {
     this.color = color
   }
 
-  // Основные методы
+  // Режимы
   toggleMode() {
     this.isDrawingMode = !this.isDrawingMode
-
+    this._cancelInteractions()
     this.redraw()
   }
 
   enableDrawing() {
     this.isDrawingMode = true
-    //this.startNewPolygon()
-
+    this._cancelInteractions()
     this.redraw()
   }
 
   disableDrawing() {
     this.isDrawingMode = false
+    this._cancelInteractions()
     this.closeCurrentPolygon()
-
     this.redraw()
   }
 
+  _cancelInteractions() {
+    this.draggedPoint = null
+    this.draggedPolygon = null
+    this.mergeTarget = null
+    this.pointerStart = null
+    this._activePointerId = null
+    this.hoveredPoint = null
+    this.hoveredSegment = null
+    this.hideContextButton()
+  }
+
   startNewPolygon() {
+    if (this.currentPolygon && this.currentPolygon.points.length === 0) {
+      this._selectPolygon(this.polygons.indexOf(this.currentPolygon))
+      return
+    }
     if (this.currentPolygon && this.currentPolygon.points.length > 2) {
       this.closeCurrentPolygon()
     }
@@ -89,111 +151,186 @@ export class ImageClickTracker {
   }
 
   closeCurrentPolygon() {
-    if (this.currentPolygon && this.currentPolygon.points.length >= 3) {
+    if (this.currentPolygon && !this.currentPolygon.isClosed && this.currentPolygon.points.length >= 3) {
       this.currentPolygon.isClosed = true
-      console.log(`Полигон ${this.polygons.length} замкнут`)
       this.redraw()
       this.fireData()
     }
   }
 
   // Обработчики событий
-  handleMouseDown(event) {
-    const pos = this.getMousePosition(event)
+  handlePointerDown(event) {
+    if (!event.isPrimary) return
+    this._lastPointerType = event.pointerType || 'mouse'
+    this._updateRect()
 
-    if (event.button === 0) { // ЛКМ
-      if (!this.isDrawingMode) {
-        // Начинаем перемещение полигона
-        if (this.currentPolygon) {
-          this.draggedPolygon = {
-            polygon: this.currentPolygon,
-            startPoints: JSON.parse(JSON.stringify(this.currentPolygon.points)),
-            startPos: pos
-          }
-        }
-        this.redraw()
-        return
-      }
+    if (event.button === 2) return
 
-      if (event.ctrlKey || event.metaKey) {
-        // Вставка точки между существующими (Ctrl+ЛКМ)
-        if (this.hoveredSegment && this.hoveredSegment.polygon) {
-          this.insertPoint(
-            this.hoveredSegment.polygon,
-            this.hoveredSegment.segmentIndex + 1,
-            pos.x,
-            pos.y
-          )
-        }
-      } else if (this.hoveredPoint) {
-        // Начало перетаскивания
+    const pos = this.getEventPosition(event)
+    this._activePointerId = event.pointerId
+    this.pointerStart = {
+      x: pos.x,
+      y: pos.y,
+      clientX: event.clientX,
+      clientY: event.clientY,
+      moved: false
+    }
+
+    this.hideContextButton()
+    this._updateHoverFromPos(pos)
+
+    if (event.button !== 0) return
+
+    try {
+      this.canvas.setPointerCapture(event.pointerId)
+    } catch (e) {
+      void e
+    }
+
+    if (this.isDrawingMode) {
+      if (this.hoveredPoint) {
         this.draggedPoint = this.hoveredPoint
-      } else if (this.currentPolygon) {
-        // Добавление новой точки
-        this.addPoint(this.currentPolygon, pos.x, pos.y)
       }
+      return
+    }
+
+    const idx = this.findPolygonIndex(pos.x, pos.y)
+    let polygon = idx >= 0 ? this.polygons[idx] : null
+    if (!polygon && this.hoveredPoint) polygon = this.hoveredPoint.polygon
+    if (!polygon && this.hoveredSegment) polygon = this.hoveredSegment.polygon
+    if (polygon) {
+      this._selectPolygon(this.polygons.indexOf(polygon))
+      this.draggedPolygon = {
+        polygon,
+        startPoints: JSON.parse(JSON.stringify(polygon.points)),
+        startPos: {x: pos.x, y: pos.y}
+      }
+    } else {
+      this.selectedPolygonIndex = -1
+      this.redraw()
     }
   }
 
-  handleMouseMove(event) {
-    const pos = this.getMousePosition(event)
+  handlePointerMove(event) {
+    const pos = this.getEventPosition(event)
 
-    // Перемещение полигона
-    if (this.draggedPolygon) {
-      const dx = pos.x - this.draggedPolygon.startPos.x
-      const dy = pos.y - this.draggedPolygon.startPos.y
-
-      this.draggedPolygon.polygon.points = this.draggedPolygon.startPoints.map(point => {
-        return [
-          Math.round(point[0] + dx),
-          Math.round(point[1] + dy)
-        ]
-      })
-      console.log(this.draggedPolygon.polygon.points)
-
-      this.redraw()
-      return
+    if (this.pointerStart && this.pointerStart.moved === false) {
+      const dx = event.clientX - this.pointerStart.clientX
+      const dy = event.clientY - this.pointerStart.clientY
+      if (Math.sqrt(dx * dx + dy * dy) > this.dragThresholdPx) {
+        this.pointerStart.moved = true
+      }
     }
 
-    // Перетаскивание точки
     if (this.draggedPoint) {
-      this.draggedPoint.point[0] = Math.round(pos.x)
-      this.draggedPoint.point[1] = Math.round(pos.y)
+      if (!this.pointerStart || !this.pointerStart.moved) return
+      const polygon = this.draggedPoint.polygon
+      const merge = this.findMergeTarget(polygon, this.draggedPoint.pointIndex, pos.x, pos.y)
+      this.mergeTarget = merge
+      let nx = Math.round(pos.x)
+      let ny = Math.round(pos.y)
+      if (merge) {
+        nx = polygon.points[merge.pointIndex][0]
+        ny = polygon.points[merge.pointIndex][1]
+      }
+      this.draggedPoint.point[0] = nx
+      this.draggedPoint.point[1] = ny
       this.redraw()
       return
     }
 
-    // Поиск ближайшей точки и сегмента
-    this.hoveredPoint = this.findPoint(pos.x, pos.y)
-    this.hoveredSegment = this.findSegment(pos.x, pos.y)
-
-    // Изменение курсора
-    if (this.hoveredPoint) {
-      this.canvas.style.cursor = 'move'
-    } else if (this.hoveredSegment && (this.isDrawingMode || event.ctrlKey)) {
-      this.canvas.style.cursor = 'cell'
-    } else {
-      this.canvas.style.cursor = 'default'
+    if (this.draggedPolygon) {
+      if (!this.pointerStart || !this.pointerStart.moved) return
+      const dx = Math.round(pos.x - this.draggedPolygon.startPos.x)
+      const dy = Math.round(pos.y - this.draggedPolygon.startPos.y)
+      this.draggedPolygon.polygon.points = this.draggedPolygon.startPoints.map(point => {
+        return [point[0] + dx, point[1] + dy]
+      })
+      this.redraw()
+      return
     }
 
+    this._cursor = pos
+    this._updateHoverFromPos(pos)
+    this._updateCursorStyle(event.ctrlKey || event.metaKey)
+
+    if (this.isDrawingMode) {
+      this._syncHoverContextButton(event)
+    } else {
+      this.hideContextButton()
+    }
     this.redraw()
   }
 
-  handleMouseUp() {
+  handlePointerUp(event) {
+    if (this._activePointerId !== null && event.pointerId !== this._activePointerId) return
+    const pos = this.getEventPosition(event)
+    const start = this.pointerStart
+    const wasTap = !!start && !start.moved
+
+    try {
+      this.canvas.releasePointerCapture(event.pointerId)
+    } catch (e) {
+      void e
+    }
+
     if (this.draggedPoint) {
+      const polygon = this.draggedPoint.polygon
+      const pointIndex = this.draggedPoint.pointIndex
+      if (start && start.moved) {
+        if (this.mergeTarget) {
+          this._mergePointInto(polygon, pointIndex, this.mergeTarget.pointIndex)
+          this.mergeTarget = null
+          this.redraw()
+        }
+        this.fireData()
+      } else {
+        this._handleDrawTap(pos, event, polygon, pointIndex)
+      }
       this.draggedPoint = null
-    }
-
-    if (this.draggedPolygon) {
+    } else if (this.draggedPolygon) {
+      if (start && start.moved) {
+        this.fireData()
+      }
       this.draggedPolygon = null
+    } else if (wasTap) {
+      if (this.isDrawingMode) {
+        this._handleDrawTap(pos, event)
+      } else {
+        this._handleDragModeTap(pos)
+      }
     }
 
-    this.fireData()
+    this.pointerStart = null
+    this._activePointerId = null
+  }
+
+  handlePointerCancel() {
+    this.draggedPoint = null
+    this.draggedPolygon = null
+    this.mergeTarget = null
+    this.pointerStart = null
+    this._activePointerId = null
+    this.hideContextButton()
+    this.redraw()
+  }
+
+  handlePointerLeave(event) {
+    if (event.pointerType === 'touch') return
+    if (this.pointerStart || this.draggedPoint || this.draggedPolygon) return
+    this.hoveredPoint = null
+    this.hoveredSegment = null
+    this._cursor = null
+    this._updateCursorStyle(false)
+    this.scheduleContextHide()
+    this.redraw()
   }
 
   handleContextMenu(event) {
     event.preventDefault()
-    const pos = this.getMousePosition(event)
+    if (this._lastPointerType === 'touch') return
+    this._updateRect()
+    const pos = this.getEventPosition(event)
 
     if (!this.isDrawingMode) {
       const polygonIndex = this.findPolygonIndex(pos.x, pos.y)
@@ -203,21 +340,103 @@ export class ImageClickTracker {
       return
     }
 
-    const pointInfo = this.findPoint(pos.x, pos.y)
-    if (pointInfo) {
-      this.removePoint(pointInfo.polygon, pointInfo.pointIndex)
+    this._updateHoverFromPos(pos)
+    if (this.hoveredPoint) {
+      this.removePoint(this.hoveredPoint.polygon, this.hoveredPoint.pointIndex)
     }
   }
 
   handleDoubleClick(event) {
-    if (event.button === 0 && this.currentPolygon?.points.length >= 3) {
-      this.closeCurrentPolygon()
+    if (!this.isDrawingMode) return
+    const polygon = this.currentPolygon
+    if (!polygon || polygon.isClosed || polygon.points.length < 3) return
+    this._closePolygonByTap(polygon)
+  }
+
+  _handleDrawTap(pos, event, tappedPolygon = null, tappedIndex = null) {
+    this._updateHoverFromPos(pos)
+
+    let pointInfo = this.hoveredPoint
+    if (tappedPolygon && tappedIndex != null) {
+      pointInfo = {
+        polygon: tappedPolygon,
+        pointIndex: tappedIndex,
+        point: tappedPolygon.points[tappedIndex]
+      }
     }
+
+    if (pointInfo) {
+      if (pointInfo.pointIndex === 0 && !pointInfo.polygon.isClosed && pointInfo.polygon.points.length >= 3) {
+        this._closePolygonByTap(pointInfo.polygon)
+        return
+      }
+      this._selectPolygon(this.polygons.indexOf(pointInfo.polygon))
+      this.showContextButton(
+        {kind: 'delete', polygon: pointInfo.polygon, pointIndex: pointInfo.pointIndex},
+        event.clientX,
+        event.clientY
+      )
+      return
+    }
+
+    if (this.hoveredSegment) {
+      this._selectPolygon(this.polygons.indexOf(this.hoveredSegment.polygon))
+      this.showContextButton(
+        {
+          kind: 'insert',
+          polygon: this.hoveredSegment.polygon,
+          segmentIndex: this.hoveredSegment.segmentIndex,
+          x: Math.round(pos.x),
+          y: Math.round(pos.y)
+        },
+        event.clientX,
+        event.clientY
+      )
+      return
+    }
+
+    this.showContextButton(
+      {kind: 'add', x: Math.round(pos.x), y: Math.round(pos.y)},
+      event.clientX,
+      event.clientY
+    )
+  }
+
+  _handleDragModeTap(pos) {
+    const idx = this.findPolygonIndex(pos.x, pos.y)
+    if (idx >= 0) {
+      this._selectPolygon(idx)
+    } else {
+      this.selectedPolygonIndex = -1
+      this.redraw()
+    }
+  }
+
+  _closePolygonByTap(polygon) {
+    const points = polygon.points
+    if (points.length >= 4) {
+      const first = points[0]
+      const last = points[points.length - 1]
+      if (Math.sqrt(Math.pow(first[0] - last[0], 2) + Math.pow(first[1] - last[1], 2)) <= this.snapThreshold) {
+        points.pop()
+      }
+    }
+    polygon.isClosed = true
+    this._selectPolygon(this.polygons.indexOf(polygon))
+    this.redraw()
+    this.fireData()
+  }
+
+  _selectPolygon(index) {
+    if (index < 0 || index >= this.polygons.length) return
+    this.selectedPolygonIndex = index
+    this.currentPolygon = this.polygons[index]
+    this.redraw()
   }
 
   // Поисковые методы
   findPoint(x, y) {
-    const threshold = 10 / Math.min(this.scaleX(), this.scaleY())
+    const threshold = this.pointThreshold * this._hitScale()
 
     for (let pIdx = 0; pIdx < this.polygons.length; pIdx++) {
       const polygon = this.polygons[pIdx]
@@ -237,7 +456,7 @@ export class ImageClickTracker {
   }
 
   findSegment(x, y) {
-    const threshold = 15 / Math.min(this.scaleX(), this.scaleY())
+    const threshold = this.segmentThreshold * this._hitScale()
     const thresholdSq = threshold * threshold
 
     for (let pIdx = 0; pIdx < this.polygons.length; pIdx++) {
@@ -245,11 +464,10 @@ export class ImageClickTracker {
       if (polygon.points.length < 2) continue
 
       for (let i = 0; i < polygon.points.length; i++) {
+        if (!polygon.isClosed && i === polygon.points.length - 1) break
+
         const p1 = polygon.points[i]
         const p2 = polygon.points[(i + 1) % polygon.points.length]
-
-        // Пропускаем последний сегмент, если полигон не замкнут
-        if (!polygon.isClosed && i === polygon.points.length - 1) break
 
         const d = this.distanceToSegmentSquared(x, y, p1[0], p1[1], p2[0], p2[1])
         if (d < thresholdSq) {
@@ -267,35 +485,37 @@ export class ImageClickTracker {
   findPolygonIndex(x, y) {
     if (!this.ctx) return -1
 
-    // Проверяем попадание в полигон
     for (let i = 0; i < this.polygons.length; i++) {
       const polygon = this.polygons[i]
       if (polygon.points.length < 3 || !polygon.isClosed) continue
 
       this.ctx.save()
       this.ctx.beginPath()
-      this.ctx.moveTo(
-        polygon.points[0][0] * this.scaleX(),
-        polygon.points[0][1] * this.scaleY()
-      )
+      this.ctx.moveTo(this.px(polygon.points[0][0]), this.py(polygon.points[0][1]))
 
       for (let j = 1; j < polygon.points.length; j++) {
-        this.ctx.lineTo(
-          polygon.points[j][0] * this.scaleX(),
-          polygon.points[j][1] * this.scaleY()
-        )
+        this.ctx.lineTo(this.px(polygon.points[j][0]), this.py(polygon.points[j][1]))
       }
 
       this.ctx.closePath()
-      const isPointInPath = this.ctx.isPointInPath(
-        x * this.scaleX(),
-        y * this.scaleY()
-      )
+      const isPointInPath = this.ctx.isPointInPath(x * this.scaleX() * this.dpr, y * this.scaleY() * this.dpr)
       this.ctx.restore()
 
       if (isPointInPath) return i
     }
     return -1
+  }
+
+  findMergeTarget(polygon, excludeIndex, x, y) {
+    const threshold = this.snapThreshold * this._hitScale()
+    for (let i = 0; i < polygon.points.length; i++) {
+      if (i === excludeIndex) continue
+      const point = polygon.points[i]
+      if (Math.sqrt(Math.pow(point[0] - x, 2) + Math.pow(point[1] - y, 2)) <= threshold) {
+        return {polygon, pointIndex: i}
+      }
+    }
+    return null
   }
 
   distanceToSegmentSquared(px, py, x1, y1, x2, y2) {
@@ -311,85 +531,322 @@ export class ImageClickTracker {
 
   // Методы работы с точками
   addPoint(polygon, x, y) {
+    if (!polygon) return
     polygon.points.push([Math.round(x), Math.round(y)])
-    polygon.isClosed = false
     this.redraw()
-    console.log(`Добавлена точка: (${Math.round(x)}, ${Math.round(y)})`)
-
     this.fireData()
   }
 
   insertPoint(polygon, index, x, y) {
+    if (!polygon) return
     polygon.points.splice(index, 0, [Math.round(x), Math.round(y)])
-    polygon.isClosed = false
     this.redraw()
-    console.log(`Вставлена точка между ${index - 1} и ${index}`)
-
+    this.fireData()
   }
 
   removePoint(polygon, index) {
-    const removedPoint = polygon.points.splice(index, 1)[0]
-    polygon.isClosed = false
+    if (!polygon || index < 0 || index >= polygon.points.length) return
+    polygon.points.splice(index, 1)
+    if (polygon.points.length < 3) {
+      polygon.isClosed = false
+    }
     this.redraw()
-    console.log(`Удалена точка: (${Math.round(removedPoint[0])}, ${Math.round(removedPoint[1])})`)
-
+    this.fireData()
   }
 
   removePolygon(index) {
     const removed = this.polygons.splice(index, 1)[0]
+    if (!removed) return
+    if (this._ctxState && this._ctxState.polygon === removed) {
+      this.hideContextButton()
+    }
     if (this.currentPolygon === removed) {
       this.currentPolygon = this.polygons[this.polygons.length - 1] || null
       this.selectedPolygonIndex = this.polygons.length - 1
+    } else if (this.selectedPolygonIndex > index) {
+      this.selectedPolygonIndex--
     }
     this.redraw()
-    console.log(`Удален полигон с ${removed.points.length} точками`)
-
     this.fireData()
+  }
+
+  _mergePointInto(polygon, removeIndex, keepIndex) {
+    const count = polygon.points.length
+    const closesShape = (removeIndex === 0 && keepIndex === count - 1) ||
+                        (removeIndex === count - 1 && keepIndex === 0)
+    polygon.points.splice(removeIndex, 1)
+    if (polygon.points.length < 3) {
+      polygon.isClosed = false
+    } else if (closesShape) {
+      polygon.isClosed = true
+    }
+  }
+
+  // Контекстные кнопки-подтверждения
+  _ensureContextButton() {
+    if (this._ctxButton) return this._ctxButton
+
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.style.cssText = 'position:fixed;display:none;align-items:center;justify-content:center;' +
+      'width:44px;height:44px;border-radius:50%;border:none;padding:0;cursor:pointer;' +
+      'background:#ffffff;box-shadow:0 2px 8px rgba(0,0,0,.35);z-index:10000;font-size:22px;' +
+      'transform:translate(-50%,-50%);touch-action:manipulation;-webkit-tap-highlight-color:transparent'
+
+    btn.addEventListener('pointerdown', e => {
+      e.preventDefault()
+      e.stopPropagation()
+    })
+    btn.addEventListener('click', e => {
+      e.preventDefault()
+      e.stopPropagation()
+      this._performContextAction()
+    })
+    btn.addEventListener('pointerenter', () => {
+      if (this._ctxHideTimer) {
+        clearTimeout(this._ctxHideTimer)
+        this._ctxHideTimer = null
+      }
+    })
+    btn.addEventListener('pointerleave', () => {
+      this.scheduleContextHide()
+    })
+
+    document.body.appendChild(btn)
+    this._ctxButton = btn
+    return btn
+  }
+
+  showContextButton(state, clientX, clientY) {
+    if (!this.isDrawingMode) return
+    const btn = this._ensureContextButton()
+
+    this._ctxState = state
+    btn.className = state.kind === 'delete' ? 'mdi mdi-trash-can-outline' : 'mdi mdi-plus'
+    btn.title = state.kind === 'delete' ? 'Delete point' : (state.kind === 'insert' ? 'Insert point' : 'Add point')
+    btn.style.color = state.kind === 'delete' ? '#c62828' : '#1565c0'
+    btn.style.display = 'flex'
+    this._positionContextButton(clientX, clientY)
+  }
+
+  _positionContextButton(clientX, clientY) {
+    if (!this._ctxButton) return
+    const margin = 8
+    const half = 22
+    const left = Math.max(half + margin, Math.min(window.innerWidth - half - margin, clientX))
+    const top = Math.max(half + margin, Math.min(window.innerHeight - half - margin, clientY - 46))
+    this._ctxButton.style.left = `${left}px`
+    this._ctxButton.style.top = `${top}px`
+  }
+
+  hideContextButton() {
+    this._clearCtxTimers()
+    this._ctxState = null
+    this._ctxHoverPos = null
+    if (this._ctxButton) {
+      this._ctxButton.style.display = 'none'
+    }
+  }
+
+  scheduleContextHide(delay = 350) {
+    if (this._ctxHideTimer) clearTimeout(this._ctxHideTimer)
+    this._ctxHideTimer = setTimeout(() => {
+      this._ctxHideTimer = null
+      this.hideContextButton()
+    }, delay)
+  }
+
+  _clearCtxTimers() {
+    if (this._ctxHideTimer) {
+      clearTimeout(this._ctxHideTimer)
+      this._ctxHideTimer = null
+    }
+    if (this._ctxHoverTimer) {
+      clearTimeout(this._ctxHoverTimer)
+      this._ctxHoverTimer = null
+    }
+  }
+
+  _performContextAction() {
+    const state = this._ctxState
+    if (!state) return
+
+    if (state.kind === 'add') {
+      if (!this.currentPolygon || this.currentPolygon.isClosed) {
+        this.startNewPolygon()
+      }
+      this.addPoint(this.currentPolygon, state.x, state.y)
+    } else if (state.kind === 'insert') {
+      this._selectPolygon(this.polygons.indexOf(state.polygon))
+      this.insertPoint(state.polygon, state.segmentIndex + 1, state.x, state.y)
+    } else if (state.kind === 'delete') {
+      this.removePoint(state.polygon, state.pointIndex)
+    }
+
+    this.hideContextButton()
+  }
+
+  _syncHoverContextButton(event) {
+    if (!this.isDrawingMode) {
+      this.hideContextButton()
+      return
+    }
+
+    if (this._ctxHoverTimer) {
+      clearTimeout(this._ctxHoverTimer)
+      this._ctxHoverTimer = null
+    }
+
+    if (this.hoveredPoint) {
+      this.showContextButton(
+        {kind: 'delete', polygon: this.hoveredPoint.polygon, pointIndex: this.hoveredPoint.pointIndex},
+        event.clientX,
+        event.clientY
+      )
+      return
+    }
+
+    if (this.hoveredSegment) {
+      this.showContextButton(
+        {
+          kind: 'insert',
+          polygon: this.hoveredSegment.polygon,
+          segmentIndex: this.hoveredSegment.segmentIndex,
+          x: Math.round(this._cursor.x),
+          y: Math.round(this._cursor.y)
+        },
+        event.clientX,
+        event.clientY
+      )
+      return
+    }
+
+    const x = Math.round(this._cursor.x)
+    const y = Math.round(this._cursor.y)
+    if (this._ctxState && this._ctxState.kind === 'add' && this._ctxButton && this._ctxButton.style.display === 'flex') {
+      this._ctxState.x = x
+      this._ctxState.y = y
+      this._positionContextButton(event.clientX, event.clientY)
+      return
+    }
+
+    this._ctxHoverPos = {clientX: event.clientX, clientY: event.clientY, x, y}
+    this._ctxHoverTimer = setTimeout(() => {
+      this._ctxHoverTimer = null
+      const p = this._ctxHoverPos
+      if (!p || !this.isDrawingMode || this.hoveredPoint || this.hoveredSegment) return
+      this.showContextButton({kind: 'add', x: p.x, y: p.y}, p.clientX, p.clientY)
+    }, 250)
+  }
+
+  _updateHoverFromPos(pos) {
+    this.hoveredPoint = this.findPoint(pos.x, pos.y)
+    this.hoveredSegment = this.hoveredPoint ? null : this.findSegment(pos.x, pos.y)
+  }
+
+  _updateCursorStyle(ctrlPressed) {
+    if (this.draggedPoint) {
+      this.canvas.style.cursor = 'move'
+    } else if (this.draggedPolygon) {
+      this.canvas.style.cursor = 'grabbing'
+    } else if (this.hoveredPoint) {
+      this.canvas.style.cursor = 'move'
+    } else if (this.hoveredSegment && (this.isDrawingMode || ctrlPressed)) {
+      this.canvas.style.cursor = 'cell'
+    } else {
+      this.canvas.style.cursor = this.isDrawingMode ? 'crosshair' : 'default'
+    }
   }
 
   // Отрисовка
   redraw() {
+    if (this._raf != null) return
+    this._raf = requestAnimationFrame(() => {
+      this._raf = null
+      this._render()
+    })
+  }
+
+  _render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
-    // Рисуем все полигоны
     this.polygons.forEach((polygon, index) => {
       this.drawPolygon(polygon, index === this.selectedPolygonIndex)
     })
 
-    // Рисуем текущий полигон (если есть)
-    if (this.currentPolygon && !this.polygons.includes(this.currentPolygon)) {
-      this.drawPolygon(this.currentPolygon, true)
-    }
+    this._drawRubberBand()
 
-    // Рисуем hovered сегмент
     if (this.hoveredSegment && (this.isDrawingMode || this.hoveredSegment.polygon === this.currentPolygon)) {
-      const p1 = this.hoveredSegment.polygon.points[this.hoveredSegment.segmentIndex]
-      const p2 = this.hoveredSegment.polygon.points[
-        (this.hoveredSegment.segmentIndex + 1) % this.hoveredSegment.polygon.points.length
-      ]
+      const points = this.hoveredSegment.polygon.points
+      const p1 = points[this.hoveredSegment.segmentIndex]
+      const p2 = points[(this.hoveredSegment.segmentIndex + 1) % points.length]
 
       this.ctx.strokeStyle = 'rgba(255, 150, 0, 0.7)'
       this.ctx.lineWidth = 3
       this.ctx.beginPath()
-      this.ctx.moveTo(p1[0] * this.scaleX(), p1[1] * this.scaleY())
-      this.ctx.lineTo(p2[0] * this.scaleX(), p2[1] * this.scaleY())
+      this.ctx.moveTo(this.px(p1[0]), this.py(p1[1]))
+      this.ctx.lineTo(this.px(p2[0]), this.py(p2[1]))
       this.ctx.stroke()
     }
 
-    // Рисуем hovered точку
     if (this.hoveredPoint && (this.isDrawingMode || this.hoveredPoint.polygon === this.currentPolygon)) {
-      const x = this.hoveredPoint.point[0] * this.scaleX()
-      const y = this.hoveredPoint.point[1] * this.scaleY()
-
-      this.ctx.fillStyle = 'rgba(103,0,0,0.66)'
-      this.ctx.beginPath()
-      this.ctx.arc(x, y, 9, 0, Math.PI * 2)
-      this.ctx.fill()
-
-      this.ctx.strokeStyle = 'rgba(255,255,255,0.5)'
-      this.ctx.lineWidth = 5
-      this.ctx.stroke()
+      this._drawMarker(this.hoveredPoint.point, 'rgba(103,0,0,0.66)', 9, 'rgba(255,255,255,0.5)', 5)
     }
+
+    if (this.mergeTarget) {
+      const point = this.mergeTarget.polygon.points[this.mergeTarget.pointIndex]
+      this._drawMarker(point, 'rgba(0,160,0,0.8)', 10, 'rgba(255,255,255,0.85)', 3)
+    }
+  }
+
+  _drawRubberBand() {
+    if (!this.isDrawingMode || !this._cursor) return
+    const polygon = this.currentPolygon
+    if (!polygon || polygon.isClosed || polygon.points.length === 0) return
+
+    const ctx = this.ctx
+    const last = polygon.points[polygon.points.length - 1]
+    const first = polygon.points[0]
+
+    ctx.save()
+    ctx.setLineDash([6, 4])
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.moveTo(this.px(last[0]), this.py(last[1]))
+    ctx.lineTo(this.px(this._cursor.x), this.py(this._cursor.y))
+    ctx.strokeStyle = 'rgba(255,255,255,0.75)'
+    ctx.stroke()
+
+    if (polygon.points.length >= 3) {
+      const d = Math.sqrt(
+        Math.pow(first[0] - this._cursor.x, 2) + Math.pow(first[1] - this._cursor.y, 2)
+      )
+      ctx.beginPath()
+      ctx.moveTo(this.px(this._cursor.x), this.py(this._cursor.y))
+      ctx.lineTo(this.px(first[0]), this.py(first[1]))
+      if (d <= this.snapThreshold) {
+        ctx.setLineDash([])
+        ctx.strokeStyle = 'rgba(0,200,0,0.9)'
+        ctx.stroke()
+        ctx.restore()
+        this._drawMarker(first, 'rgba(0,160,0,0.7)', 9, 'rgba(255,255,255,0.85)', 3)
+        return
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+      ctx.stroke()
+    }
+    ctx.restore()
+  }
+
+  _drawMarker(point, fill, radius, stroke, strokeWidth) {
+    this.ctx.fillStyle = fill
+    this.ctx.beginPath()
+    this.ctx.arc(this.px(point[0]), this.py(point[1]), radius, 0, Math.PI * 2)
+    this.ctx.fill()
+
+    this.ctx.strokeStyle = stroke
+    this.ctx.lineWidth = strokeWidth
+    this.ctx.stroke()
   }
 
   fireData() {
@@ -401,93 +858,76 @@ export class ImageClickTracker {
   }
 
   drawPolygon(polygon, isSelected) {
-    if (polygon.points.length < 1) return
+    if (!polygon.points || polygon.points.length < 1) return
+    const ctx = this.ctx
 
-    // Заливка полигона
     if (polygon.points.length >= 3 && polygon.isClosed) {
-      this.ctx.fillStyle = this.adjustAlpha(polygon.color, 0.3)
-      this.ctx.beginPath()
-      this.ctx.moveTo(
-        polygon.points[0][0] * this.scaleX(),
-        polygon.points[0][1] * this.scaleY()
-      )
+      ctx.fillStyle = this.adjustAlpha(polygon.color, 0.3)
+      ctx.beginPath()
+      ctx.moveTo(this.px(polygon.points[0][0]), this.py(polygon.points[0][1]))
 
       for (let i = 1; i < polygon.points.length; i++) {
-        this.ctx.lineTo(
-          polygon.points[i][0] * this.scaleX(),
-          polygon.points[i][1] * this.scaleY()
-        )
+        ctx.lineTo(this.px(polygon.points[i][0]), this.py(polygon.points[i][1]))
       }
 
-      this.ctx.closePath()
-      this.ctx.fill()
+      ctx.closePath()
+      ctx.fill()
     }
 
-    // Контур полигона
-    this.ctx.strokeStyle = isSelected ?
-      this.adjustAlpha(polygon.color, 0.9) :
-      this.adjustAlpha(polygon.color, 0.5)
-    this.ctx.lineWidth = isSelected ? 4 : 2
-    this.ctx.beginPath()
-    this.ctx.moveTo(
-      polygon.points[0][0] * this.scaleX(),
-      polygon.points[0][1] * this.scaleY()
-    )
+    ctx.strokeStyle = this.adjustAlpha(polygon.color, isSelected ? 0.9 : 0.5)
+    ctx.lineWidth = isSelected ? 4 : 2
+    ctx.beginPath()
+    ctx.moveTo(this.px(polygon.points[0][0]), this.py(polygon.points[0][1]))
 
     for (let i = 1; i < polygon.points.length; i++) {
-      this.ctx.lineTo(
-        polygon.points[i][0] * this.scaleX(),
-        polygon.points[i][1] * this.scaleY()
-      )
+      ctx.lineTo(this.px(polygon.points[i][0]), this.py(polygon.points[i][1]))
     }
 
     if (polygon.isClosed && polygon.points.length >= 3) {
-      this.ctx.closePath()
+      ctx.closePath()
     }
-    this.ctx.stroke()
+    ctx.stroke()
 
-    // Точки полигона
     polygon.points.forEach(point => {
-      const x = point[0] * this.scaleX()
-      const y = point[1] * this.scaleY()
-
-      this.ctx.fillStyle = polygon === this.currentPolygon ? '#ff0000' : '#aa0000'
-      this.ctx.beginPath()
-      this.ctx.arc(x, y, 5, 0, Math.PI * 2)
-      this.ctx.fill()
-
-      this.ctx.strokeStyle = '#ffffff'
-      this.ctx.lineWidth = 1
-      this.ctx.stroke()
+      this._drawMarker(point, polygon === this.currentPolygon ? '#ff0000' : '#aa0000', 5, '#ffffff', 1)
     })
   }
 
   // Вспомогательные методы
   changePolygonColor(i, color) {
-    if (this.currentPolygon) {
-      this.currentPolygon.color = color
+    if (this.polygons[i]) {
       this.polygons[i].color = color
+      if (this.currentPolygon === this.polygons[i]) {
+        this.currentPolygon.color = color
+      }
       this.redraw()
     }
   }
 
   updateName(name) {
+    if (!this.currentPolygon) return
     this.currentPolygon.name = name
     this.redraw()
   }
 
-  getMousePosition(event) {
-    const rect = this.canvas.getBoundingClientRect()
+  getEventPosition(event) {
+    if (!this.rect) this._updateRect()
     return {
-      x: (event.clientX - rect.left) / this.scaleX(),
-      y: (event.clientY - rect.top) / this.scaleY()
+      x: (event.clientX - this.rect.left) / this.scaleX(),
+      y: (event.clientY - this.rect.top) / this.scaleY()
     }
   }
 
+  _updateRect() {
+    this.rect = this.canvas.getBoundingClientRect()
+    this.dpr = window.devicePixelRatio || 1
+  }
+
   resizeCanvas() {
-    const rect = this.image.getBoundingClientRect()
-    this.canvas.width = rect.width
-    this.canvas.height = rect.height
+    this._updateRect()
+    const rect = this.rect
+    this.canvas.width = Math.max(1, Math.round(rect.width * this.dpr))
+    this.canvas.height = Math.max(1, Math.round(rect.height * this.dpr))
     this.canvas.style.width = `${rect.width}px`
     this.canvas.style.height = `${rect.height}px`
     this.redraw()
@@ -509,20 +949,19 @@ export class ImageClickTracker {
 
   importFromJSON(json) {
     try {
-      this.polygons = json.map(polygon => ({
+      this.polygons = (json || []).map(polygon => ({
         id: polygon?.id,
         active: polygon.active,
         name: polygon.name,
         points: polygon.points,
         options: polygon.options,
         priority: polygon.priority,
-        isClosed: true, //fix
+        isClosed: true,
         color: polygon.color || this.getRandomColor()
       }))
 
       this.currentPolygon = this.polygons[this.polygons.length - 1] || null
       this.selectedPolygonIndex = this.polygons.length - 1
-      console.log(`Импортировано ${this.polygons.length} полигонов`)
       this.redraw()
       this.fireData()
     } catch (e) {
@@ -536,26 +975,45 @@ export class ImageClickTracker {
   }
 
   adjustAlpha(color, alpha) {
+    if (!color || typeof color !== 'string') return color
     if (color.startsWith('hsl')) {
       return color.replace(')', `, ${alpha})`).replace('hsl', 'hsla')
+    }
+    if (color.startsWith('#')) {
+      let hex = color.slice(1)
+      if (hex.length === 3 || hex.length === 4) {
+        hex = hex.split('').map(char => char + char).join('')
+      }
+      if (hex.length === 8) {
+        const r = parseInt(hex.slice(0, 2), 16)
+        const g = parseInt(hex.slice(2, 4), 16)
+        const b = parseInt(hex.slice(4, 6), 16)
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`
+      }
     }
     return color
   }
 
+  px(x) {
+    return x * this.scaleX() * this.dpr
+  }
+
+  py(y) {
+    return y * this.scaleY() * this.dpr
+  }
+
   scaleX() {
-    return this.image.getBoundingClientRect().width / this.referenceWidth
+    if (!this.rect) this._updateRect()
+    return this.rect.width / this.referenceWidth || 1
   }
 
   scaleY() {
-    return this.image.getBoundingClientRect().height / this.referenceHeight
+    if (!this.rect) this._updateRect()
+    return this.rect.height / this.referenceHeight || 1
   }
 
-  // Поддержка и <img> (naturalWidth/Height), и <video> (videoWidth/Height)
-  naturalWidth() {
-    return this.referenceWidth
-  }
-
-  naturalHeight() {
-    return this.referenceHeight
+  _hitScale() {
+    const base = 1 / Math.min(this.scaleX(), this.scaleY())
+    return this._lastPointerType === 'touch' ? base * 1.6 : base
   }
 }
