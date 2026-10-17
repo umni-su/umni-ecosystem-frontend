@@ -569,7 +569,7 @@ export class ImageClickTracker {
   _mergePointInto(polygon, removeIndex, keepIndex) {
     const count = polygon.points.length
     const closesShape = (removeIndex === 0 && keepIndex === count - 1) ||
-                        (removeIndex === count - 1 && keepIndex === 0)
+            (removeIndex === count - 1 && keepIndex === 0)
     polygon.points.splice(removeIndex, 1)
     if (polygon.points.length < 3) {
       polygon.isClosed = false
@@ -583,13 +583,13 @@ export class ImageClickTracker {
     if (this._ctxButton) return this._ctxButton
 
     const btnCss = 'display:flex;align-items:center;justify-content:center;width:44px;height:44px;' +
-      'border-radius:50%;border:none;padding:0;cursor:pointer;background:#ffffff;' +
-      'box-shadow:0 2px 8px rgba(0,0,0,.35);font-size:22px;' +
-      'touch-action:manipulation;-webkit-tap-highlight-color:transparent'
+            'border-radius:50%;border:none;padding:0;cursor:pointer;background:#ffffff;' +
+            'box-shadow:0 2px 8px rgba(0,0,0,.35);font-size:22px;' +
+            'touch-action:manipulation;-webkit-tap-highlight-color:transparent'
 
     const wrap = document.createElement('div')
     wrap.style.cssText = 'position:fixed;display:none;align-items:center;justify-content:center;gap:8px;' +
-      'transform:translate(-50%,-50%);z-index:10000'
+            'transform:translate(-50%,-50%);z-index:10000'
 
     const action = document.createElement('button')
     action.type = 'button'
@@ -879,7 +879,7 @@ export class ImageClickTracker {
     if (!polygon.points || polygon.points.length < 1) return
     const ctx = this.ctx
     const disabled = polygon.options && polygon.options.enabled === false
-    const color = disabled ? '#9e9e9e' : polygon.color
+    const color = disabled ? 'rgba(85,85,85,0.7)' : polygon.color
 
     if (polygon.points.length >= 3 && polygon.isClosed) {
       ctx.fillStyle = this.adjustAlpha(color, 0.3)
