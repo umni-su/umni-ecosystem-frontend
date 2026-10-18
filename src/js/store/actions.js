@@ -67,7 +67,8 @@ export default {
     const url = `${API}auth/check`
     const res = await axios.get(url)
       .catch(e => {
-        const status = e.response.status
+        // e.response отсутствует при сетевой ошибке/аборте запроса
+        const status = e.response?.status
         if (status === 401) {
           commit('setInstalled', true)
         } else if (status === 423) {

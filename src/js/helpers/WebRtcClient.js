@@ -33,12 +33,44 @@ export class WebRtcClient {
     this.configLoaded = false
   }
 
-  // Один клиент (и один WS) на токен/страницу.
+  // Один клиент (и один WS) на страницу.
+  // Токен может обновиться (см. healthcheck в App.vue), но WS авторизуется
+  // один раз при хэндшейке и истечение токена его не трогает. Поэтому при
+  // смене токена инстанс переиспользуем, а не пересоздаём: новый клиент
+  // означал бы новый WebSocket и брошенный старый WS со всеми живыми
+  // RTCPeerConnection. Запоминаем свежий токен — он пригодится при
+  // будущем reconnect после ws.onclose и в HTTP-запросах (loadConfig).
   static get(token) {
-    if (!WebRtcClient.instance || WebRtcClient.instance.token !== token) {
-      WebRtcClient.instance = new WebRtcClient(token)
+    if (WebRtcClient.instance) {
+      if (token && WebRtcClient.instance.token !== token) {
+        WebRtcClient.instance.token = token
+      }
+      return WebRtcClient.instance
     }
+    WebRtcClient.instance = new WebRtcClient(token)
     return WebRtcClient.instance
+  }
+
+  // Полный сброс: закрывает все peer-сессии, WS и обнуляет синглтон.
+  // Нужен при logout — иначе следующий пользователь унаследует WS
+  // с чужими камерами.
+  static reset() {
+    const instance = WebRtcClient.instance
+    if (!instance) {
+      return
+    }
+    for (const sessionId of [...instance.sessions.keys()]) {
+      instance.closeSession(sessionId)
+    }
+    try {
+      if (instance.ws) {
+        instance.ws.close()
+      }
+    } catch (e) {
+      // ignore
+    }
+    instance.ws = null
+    WebRtcClient.instance = null
   }
 
   async loadConfig() {

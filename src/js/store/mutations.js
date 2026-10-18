@@ -1,4 +1,5 @@
 import {useVueFlow} from '@vue-flow/core'
+import {WebRtcClient} from '../helpers/WebRtcClient.js'
 
 const {
   addNodes,
@@ -14,6 +15,15 @@ export default {
   logout(state) {
     state.user = null
     state.authenticated = false
+    // Мёртвый токен нельзя оставлять: state.js читает его из localStorage
+    // при загрузке, и мы уходим в бесконечный 401.
+    state.token = null
+    localStorage.removeItem('token')
+    // Мутация вызывается из axios-интерсептора, но защищаемся на случай
+    // вызова до загрузки модуля, где создаётся window.axios.
+    delete window.axios?.defaults.headers.common['Authorization']
+    // Закрываем WS WebRTC: он авторизован токеном предыдущего пользователя.
+    WebRtcClient.reset()
   },
   setLoading(state, loading) {
     state.loading = loading
@@ -56,7 +66,13 @@ export default {
   },
   setToken(state, token) {
     state.token = token
-    localStorage.setItem('token', token)
+    // setItem(state, null) хранил бы строку "null": ?? в state.js её не
+    // отфильтрует, и при перезагрузке ушёл бы запрос с Bearer null.
+    if (token) {
+      localStorage.setItem('token', token)
+    } else {
+      localStorage.removeItem('token')
+    }
   },
   setTheme(state, theme) {
     localStorage.setItem('theme', theme)
