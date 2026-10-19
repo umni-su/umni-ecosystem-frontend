@@ -1,14 +1,37 @@
 <script>
 import DatePicker from '../DatePicker.vue'
+import CameraAreaSelect from './CameraAreaSelect.vue'
 
 export default {
   name: 'CameraEventsFilter',
-  components: {DatePicker}
+  components: {CameraAreaSelect, DatePicker},
+  props: {
+    modelValue: {
+      type: Object,
+      required: true
+    },
+    camera: {
+      type: Object,
+      required: true
+    }
+  },
+  data() {
+    return {
+      open: false,
+      filter: {}
+    }
+  },
+  created() {
+    this.filter = this.modelValue
+  }
 }
 </script>
 
 <template>
-  <VBottomSheet>
+  <VBottomSheet
+    v-model="open"
+    max-width="1200"
+  >
     <template #activator="{props}">
       <VBtn
         density="comfortable"
@@ -19,9 +42,18 @@ export default {
     </template>
     <template #default>
       <VCard rounded="t-lg">
-        <VCardTitle>
+        <template #append>
+          <VBtn
+            density="comfortable"
+            variant="plain"
+            color="default"
+            icon="mdi-close"
+            @click="open = !open"
+          />
+        </template>
+        <template #title>
           {{ $t('Events filter') }}
-        </VCardTitle>
+        </template>
         <VCardText>
           <VContainer>
             <VRow>
@@ -29,13 +61,22 @@ export default {
                 cols="12"
                 md="6"
               >
-                <DatePicker/>
+                <DatePicker :label="$t('Start')"/>
               </VCol>
               <VCol
                 cols="12"
                 md="6"
               >
-                <DatePicker/>
+                <DatePicker :label="$t('End')"/>
+              </VCol>
+              <VCol
+                cols="12"
+                md="12"
+              >
+                <CameraAreaSelect
+                  v-model="filter.area"
+                  :camera="camera"
+                />
               </VCol>
             </VRow>
             <VRow>
@@ -47,6 +88,7 @@ export default {
               </VCol>
             </VRow>
           </VContainer>
+          {{ filter }}
         </VCardText>
       </VCard>
     </template>
