@@ -338,7 +338,7 @@ export default {
                       </VSheet>
                       <VSheet class="mt-4">
                         <div class="text-body-small opacity-50">
-                          {{ $t('Min aspect ratio') }}
+                          {{ $t('Max aspect ratio') }}
                         </div>
                         <VSlider
                           v-model="polygons[i].options.max_aspect_ratio"
