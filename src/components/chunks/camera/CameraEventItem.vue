@@ -1,11 +1,16 @@
 <script>
 import secondsToHms from '../../../js/helpers/secondsToHms.js'
 import CameraEventImage from './CameraEventImage.vue'
+import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+import ConfirmationDialog from '../ConfirmationDialog.vue'
 
 export default {
   name: 'CameraEventItem',
-  components: {CameraEventImage},
-  emits: ['on-check'],
+  components: {ConfirmationDialog, CameraEventImage},
+  emits: [
+    'on-check',
+    'on-delete'
+  ],
   props: {
     event: {
       type: Object,
@@ -64,6 +69,23 @@ export default {
       this.$store.dispatch('getCameraEventScreenshot', {id: this.event.id, type: 'resized'}).then(res => {
         this.src = res
       })
+    },
+    async deleteEvent() {
+      const ok = await this.$refs.del.show(
+        {
+          title: this.$t('Delete event'),
+          message: this.$t('Event with files will be deleted'),
+          okText: this.$t('Delete'),
+          okIcon: 'mdi-trash-can'
+        }
+      )
+      if (ok) {
+        const res = await this.$store.dispatch('deleteCameraEvent', this.event.id)
+        if (res) {
+          this.$store.commit('addNotification', createSuccessNotification(this.$t('Success')))
+          this.$emit('on-delete', this.event)
+        }
+      }
     }
   }
 }
@@ -142,9 +164,9 @@ export default {
     </td>
     <td>
       <VSheet
-        class="position-relative mt-2"
-        width="110"
-        height="60"
+        class="position-relative my-2"
+        width="90"
+        height="50"
       >
         <CameraEventImage
           v-if="src"
@@ -154,7 +176,7 @@ export default {
         <VSkeletonLoader
           v-else
           width="90"
-          height="60"
+          height="50"
         />
       </VSheet>
     </td>
@@ -202,9 +224,7 @@ export default {
       />
       {{ $moment(event.start).fromNow() }}
       <span v-if="duration">
-        ({{ duration.h }}:
-        {{ duration.m }}:
-        {{ duration.s }})
+        ({{ duration.h }}:{{ duration.m }}:{{ duration.s }})
       </span>
       <div
         v-if="format"
@@ -219,20 +239,27 @@ export default {
       </div>
     </td>
     <td class="text-center">
-      <VBtn
-        density="compact"
-        variant="text"
-        color="default"
-        :to="{name:'event', params:{id: event.id}}"
-        icon="mdi-chevron-right"
-        class="mr-4"
-      />
-      <VBtn
-        density="compact"
-        variant="text"
-        icon="mdi-trash-can"
-        color="error"
-      />
+      <VSheet
+        color="transparent"
+        class="d-flex"
+      >
+        <VBtn
+          density="compact"
+          variant="text"
+          color="default"
+          :to="{name:'event', params:{id: event.id}}"
+          icon="mdi-chevron-right"
+          class="mr-4"
+        />
+        <VBtn
+          density="compact"
+          variant="text"
+          icon="mdi-trash-can"
+          color="error"
+          @click="deleteEvent"
+        />
+      </VSheet>
+      <ConfirmationDialog ref="del"/>
     </td>
   </tr>
 </template>
