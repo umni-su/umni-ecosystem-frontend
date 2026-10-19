@@ -124,7 +124,7 @@ export default {
       />
 
       <VBtn
-        :icon="!hideDrawings ? 'mdi-image' : 'mdi-image-off'"
+        :icon="!hideDrawings ? 'mdi-texture-box' : 'mdi-texture'"
         :color="!hideDrawings ? 'orange' : 'secondary'"
         variant="tonal"
         density="comfortable"
@@ -156,14 +156,6 @@ export default {
         density="comfortable"
         class="mr-2"
         @click="$router.push({name:'camera-events',params:{id:camera.id}})"
-      />
-      <VBtn
-        readonly
-        icon="mdi-cloud-upload"
-        color="secondary"
-        variant="tonal"
-        density="comfortable"
-        class="mr-2"
       />
       <VBtn
         :icon="open? 'mdi-cog':'mdi-cog-play'"
