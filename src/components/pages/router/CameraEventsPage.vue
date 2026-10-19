@@ -19,8 +19,12 @@ export default {
       selected: [],
       total: 0,
       pages: 0,
+      tableHeight: 0,
       filter: {
         id: null,
+        start: null,
+        end: null,
+        area: null,
         type: null,
         page: 1,
         size: 20
@@ -43,12 +47,30 @@ export default {
   },
   mounted() {
     this.events = []
+    window.addEventListener('resize', () => {
+      this.reCalculateHeight()
+    })
   },
   async created() {
     await this.getCamera()
     await this.getEvents()
+    this.reCalculateHeight()
+
   },
   methods: {
+    reCalculateHeight() {
+      try {
+        const rect = this.$refs.table.$el.getBoundingClientRect()
+        const top = rect.top
+        const h = window.innerHeight
+        this.tableHeight = h - top - 68
+        if (this.tableHeight < 100) {
+          this.tableHeight = 100
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    },
     async getCamera() {
       this.camera = await this.$store.dispatch('getCamera', this.id)
       this.filter.id = this.camera.id
@@ -127,7 +149,10 @@ export default {
           </RouterLink>
         </template>
         <template #append>
-          <CameraEventsFilter/>
+          <CameraEventsFilter
+            v-model="filter"
+            :camera="camera"
+          />
           <VBtnToggle
             v-model="filter.type"
             rounded="pill"
@@ -171,6 +196,9 @@ export default {
         </template>
       </PageActions>
       <VTable
+        ref="table"
+        fixed-header
+        :height="tableHeight"
         hover
         striped="even"
       >
@@ -199,6 +227,7 @@ export default {
             :event="event"
             mode="row"
             @on-check="onEventCheck(event.id,$event)"
+            @on-delete="getEvents"
           >
             <td>
               {{ event.id }}
@@ -206,6 +235,7 @@ export default {
 
           </CameraEventItem>
         </tbody>
+        <tfoot/>
       </VTable>
       <template #empty>
         <VBtn
