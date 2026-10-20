@@ -42,51 +42,51 @@ export default {
   <VLayout
     :theme="theme"
     full-height
-    class="bg-primary"
+    class="bg-primary image-bg"
   >
     <VSheet
       v-if="!start"
+      color="transparent"
       rounded="0"
       class="install fill-height d-flex flex-column align-center justify-center"
       :class="{show:show}"
       width="100%"
     >
       <UmniLogo
-        class="d-block mb-6"
+        class="d-block mb-2"
         fill="#ffffff"
         :width="280"
         :short="false"
       />
-      <div class="text-center mb-6">
-        <div class="text-h5 mb-2">
+      <div class="text-center mb-2">
+        <div class="text-headline-medium mb-2">
           {{ $t('SERVER') }}
         </div>
         <div class="text-subtitle-2 w-75 mx-auto">
           {{
-            $t('The first free open-source ecosystem of control' +
-              ' of automation devices, access control systems and video surveillance')
+            $t('An open‑source software system for smart home devices, video analytics, and access control')
           }}
         </div>
         <VBtn
+          append-icon="mdi-arrow-right"
           class="mt-8"
           size="x-large"
           :text="$t('Install ecosystem')"
-          color="white"
+          color="primary-darken"
           rounded="lg"
-          elevation="1"
-          variant="tonal"
+          variant="elevated"
           @click="startInstall"
         />
       </div>
       <VSheet
+        color="transparent"
         class="mb-4 buttons-bottom"
         variant="tonal"
       >
         <VBtn
-          color="white"
           rounded="lg"
-          elevation="1"
-          variant="tonal"
+          color="default"
+          variant="elevated"
           prepend-icon="mdi-web"
           :text="$t('Site')"
           href="https://umni.su"
@@ -94,10 +94,9 @@ export default {
           class="mr-4"
         />
         <VBtn
-          color="white"
           rounded="lg"
-          elevation="1"
-          variant="tonal"
+          color="default"
+          variant="elevated"
           prepend-icon="mdi-book"
           href="https://docs.umni.su"
           target="_blank"
@@ -105,11 +104,18 @@ export default {
         />
       </VSheet>
     </VSheet>
-    <InstallForm v-else />
+    <InstallForm v-else/>
   </VLayout>
 </template>
 
 <style lang="scss" scoped>
+.image-bg {
+  background-image: url("../../assets/img/eco-bg.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 .install {
   opacity: 0;
 

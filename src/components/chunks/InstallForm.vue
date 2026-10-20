@@ -18,12 +18,6 @@ export default {
         email: null,
         password: null,
         passwordConfirm: null
-      },
-      mqtt: {
-        port: 1883,
-        host: '127.0.0.1',
-        user: null,
-        password: null
       }
     }
   },
@@ -46,10 +40,9 @@ export default {
   methods: {
     async installEcosystem() {
       const data = {
-        account: this.account,
-        mqtt: this.mqtt
+        account: this.account
       }
-      const ok = await this.$store.dispatch('install', data).catch(e => {
+      await this.$store.dispatch('install', data).catch(e => {
         this.$store.commit('addNotification', createManyNotifications('error', e.response.data.errors))
       })
     }
@@ -59,10 +52,11 @@ export default {
 
 <template>
   <VSheet
+    color="transparent"
     class="fill-height w-100 d-flex align-center justify-center"
   >
     <VCard
-      color="primary-darken"
+      color="primary"
       max-width="400"
       width="100%"
       class="ma-auto"
@@ -157,12 +151,7 @@ export default {
         />
       </VCardActions>
     </VCard>
-    <VSheet class="pa-4 bottom-nav">
-      <ThemeSwitcher
-        density="comfortable"
-        class="mx-3"
-      />
-    </VSheet>
+    
   </VSheet>
 </template>
 
