@@ -39,24 +39,13 @@ export default {
     })
     if (res) {
       this.init = res.success
-      await this.$store.dispatch('checkAuth').finally(
-        this.visible = true
-      )
+      await this.$store.dispatch('checkAuth')
     }
-    // Healthcheck авторизации.
-    // Бэкенд перевыпускает токен только когда до его истечения остаётся
-    // <= 1/5 срока (ACCESS_TOKEN_EXPIRE_MINUTES / 5, т.е. последние 6 минут
-    // из 30) и лишь в ответ на запрос. Пока страница простаивает, никто
-    // токен не обновляет, и через 30 минут следующий запрос даёт 401.
-    // Опрос раз в 5 минут гарантированно попадает в это 6-минутное окно,
-    // а присланный X-Refresh-Token axios-интерсептор пишет в state.token,
-    // localStorage и заголовок Authorization.
     this._healthcheck = setInterval(() => {
       if (this.$store.getters['isAuthenticated']) {
         this.$store.dispatch('checkAuth')
       }
     }, 5 * 60 * 1000)
-    this.visible = true
   },
   beforeUnmount() {
     clearInterval(this._healthcheck)
@@ -64,6 +53,8 @@ export default {
   methods: {
     onI18nInitialized(data) {
       console.log('i18n initialized with:', data)
+      console.log('App now is visible')
+      this.visible = true
     }
   }
 }
