@@ -2,7 +2,7 @@
 import ModalDialog from '../ModalDialog.vue'
 import PluginsSelect from '../plugins/PluginsSelect.vue'
 import PluginDeviceSearchItem from '../plugins/PluginDeviceSearchItem.vue'
-import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+import {createErrorNotification, createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
 
 export default {
   name: 'ScanDeviceModal',
@@ -35,11 +35,15 @@ export default {
       const res = await this.$store.dispatch('plugins/addPluginDevice', {
         id: item.plugin_id,
         external_id: item.external_id
+      }).catch(e => {
+        this.$store.commit('addNotification', createErrorNotification(e.response.data.detail))
       }).finally(() => {
         this.loading = false
       })
       if (res) {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Device added successfully')))
+        this.devices = this.devices.filter(d => d.external_id !== item.external_id)
+        await this.$store.dispatch('devices/getDevices')
       }
     }
   },
@@ -81,8 +85,8 @@ export default {
       >
         <template #append>
           <VBtn
-            icon="mdi-plus"
-            color="green"
+            :icon="item?.exists ? 'mdi-check' : 'mdi-plus'"
+            :color="item?.exists ? 'green' : 'primary'"
             density="comfortable"
             variant="tonal"
             class="ml-2"

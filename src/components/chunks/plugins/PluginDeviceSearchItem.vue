@@ -7,6 +7,11 @@ export default {
       required: true
     }
   },
+  computed: {
+    exists() {
+      return this.item?.exists
+    }
+  },
   data() {
     return {
       more: false
@@ -16,7 +21,7 @@ export default {
 </script>
 
 <template>
-  <VCard>
+  <VCard :disabled="exists">
     <template #append>
       <VBtn
         variant="plain"
