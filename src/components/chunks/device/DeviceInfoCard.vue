@@ -103,13 +103,73 @@ export default {
     :disabled="!online"
     width="100%"
   >
-    <template #title>
-      {{ name.toUpperCase() }}
-    </template>
-    <template #subtitle>
+    <VCardSubtitle class="d-flex justify-space-between align-center mt-2">
+      <VChip
+        class="mr-4"
+        color="primary"
+        density="compact"
+        :text="typeStr"
+      />
+      <VSheet>
+        <VBtn
+          density="comfortable"
+          variant="plain"
+          icon="mdi-pencil"
+          color="default"
+          @click="openEditModal"
+        />
+        <VMenu>
+          <template #activator="{props}">
+            <VBtn
+              density="comfortable"
+              variant="plain"
+              v-bind="props"
+              icon="mdi-dots-vertical"
+              color="default"
+            />
+          </template>
+          <input
+            ref="cover"
+            type="file"
+            class="d-none"
+            accept="image/*"
+            @change="setCover"
+          >
+          <VList>
+            <VListItem
+              prepend-icon="mdi-camera"
+              :title="$t('Change cover')"
+              @click="$refs.cover.click()"
+            />
+            <VListItem
+              prepend-icon="mdi-trash-can"
+              color="red"
+              :title="$t('Delete')"
+            />
+          </VList>
+        </VMenu>
+        <ModalDialog
+          v-model="showForm"
+          :title="$t('Device info')"
+        >
+          <VTextField
+            v-model="device.title"
+            :label="$t('Title')"
+          />
+          <template #actions>
+            <VBtn
+              prepend-icon="mdi-content-save"
+              :text="$t('Save')"
+              @click="save"
+            />
+          </template>
+        </ModalDialog>
+      </VSheet>
+    </VCardSubtitle>
+    <VCardSubtitle>
       {{ $t('Last update') }}: {{ lastSyncFromNow }}
-    </template>
-    <template #text>
+    </VCardSubtitle>
+    <VCardText>
       <VSheet
         v-if="device.photo !== null && src !== null"
         class="mb-2"
@@ -135,22 +195,23 @@ export default {
           />
         </template>
       </DeviceCardCharacteristicItem>
-      <!--      <DeviceCardCharacteristicItem-->
-      <!--        icon="mdi-memory"-->
-      <!--        :title="$t('Memory')"-->
-      <!--      >-->
-      <!--        <template #value>-->
-      <!--          <div class="d-flex align-center justify-between">-->
-      <!--            <VProgressLinear-->
-      <!--              :color="memoryColor"-->
-      <!--              :model-value="memoryUsage.toFixed(2)"-->
-      <!--            />-->
-      <!--            <div class="text-subtitle-2 ml-4 font-weight-bold opacity-50">-->
-      <!--              {{ memoryUsage.toFixed(2) }}%-->
-      <!--            </div>-->
-      <!--          </div>-->
-      <!--        </template>-->
-      <!--      </DeviceCardCharacteristicItem>-->
+      <DeviceCardCharacteristicItem
+        v-if="memoryUsage"
+        icon="mdi-memory"
+        :title="$t('Memory')"
+      >
+        <template #value>
+          <div class="d-flex align-center justify-between">
+            <VProgressLinear
+              :color="memoryColor"
+              :model-value="memoryUsage.toFixed(2)"
+            />
+            <div class="text-subtitle-2 ml-4 font-weight-bold opacity-50">
+              {{ memoryUsage.toFixed(2) }}%
+            </div>
+          </div>
+        </template>
+      </DeviceCardCharacteristicItem>
       <VBtn
         class="mt-4"
         density="comfortable"
@@ -177,68 +238,8 @@ export default {
           />
         </template>
       </VEmptyState>
-    </template>
-    <template #append>
-      <VChip
-        class="mr-4"
-        color="primary"
-        density="compact"
-        :text="typeStr"
-      />
-      <VBtn
-        density="comfortable"
-        variant="plain"
-        icon="mdi-pencil"
-        color="default"
-        @click="openEditModal"
-      />
-      <VMenu>
-        <template #activator="{props}">
-          <VBtn
-            density="comfortable"
-            variant="plain"
-            v-bind="props"
-            icon="mdi-dots-vertical"
-            color="default"
-          />
-        </template>
-        <input
-          ref="cover"
-          type="file"
-          class="d-none"
-          accept="image/*"
-          @change="setCover"
-        >
-        <VList>
-          <VListItem
-            prepend-icon="mdi-camera"
-            :title="$t('Change cover')"
-            @click="$refs.cover.click()"
-          />
-          <VListItem
-            prepend-icon="mdi-trash-can"
-            color="red"
-            :title="$t('Delete')"
-          />
-        </VList>
-      </VMenu>
-      <ModalDialog
-        v-model="showForm"
-        :title="$t('Device info')"
-      >
-        <VTextField
-          v-model="device.title"
-          :label="$t('Title')"
-        />
-        <template #actions>
-          <VBtn
-            prepend-icon="mdi-content-save"
-            :text="$t('Save')"
-            @click="save"
-          />
-        </template>
-      </ModalDialog>
-    </template>
+    </VCardText>
+
   </VCard>
 </template>
 

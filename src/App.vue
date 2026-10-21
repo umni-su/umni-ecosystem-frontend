@@ -1,5 +1,5 @@
 <script>
-import { useI18n } from './js/i18n.js'
+import {useI18n} from './js/i18n.js'
 import PageLayout from './components/pages/PageLayout.vue'
 import LoginPage from './components/pages/LoginPage.vue'
 import InstallPage from './components/pages/InstallPage.vue'
@@ -39,7 +39,9 @@ export default {
     })
     if (res) {
       this.init = res.success
-      await this.$store.dispatch('checkAuth')
+      await this.$store.dispatch('checkAuth').finally(
+        this.visible = true
+      )
     }
     // Healthcheck авторизации.
     // Бэкенд перевыпускает токен только когда до его истечения остаётся
@@ -59,8 +61,8 @@ export default {
   beforeUnmount() {
     clearInterval(this._healthcheck)
   },
-  methods:{
-    onI18nInitialized(data){
+  methods: {
+    onI18nInitialized(data) {
       console.log('i18n initialized with:', data)
     }
   }
@@ -69,7 +71,6 @@ export default {
 
 <template>
   <I18nLoader @initialized="onI18nInitialized">
-
     <VLocaleProvider
       :locale="$store.getters['getCurrentLanguage']"
       fallback-locale="en"
@@ -80,13 +81,13 @@ export default {
           :theme="_theme"
           class="fill-height"
         >
-          <InstallPage v-if="!init && !installed" />
-          <PageLayout v-else-if="authenticated" />
-          <LoginPage v-else />
+          <InstallPage v-if="!init && !installed"/>
+          <PageLayout v-else-if="authenticated"/>
+          <LoginPage v-else/>
 
         </VApp>
         <Teleport to="body">
-          <SystemNotifications />
+          <SystemNotifications/>
         </Teleport>
       </VSheet>
     </VLocaleProvider>

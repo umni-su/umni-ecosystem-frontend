@@ -78,6 +78,7 @@ export default {
         commit('setAuthenticated', false)
         commit('setUser', null)
         commit('setToken', null)
+        return Promise.reject(status)
       })
     if (res) {
       if (!res.data?.installed) {
@@ -89,7 +90,6 @@ export default {
         commit('setAuthenticated', res?.data?.authenticated)
         commit('setUser', res?.data?.user)
       }
-
     }
   },
   async logIn({commit}, {username, password}) {

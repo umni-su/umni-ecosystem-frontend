@@ -1,31 +1,26 @@
 <!-- src/components/I18nLoader.vue -->
 <template>
-  <div
-    v-if="loading"
-    class="i18n-loader"
-  >
-    <VProgressCircular
-      size="130"
-      indeterminate
-    />
-  </div>
-
-  <div
-    v-else-if="error"
-    class="i18n-error"
+  <VSheet
+    v-if="error"
+    rounded="0"
+    class="i18n-error with-bg"
   >
     <VBtn
+      :loading="loading"
+      :disabled="loading"
+      variant="elevated"
+      rounded="pill"
       size="x-large"
       icon="mdi-refresh"
       @click="retry"
     />
-  </div>
+  </VSheet>
 
   <slot v-else/>
 </template>
 
 <script>
-import { initI18nFromAPI } from '../../../js/i18n.js'
+import {initI18nFromAPI} from '../../../js/i18n.js'
 
 export default {
   name: 'I18nLoader',
@@ -64,8 +59,22 @@ export default {
       }
     },
 
-    retry() {
-      this.initializeI18n()
+    async retry() {
+      let go = false
+      this.loading = true
+      const res = await this.$store.dispatch('checkAuth')
+        .catch(status => {
+          go = status === 401
+        }).finally(() => this.loading = false)
+      if (res || go) {
+        await Promise.any([
+          this.$store.dispatch('init'),
+          this.initializeI18n()
+        ]).finally(() => {
+          this.loading = false
+        })
+      }
+
     }
   }
 }
@@ -80,18 +89,10 @@ export default {
   height: 100vh;
 }
 
-.loading-spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.with-bg {
+  background-image: url("../../../assets/img/eco-bg.jpg");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 </style>

@@ -4,10 +4,12 @@ import DeviceNetworkInfoCard from '../../chunks/device/DeviceNetworkInfoCard.vue
 import DeviceInfoSensorsCard from '../../chunks/device/DeviceInfoSensorsCard.vue'
 import DeviceActiveSensor from '../../chunks/device/DeviceActiveSensor.vue'
 import DeviceUptimeCard from '../../chunks/device/DeviceUptimeCard.vue'
+import PageActions from '../../chunks/PageActions.vue'
 
 export default {
   name: 'DevicePage',
   components: {
+    PageActions,
     DeviceUptimeCard,
     DeviceActiveSensor,
     DeviceInfoSensorsCard,
@@ -87,6 +89,18 @@ export default {
     class="ma-auto"
     color="transparent"
   >
+    <PageActions>
+      <template #title>
+        {{ name }}
+      </template>
+      <template #append>
+        <VBtn
+          :text="$t('Add widget')"
+          variant="tonal"
+          prepend-icon="mdi-plus"
+        />
+      </template>
+    </PageActions>
     <VContainer fluid>
       <VRow>
         <VCol
