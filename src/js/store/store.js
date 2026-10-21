@@ -9,6 +9,7 @@ import users from './modules/users/index.js'
 import notifications from './modules/notifications/index.js'
 import devices from './modules/devices/index.js'
 import sensors from './modules/sensors/index.js'
+import widgets from './modules/widgets/index.js'
 
 const store = createStore({
   actions,
@@ -21,7 +22,8 @@ const store = createStore({
     users,
     notifications,
     devices,
-    sensors
+    sensors,
+    widgets
   }
 })
 export default store
