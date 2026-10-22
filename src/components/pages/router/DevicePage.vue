@@ -5,10 +5,12 @@ import DeviceInfoSensorsCard from '../../chunks/device/DeviceInfoSensorsCard.vue
 import DeviceActiveSensor from '../../chunks/device/DeviceActiveSensor.vue'
 import DeviceUptimeCard from '../../chunks/device/DeviceUptimeCard.vue'
 import PageActions from '../../chunks/PageActions.vue'
+import WidgetCard from '../../chunks/widgets/WidgetCard.vue'
 
 export default {
   name: 'DevicePage',
   components: {
+    WidgetCard,
     PageActions,
     DeviceUptimeCard,
     DeviceActiveSensor,
@@ -24,6 +26,7 @@ export default {
   },
   data() {
     return {
+      add: false,
       cover: null,
       handler: null,
       deviceModel: undefined,
@@ -78,6 +81,9 @@ export default {
         this.loading = false
       })
       this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
+    },
+    addWidget() {
+      this.add = true
     }
   }
 }
@@ -98,10 +104,17 @@ export default {
           :text="$t('Add widget')"
           variant="tonal"
           prepend-icon="mdi-plus"
+          @click="addWidget"
         />
       </template>
     </PageActions>
     <VContainer fluid>
+      <VRow v-if="add">
+        <WidgetCard
+          type="DEVICE"
+          :entity="device"
+        />
+      </VRow>
       <VRow>
         <VCol
           cols="12"
