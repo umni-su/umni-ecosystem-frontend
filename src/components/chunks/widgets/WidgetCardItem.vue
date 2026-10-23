@@ -77,11 +77,16 @@ export default {
     const rowSpan = computed(() => Math.max(1, Math.ceil(contentHeight.value + MASONRY_GAP)))
     const ready = computed(() => contentHeight.value > 0)
 
-    const itemStyle = computed(() => ({
-      gridColumn: `span ${span.value}`,
-      gridRow: `span ${rowSpan.value}`,
-      opacity: ready.value ? 1 : 0
-    }))
+    const itemStyle = computed(() => {
+      const style = {
+        gridColumn: `span ${span.value}`,
+        gridRow: `span ${rowSpan.value}`
+      }
+      // Прячем только до первого измерения; после этого inline-opacity
+      // не мешает ghost-классу Sortable
+      if (!ready.value) style.opacity = 0
+      return style
+    })
 
     let resizeObserver = null
     onMounted(() => {
@@ -219,6 +224,12 @@ export default {
       class="widget-item overflow-visible d-flex flex-column align-items-center justify-center"
       :style="heightStyle"
     >
+      <div class="widget-item__drag-handle">
+        <VIcon
+          icon="mdi-drag"
+          size="18"
+        />
+      </div>
       <VCardText class="d-flex flex-column justify-center align-center">
         <VIcon
           :size="40"
@@ -308,6 +319,39 @@ export default {
 }
 
 .widget-item {
+  .widget-item__drag-handle {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    color: rgba(var(--v-theme-on-surface), 0.65);
+    background: rgba(var(--v-theme-surface), 0.85);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  &:hover .widget-item__drag-handle {
+    opacity: 1;
+  }
+
+  .widget-item__drag-handle:active {
+    cursor: grabbing;
+  }
+
+  @media (hover: none) {
+    .widget-item__drag-handle {
+      opacity: 0.7;
+    }
+  }
+
   .abs-actions,
   .abs-actions-y {
     opacity: 0;

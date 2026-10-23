@@ -1,5 +1,6 @@
 <script>
 import {reactive} from 'vue'
+import Draggable from 'vuedraggable'
 import ModalDialog from '../ModalDialog.vue'
 import DeviceSensorSelect from '../device/DeviceSensorSelect.vue'
 import WidgetCardItem from './WidgetCardItem.vue'
@@ -11,7 +12,8 @@ export default {
   components: {
     WidgetCardItem,
     DeviceSensorSelect,
-    ModalDialog
+    ModalDialog,
+    Draggable
   },
   props: {
     type: {
@@ -92,16 +94,20 @@ export default {
         </VMenu>
       </VSheet>
 
-      <div
+      <Draggable
+        v-model="widgetData.items"
+        item-key="id"
+        tag="div"
         class="widget-masonry"
         :style="masonryStyle"
+        :animation="150"
+        handle=".widget-item__drag-handle"
+        ghost-class="widget-masonry__ghost"
       >
-        <WidgetCardItem
-          v-for="item in widgetData.items"
-          :key="item.id"
-          :item="item"
-        />
-      </div>
+        <template #item="{element}">
+          <WidgetCardItem :item="element" />
+        </template>
+      </Draggable>
 
 
       <VSheet
@@ -154,6 +160,10 @@ export default {
   grid-auto-flow: row dense;
   align-items: start;
   column-gap: var(--masonry-gap, 16px);
+
+  :deep(.widget-masonry__ghost) {
+    opacity: 0.35;
+  }
 }
 
 .widget-card__size {
