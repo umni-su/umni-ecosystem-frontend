@@ -14,7 +14,7 @@ import {
   parseSensorValues
 } from '../../../js/composables/useSensor.js'
 import {useHorizontalResize, useVerticalResize} from '../../../js/composables/useResize.js'
-import {MASONRY_GAP} from '../../../js/composables/useMasonry.js'
+import {MASONRY_GAP, MASONRY_ROW} from '../../../js/composables/useMasonry.js'
 
 // Типы ui_component, для которых рисуем переключатель
 const TOGGLE_COMPONENTS = ['switch', 'lock', 'boolean']
@@ -73,9 +73,13 @@ export default {
       return Number.isFinite(height) && height > 0 ? height : measuredHeight.value
     })
 
-    // Шаг строки сетки — 1px, поэтому высота айтема + отступ = span
-    const rowSpan = computed(() => Math.max(1, Math.ceil(contentHeight.value + MASONRY_GAP)))
     const ready = computed(() => contentHeight.value > 0)
+    // Строка сетки — 10px. Округляем вверх, чтобы позиции границ были кратны 10px,
+    // а не съезжали из-за добавленного вертикального отступа.
+    const rowSpan = computed(() => {
+      if (!ready.value) return 1
+      return Math.max(1, Math.ceil((contentHeight.value + MASONRY_GAP) / MASONRY_ROW))
+    })
 
     const itemStyle = computed(() => {
       const style = {

@@ -5,7 +5,7 @@ import ModalDialog from '../ModalDialog.vue'
 import DeviceSensorSelect from '../device/DeviceSensorSelect.vue'
 import WidgetCardItem from './WidgetCardItem.vue'
 import {useHorizontalResize} from '../../../js/composables/useResize.js'
-import {MASONRY_GAP} from '../../../js/composables/useMasonry.js'
+import {MASONRY_GAP, MASONRY_ROW} from '../../../js/composables/useMasonry.js'
 
 export default {
   name: 'WidgetCard',
@@ -51,8 +51,11 @@ export default {
       commit: (value) => emit('update:size', value)
     })
 
-    // Отступ сетки задаём из JS, чтобы он совпадал с расчётом высоты айтема
-    const masonryStyle = {'--masonry-gap': `${MASONRY_GAP}px`}
+    // Высота строки и отступ задаются из JS, чтобы совпадать с расчётом span
+    const masonryStyle = {
+      '--masonry-gap': `${MASONRY_GAP}px`,
+      '--masonry-row': `${MASONRY_ROW}px`
+    }
 
     return {widgetData, size, dragging, changeWidth, masonryStyle}
   }
@@ -156,7 +159,7 @@ export default {
 .widget-masonry {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-auto-rows: 1px;
+  grid-auto-rows: var(--masonry-row, 10px);
   grid-auto-flow: row dense;
   align-items: start;
   column-gap: var(--masonry-gap, 16px);
