@@ -3,7 +3,7 @@ import {reactive} from 'vue'
 import ModalDialog from '../ModalDialog.vue'
 import DeviceSensorSelect from '../device/DeviceSensorSelect.vue'
 import WidgetCardItem from './WidgetCardItem.vue'
-import {useHorizontalResize} from '../../../js/composables/useHorizontalResize.js'
+import {useHorizontalResize} from '../../../js/composables/useResize.js'
 
 export default {
   name: 'WidgetCard',

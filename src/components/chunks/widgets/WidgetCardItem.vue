@@ -6,7 +6,7 @@ import {
   getSensorUiComponent,
   parseSensorValues
 } from '../../../js/composables/useSensor.js'
-import {useHorizontalResize} from '../../../js/composables/useHorizontalResize.js'
+import {useHorizontalResize, useVerticalResize} from '../../../js/composables/useResize.js'
 
 // Типы ui_component, для которых рисуем переключатель
 const TOGGLE_COMPONENTS = ['switch', 'lock', 'boolean']
@@ -26,7 +26,7 @@ export default {
       required: true
     }
   },
-  emits: ['update:size'],
+  emits: ['update:size', 'update:height'],
   setup(props, {emit}) {
     const {size, dragging, changeWidth} = useHorizontalResize({
       getSize: () => props.item?.size,
@@ -36,7 +36,17 @@ export default {
       commit: (value) => emit('update:size', {id: props.item.id, size: value})
     })
 
-    return {size, dragging, changeWidth}
+    const {changeHeight} = useVerticalResize({
+      getSize: () => props.item?.height,
+      setSize: (value) => {
+        props.item.height = value
+      },
+      commit: (value) => emit('update:height', {id: props.item.id, height: value}),
+      measure: (event) =>
+        event?.currentTarget?.closest?.('.widget-item')?.getBoundingClientRect().height
+    })
+
+    return {size, dragging, changeWidth, changeHeight}
   },
   computed: {
     name() {
@@ -84,6 +94,11 @@ export default {
     },
     showEnum() {
       return this.writable && this.enumValues.length > 0
+    },
+    // Если высота не задана — карточка растягивается на ячейку (h-100)
+    heightStyle() {
+      const height = Number(this.item.height)
+      return Number.isFinite(height) && height > 0 ? {height: `${height}px`} : null
     },
     sliderValue: {
       get() {
@@ -144,7 +159,9 @@ export default {
     cols="12"
   >
     <VCard
-      class="widget-item overflow-visible fill-height d-flex flex-column align-items-center justify-center"
+      class="widget-item overflow-visible d-flex flex-column align-items-center justify-center"
+      :class="{'h-100': !heightStyle}"
+      :style="heightStyle"
     >
       <VCardText class="d-flex flex-column justify-center align-center">
         <VIcon
@@ -208,29 +225,67 @@ export default {
           @pointerdown="changeWidth"
         />
       </VSheet>
+      <VSheet
+        color="transparent"
+        class="abs-actions-y pa-1"
+      >
+        <VBtn
+          class="trigger"
+          color="grey"
+          variant="tonal"
+          icon="mdi-arrow-split-horizontal"
+          size="x-small"
+          density="comfortable"
+          @pointerdown="changeHeight"
+        />
+      </VSheet>
     </VCard>
   </VCol>
 </template>
 
 <style scoped lang="scss">
 .widget-item {
-  .abs-actions {
+  .abs-actions,
+  .abs-actions-y {
     opacity: 0;
     transition: opacity 0.2s ease;
     position: absolute;
-    right: -14px;
-    top: 50%;
-    margin-top: -20px;
     z-index: 2;
   }
 
-  &:hover .abs-actions {
+  .abs-actions {
+    right: -14px;
+    top: 50%;
+    margin-top: -20px;
+  }
+
+  .abs-actions-y {
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &:hover .abs-actions,
+  &:hover .abs-actions-y {
     opacity: 1;
   }
 
   :deep(.abs-actions .v-btn) {
     cursor: ew-resize;
     touch-action: none;
+  }
+
+  :deep(.abs-actions-y .v-btn) {
+    cursor: ns-resize;
+    touch-action: none;
+  }
+
+  // Фиксированная высота не должна давать контенту вылезать за карточку
+  :deep(.v-card-text) {
+    width: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
   }
 }
 
