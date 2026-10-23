@@ -1,4 +1,11 @@
 <script>
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  ref
+} from 'vue'
+import {useDisplay} from 'vuetify'
 import ColorPicker from '../ColorPicker.vue'
 import {
   getSensorIcon,
@@ -7,6 +14,7 @@ import {
   parseSensorValues
 } from '../../../js/composables/useSensor.js'
 import {useHorizontalResize, useVerticalResize} from '../../../js/composables/useResize.js'
+import {MASONRY_GAP} from '../../../js/composables/useMasonry.js'
 
 // Типы ui_component, для которых рисуем переключатель
 const TOGGLE_COMPONENTS = ['switch', 'lock', 'boolean']
@@ -28,12 +36,18 @@ export default {
   },
   emits: ['update:size', 'update:height'],
   setup(props, {emit}) {
+    const {smAndUp, mdAndUp} = useDisplay()
+    const itemEl = ref(null)
+    const measuredHeight = ref(0)
+
     const {size, dragging, changeWidth} = useHorizontalResize({
       getSize: () => props.item?.size,
       setSize: (value) => {
         props.item.size = value
       },
-      commit: (value) => emit('update:size', {id: props.item.id, size: value})
+      commit: (value) => emit('update:size', {id: props.item.id, size: value}),
+      // Шаг ширины считаем по ширине masonry-сетки, а не страницы
+      stepSelector: '.widget-masonry'
     })
 
     const {changeHeight} = useVerticalResize({
@@ -46,7 +60,50 @@ export default {
         event?.currentTarget?.closest?.('.widget-item')?.getBoundingClientRect().height
     })
 
-    return {size, dragging, changeWidth, changeHeight}
+    // На узких экранах повторяем прежнее поведение VCol: 12 / 6 / size
+    const span = computed(() => {
+      if (!smAndUp.value) return 12
+      if (!mdAndUp.value) return 6
+      return size.value
+    })
+
+    // Явно заданная высота важнее измеренной по контенту
+    const contentHeight = computed(() => {
+      const height = Number(props.item?.height)
+      return Number.isFinite(height) && height > 0 ? height : measuredHeight.value
+    })
+
+    // Шаг строки сетки — 1px, поэтому высота айтема + отступ = span
+    const rowSpan = computed(() => Math.max(1, Math.ceil(contentHeight.value + MASONRY_GAP)))
+    const ready = computed(() => contentHeight.value > 0)
+
+    const itemStyle = computed(() => ({
+      gridColumn: `span ${span.value}`,
+      gridRow: `span ${rowSpan.value}`,
+      opacity: ready.value ? 1 : 0
+    }))
+
+    let resizeObserver = null
+    onMounted(() => {
+      if (!itemEl.value) return
+      // Без ResizeObserver хотя бы показываем контент с текущей высотой
+      if (typeof ResizeObserver === 'undefined') {
+        measuredHeight.value = Math.round(itemEl.value.getBoundingClientRect().height)
+        return
+      }
+      resizeObserver = new ResizeObserver((entries) => {
+        const entry = entries[0]
+        // borderBoxSize есть не во всех браузерах, contentRect — надёжный fallback
+        const height = entry?.borderBoxSize?.[0]?.blockSize ?? entry?.contentRect?.height ?? 0
+        measuredHeight.value = Math.round(height)
+      })
+      resizeObserver.observe(itemEl.value)
+    })
+    onBeforeUnmount(() => {
+      resizeObserver?.disconnect()
+    })
+
+    return {size, dragging, changeWidth, changeHeight, itemEl, itemStyle}
   },
   computed: {
     name() {
@@ -95,7 +152,7 @@ export default {
     showEnum() {
       return this.writable && this.enumValues.length > 0
     },
-    // Если высота не задана — карточка растягивается на ячейку (h-100)
+    // Если высота не задана — карточка занимает высоту по контенту
     heightStyle() {
       const height = Number(this.item.height)
       return Number.isFinite(height) && height > 0 ? {height: `${height}px`} : null
@@ -153,14 +210,13 @@ export default {
 </script>
 
 <template>
-  <VCol
-    sm="6"
-    :md="size"
-    cols="12"
+  <div
+    ref="itemEl"
+    class="widget-masonry__item"
+    :style="itemStyle"
   >
     <VCard
       class="widget-item overflow-visible d-flex flex-column align-items-center justify-center"
-      :class="{'h-100': !heightStyle}"
       :style="heightStyle"
     >
       <VCardText class="d-flex flex-column justify-center align-center">
@@ -240,10 +296,17 @@ export default {
         />
       </VSheet>
     </VCard>
-  </VCol>
+  </div>
 </template>
 
 <style scoped lang="scss">
+.widget-masonry__item {
+  min-width: 0;
+  // Обязательно: иначе grid растянет айтем до высоты row span и ResizeObserver зациклится
+  align-self: start;
+  transition: opacity 0.15s ease;
+}
+
 .widget-item {
   .abs-actions,
   .abs-actions-y {

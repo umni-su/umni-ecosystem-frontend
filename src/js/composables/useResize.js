@@ -29,7 +29,7 @@ function normalize(value, min, max, step, fallback) {
 
 /**
  * Общее изменение размера перетаскиванием за ручку.
- * Для оси X шаг считается по ширине ближайшего .v-row (1/12),
+ * Для оси X шаг считается по ширине ближайшего stepSelector (1/12),
  * для оси Y — фиксированный шаг в пикселях.
  */
 function useDragResize({
@@ -41,7 +41,8 @@ function useDragResize({
   min = MIN_SIZE,
   max = MAX_SIZE,
   step = 1,
-  measure
+  measure,
+  stepSelector = '.v-row'
 } = {}) {
   const dragging = ref(false)
   let startPointer = 0
@@ -89,7 +90,7 @@ function useDragResize({
 
   function calcPixelStep(event) {
     if (axis === 'y') return step
-    const row = event?.currentTarget?.closest?.('.v-row')
+    const row = event?.currentTarget?.closest?.(stepSelector)
     const width = row?.getBoundingClientRect().width ?? 0
     return Math.max(10, (width || 1200) / MAX_SIZE)
   }
@@ -125,14 +126,15 @@ function useDragResize({
 
 /**
  * Изменение ширины блока перетаскиванием за ручку (влево — меньше, вправо — больше).
- * Шаг считается по ширине ближайшего .v-row, поэтому подходит
- * и для карточки (ряд страницы), и для айтема (ряд внутри карточки).
+ * Шаг считается по ширине контейнера, найденного через stepSelector,
+ * поэтому подходит и для карточки (ряд страницы), и для айтема (masonry-сетка).
  *
  * @param {Object} options
  * @param {Function} options.getSize — текущая ширина (1..12)
  * @param {Function} options.setSize — запись ширины (живое изменение)
  * @param {Function} [options.commit] — фиксация после перетаскивания (с дебаунсом)
  * @param {Number} [options.defaultSize=MAX_SIZE] — ширина, если getSize() не число
+ * @param {String} [options.stepSelector='.v-row'] — контейнер, от ширины которого считается шаг колонки
  * @returns {{size: import('vue').ComputedRef<number>, dragging: import('vue').Ref<boolean>, changeWidth: Function}}
  */
 export function useHorizontalResize({defaultSize = MAX_SIZE, ...options} = {}) {

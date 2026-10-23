@@ -4,6 +4,7 @@ import ModalDialog from '../ModalDialog.vue'
 import DeviceSensorSelect from '../device/DeviceSensorSelect.vue'
 import WidgetCardItem from './WidgetCardItem.vue'
 import {useHorizontalResize} from '../../../js/composables/useResize.js'
+import {MASONRY_GAP} from '../../../js/composables/useMasonry.js'
 
 export default {
   name: 'WidgetCard',
@@ -48,7 +49,10 @@ export default {
       commit: (value) => emit('update:size', value)
     })
 
-    return {widgetData, size, dragging, changeWidth}
+    // Отступ сетки задаём из JS, чтобы он совпадал с расчётом высоты айтема
+    const masonryStyle = {'--masonry-gap': `${MASONRY_GAP}px`}
+
+    return {widgetData, size, dragging, changeWidth, masonryStyle}
   }
 }
 </script>
@@ -65,7 +69,7 @@ export default {
 
       <VSheet
         color="transparent"
-        class="text-center"
+        class="text-center mb-4"
       >
         <VMenu :close-on-content-click="false">
           <template #activator="{props}">
@@ -88,20 +92,16 @@ export default {
         </VMenu>
       </VSheet>
 
-      <VSheet
-        color="transparent"
-        class="ma-n2"
+      <div
+        class="widget-masonry"
+        :style="masonryStyle"
       >
-        <VContainer fluid>
-          <VRow>
-            <WidgetCardItem
-              v-for="item in widgetData.items"
-              :key="item.id"
-              :item="item"
-            />
-          </VRow>
-        </VContainer>
-      </VSheet>
+        <WidgetCardItem
+          v-for="item in widgetData.items"
+          :key="item.id"
+          :item="item"
+        />
+      </div>
 
 
       <VSheet
@@ -145,6 +145,15 @@ export default {
     cursor: ew-resize;
     touch-action: none;
   }
+}
+
+.widget-masonry {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: 1px;
+  grid-auto-flow: row dense;
+  align-items: start;
+  column-gap: var(--masonry-gap, 16px);
 }
 
 .widget-card__size {
