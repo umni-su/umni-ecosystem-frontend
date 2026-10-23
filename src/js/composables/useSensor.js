@@ -39,6 +39,69 @@ export function getSensorIcon(type) {
   return 'mdi-help-circle'
 }
 
+/**
+ * Значение options.values у сенсора.
+ *
+ * Бэкенд (Tuya) может отдавать values JSON-строкой, например
+ * '{"min":10,"max":1000,"scale":0,"step":1}' или '["auto","manual"]',
+ * поэтому строку нужно разобрать. Если разобрать не удалось — null.
+ */
+export function parseSensorValues(options) {
+  const raw = options?.values
+  if (raw === null || raw === undefined) return null
+  if (typeof raw !== 'string') return raw
+
+  const text = raw.trim()
+  if (!text) return null
+  try {
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Числовой диапазон для слайдера из options.values.
+ *
+ * scale уже учтён: бэкенд хранит значение, разделённое на 10**scale.
+ * Для яркости (brightness/light) бэкенд хранит проценты 0..100.
+ * Если диапазона нет — null.
+ */
+export function getSensorRange(sensor) {
+  const options = sensor?.options ?? {}
+  const values = parseSensorValues(options)
+  const component = sensor?.ui_component ?? uiComponentOf(sensor?.type)
+
+  if (!values || typeof values !== 'object' || Array.isArray(values)) {
+    return null
+  }
+
+  if (component === 'brightness' || component === 'light') {
+    const rawMax = Number(values.max)
+    if (!Number.isFinite(rawMax) || rawMax <= 0) return null
+    const rawMin = Number(values.min)
+    return {
+      min: Number.isFinite(rawMin) ? Math.round(rawMin / rawMax * 100) : 0,
+      max: 100,
+      step: 1
+    }
+  }
+
+  const min = Number(values.min)
+  const max = Number(values.max)
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min >= max) return null
+
+  const scale = Number(values.scale) || 0
+  const factor = Math.pow(10, scale)
+  const step = Number(values.step) > 0 ? Number(values.step) : 1
+
+  return {
+    min: min / factor,
+    max: max / factor,
+    step: step / factor
+  }
+}
+
 export function useSensor(sensor, value) {
   const valueByType = computed(() => {
     const rawValue = value?.value !== undefined ? value.value : value
