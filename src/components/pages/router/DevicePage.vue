@@ -51,6 +51,9 @@ export default {
     },
     interval() {
       return this.$store.getters['getInterval']
+    },
+    widgets() {
+      return this.$store.getters['widgets/getWidgets']
     }
   },
   watch: {
@@ -77,13 +80,28 @@ export default {
   methods: {
     async getDevice() {
       this.loading = true
-      await this.$store.dispatch('devices/getDevice', this.id).finally(() => {
-        this.loading = false
-      })
+      await Promise.all([
+        await this.$store.dispatch('devices/getDevice', this.id).finally(() => {
+          this.loading = false
+        }),
+        setTimeout(async () => {
+          await this.getWidgets()
+        }, 500)
+      ])
       this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
+    },
+    async getWidgets() {
+      if (this.device === null || this.device?.id === null) return false
+      await this.$store.dispatch('widgets/getWidgets', {
+        entity_id: this.device.id,
+        type: 'DEVICE'
+      })
     },
     addWidget() {
       this.add = true
+    },
+    onDeleteWidget() {
+      this.add = false
     }
   }
 }
@@ -113,6 +131,17 @@ export default {
         <WidgetCard
           type="DEVICE"
           :entity="device"
+          @on-delete="onDeleteWidget"
+        />
+      </VRow>
+      <VRow v-if="widgets">
+        <WidgetCard
+          v-for="widget in widgets"
+          :key="widget.id"
+          type="DEVICE"
+          :widget="widget"
+          :entity="device"
+          @on-delete="onDeleteWidget"
         />
       </VRow>
       <VRow>

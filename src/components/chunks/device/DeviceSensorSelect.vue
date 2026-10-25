@@ -23,48 +23,40 @@ export default {
       sensorsPaginated: []
     }
   },
-  watch: {},
   mounted() {
-    if (this.modelValue?.length > 0) {
-      this.selected = this.modelValue
-    }
+    this.selected = this.modelValue
   },
-  methods: {
-    chooseSensor() {
-      this.$emit('update:model-value', this.selected)
+  watch: {
+    modelValue: {
+      deep: true,
+      handler(v) {
+        this.selected = v
+      }
+    },
+    selected: {
+      deep: true,
+      handler(v) {
+        this.$emit('update:model-value', v)
+      }
     }
   }
 }
 </script>
 
 <template>
-  <VList
+  <VAutocomplete
     v-if="activeDevice.sensors.length > 0"
-    v-model:selected="selected"
+    v-model="selected"
+    :items="activeDevice.sensors"
     return-object
-    selectable
-    select-strategy="leaf"
-    min-width="370"
-    max-height="300"
+    multiple
+    chips
+    closable-chips
+    item-title="visible_name"
     item-value="id"
     clearable
-    @update:selected="chooseSensor"
-  >
-    <VListItem
-      v-for="sensor in activeDevice.sensors"
-      :key="sensor.id"
-      :value="sensor"
-    >
-      <template #title>{{ sensor.name }}</template>
-      <template #append>
-        <VChip
-          :text="sensor.capability"
-          color="primary"
-          density="comfortable"
-        />
-      </template>
-    </VListItem>
-  </VList>
+  />
+
 </template>
 
 <style scoped>
