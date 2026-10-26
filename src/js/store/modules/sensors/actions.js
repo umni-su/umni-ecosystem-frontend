@@ -43,9 +43,9 @@ export default {
   },
 
   async setSensorState({commit}, data) {
-    commit('setLoading', true)
+    commit('setLoading', false, {root: true})
     const res = await axios.post(`/api/sensors/${data.id}/set`, data).finally(() => {
-      commit('setLoading', false)
+      commit('setLoading', false, {root: true})
     })
     return res.data
   },

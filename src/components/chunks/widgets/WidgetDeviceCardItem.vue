@@ -155,9 +155,11 @@ export default {
         return this.range?.min ?? 0
       },
       set(value) {
-        // Пока меняем значение только локально, без запроса к API.
         this.entity.value = value
-        console.log(`Value of ${this.entity.name}: ${value}`)
+        this.$store.dispatch('sensors/setSensorState', {
+          id: this.entity.id,
+          value: value
+        })
       }
     },
     enumValue: {
@@ -165,9 +167,11 @@ export default {
         return this.entity.value
       },
       set(value) {
-        // Пока меняем значение только локально, без запроса к API.
         this.entity.value = value
-        console.log(`Value of ${this.entity.name}: ${value}`)
+        this.$store.dispatch('sensors/setSensorState', {
+          id: this.entity.id,
+          value: value
+        })
       }
     },
     displayValue() {
@@ -181,9 +185,11 @@ export default {
         return isTruthy(this.entity.value)
       },
       set(value) {
-        // Пока меняем значение только локально, без запроса к API.
         this.entity.value = value
-        console.log(`Value of ${this.entity.name}: ${value}`)
+        this.$store.dispatch('sensors/setSensorState', {
+          id: this.entity.id,
+          value: value
+        })
       }
     },
     color: {
@@ -195,9 +201,11 @@ export default {
         return '#ffffff'
       },
       set(value) {
-        // Пока меняем значение только локально, без запроса к API.
         this.entity.value = value
-        console.log(`Value of ${this.entity.name}: ${value}`)
+        this.$store.dispatch('sensors/setSensorState', {
+          id: this.entity.id,
+          value: value
+        })
       }
     }
   },
