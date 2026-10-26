@@ -1,10 +1,4 @@
 <script>
-import {
-  computed,
-  onBeforeUnmount,
-  onMounted,
-  ref
-} from 'vue'
 import {useDisplay} from 'vuetify'
 import ColorPicker from '../ColorPicker.vue'
 import {
@@ -26,7 +20,7 @@ function isTruthy(value) {
 }
 
 export default {
-  name: 'WidgetCardItem',
+  name: 'WidgetDeviceCardItem',
   components: {ColorPicker},
   props: {
     item: {
@@ -34,98 +28,86 @@ export default {
       required: true
     }
   },
-  emits: ['update:size', 'update:height'],
-  setup(props, {emit}) {
+  emits: ['update:size', 'update:height', 'delete-item'],
+  data() {
     const {smAndUp, mdAndUp} = useDisplay()
-    const itemEl = ref(null)
-    const measuredHeight = ref(0)
 
     const {size, dragging, changeWidth} = useHorizontalResize({
-      getSize: () => props.item?.size,
+      getSize: () => this.item?.options?.size,
       setSize: (value) => {
-        props.item.size = value
+        this.item.options.size = value
       },
-      commit: (value) => emit('update:size', {id: props.item.id, size: value}),
+      commit: (value) => this.$emit('update:size', {id: this.item.id, size: value}),
       // Шаг ширины считаем по ширине masonry-сетки, а не страницы
       stepSelector: '.widget-masonry'
     })
 
     const {changeHeight} = useVerticalResize({
-      getSize: () => props.item?.height,
+      getSize: () => this.item?.options?.height,
       setSize: (value) => {
-        props.item.height = value
+        this.item.options.height = value
       },
-      commit: (value) => emit('update:height', {id: props.item.id, height: value}),
+      commit: (value) => this.$emit('update:height', {id: this.item.id, height: value}),
       measure: (event) =>
         event?.currentTarget?.closest?.('.widget-item')?.getBoundingClientRect().height
     })
 
+    return {
+      smAndUp,
+      mdAndUp,
+      size,
+      dragging,
+      changeWidth,
+      changeHeight,
+      measuredHeight: 0,
+      resizeObserver: null
+    }
+  },
+  computed: {
+    entity() {
+      return this.item?.entity
+    },
     // На узких экранах повторяем прежнее поведение VCol: 12 / 6 / size
-    const span = computed(() => {
-      if (!smAndUp.value) return 12
-      if (!mdAndUp.value) return 6
-      return size.value
-    })
-
+    span() {
+      if (!this.smAndUp) return 12
+      if (!this.mdAndUp) return 6
+      return this.size
+    },
     // Явно заданная высота важнее измеренной по контенту
-    const contentHeight = computed(() => {
-      const height = Number(props.item?.height)
-      return Number.isFinite(height) && height > 0 ? height : measuredHeight.value
-    })
-
-    const ready = computed(() => contentHeight.value > 0)
+    contentHeight() {
+      const height = Number(this.item?.options?.height)
+      return Number.isFinite(height) && height > 0 ? height : this.measuredHeight
+    },
+    ready() {
+      return this.contentHeight > 0
+    },
     // Строка сетки — 10px. Округляем вверх, чтобы позиции границ были кратны 10px,
     // а не съезжали из-за добавленного вертикального отступа.
-    const rowSpan = computed(() => {
-      if (!ready.value) return 1
-      return Math.max(1, Math.ceil((contentHeight.value + MASONRY_GAP) / MASONRY_ROW))
-    })
-
-    const itemStyle = computed(() => {
+    rowSpan() {
+      if (!this.ready) return 1
+      return Math.max(1, Math.ceil((this.contentHeight + MASONRY_GAP) / MASONRY_ROW))
+    },
+    itemStyle() {
       const style = {
-        gridColumn: `span ${span.value}`,
-        gridRow: `span ${rowSpan.value}`
+        gridColumn: `span ${this.span}`,
+        gridRow: `span ${this.rowSpan}`
       }
       // Прячем только до первого измерения; после этого inline-opacity
       // не мешает ghost-классу Sortable
-      if (!ready.value) style.opacity = 0
+      if (!this.ready) style.opacity = 0
       return style
-    })
-
-    let resizeObserver = null
-    onMounted(() => {
-      if (!itemEl.value) return
-      // Без ResizeObserver хотя бы показываем контент с текущей высотой
-      if (typeof ResizeObserver === 'undefined') {
-        measuredHeight.value = Math.round(itemEl.value.getBoundingClientRect().height)
-        return
-      }
-      resizeObserver = new ResizeObserver((entries) => {
-        const entry = entries[0]
-        // borderBoxSize есть не во всех браузерах, contentRect — надёжный fallback
-        const height = entry?.borderBoxSize?.[0]?.blockSize ?? entry?.contentRect?.height ?? 0
-        measuredHeight.value = Math.round(height)
-      })
-      resizeObserver.observe(itemEl.value)
-    })
-    onBeforeUnmount(() => {
-      resizeObserver?.disconnect()
-    })
-
-    return {size, dragging, changeWidth, changeHeight, itemEl, itemStyle}
-  },
-  computed: {
+    },
     name() {
-      return this.item.visible_name ?? this.item.name ?? this.item.title ?? this.$t('No name')
+      return this.entity.visible_name ?? this.entity.name ?? this.item.title ?? this.$t('No name')
     },
     icon() {
-      return this.item.type_icon ?? this.item.icon ?? getSensorIcon(this.item.type)
+      return this.entity.type_icon ?? this.entity.type_icon ?? getSensorIcon(this.entity.type)
     },
     componentType() {
-      return this.item.ui_component ?? getSensorUiComponent(this.item.type)
+      return this.entity.ui_component ?? getSensorUiComponent(this.entity.type)
     },
     writable() {
-      return Boolean(this.item.writable)
+      return Boolean(this.entity.writable)
     },
     isToggle() {
       return TOGGLE_COMPONENTS.includes(this.componentType)
@@ -141,7 +123,7 @@ export default {
     },
     // options сенсора: у Tuya это спецификация DP (code, dp_type, values, ...)
     spec() {
-      return this.item.options ?? {}
+      return this.entity.options ?? {}
     },
     // values приходит JSON-строкой — разбираем её один раз
     specValues() {
@@ -149,7 +131,7 @@ export default {
     },
     // Числовой диапазон (min/max/step) для слайдера
     range() {
-      return getSensorRange(this.item)
+      return getSensorRange(this.entity)
     },
     // Список значений для Enum-сенсоров (режимы и т.п.)
     enumValues() {
@@ -163,47 +145,50 @@ export default {
     },
     // Если высота не задана — карточка занимает высоту по контенту
     heightStyle() {
-      const height = Number(this.item.height)
+      const height = Number(this.item.options.height)
       return Number.isFinite(height) && height > 0 ? {height: `${height}px`} : null
     },
     sliderValue: {
       get() {
-        const value = Number(this.item.value)
+        const value = Number(this.entity.value)
         if (Number.isFinite(value)) return value
         return this.range?.min ?? 0
       },
       set(value) {
         // Пока меняем значение только локально, без запроса к API.
-        this.item.value = value
+        this.entity.value = value
+        console.log(`Value of ${this.entity.name}: ${value}`)
       }
     },
     enumValue: {
       get() {
-        return this.item.value
+        return this.entity.value
       },
       set(value) {
         // Пока меняем значение только локально, без запроса к API.
-        this.item.value = value
+        this.entity.value = value
+        console.log(`Value of ${this.entity.name}: ${value}`)
       }
     },
     displayValue() {
-      const value = this.item.value
+      const value = this.entity.value
       if (value === null || value === undefined || value === '') return ''
-      const unit = this.item.unit ?? this.spec.unit ?? ''
+      const unit = this.entity.unit ?? this.spec.unit ?? ''
       return unit ? `${value} ${unit}` : String(value)
     },
     checked: {
       get() {
-        return isTruthy(this.item.value)
+        return isTruthy(this.entity.value)
       },
       set(value) {
         // Пока меняем значение только локально, без запроса к API.
-        this.item.value = value
+        this.entity.value = value
+        console.log(`Value of ${this.entity.name}: ${value}`)
       }
     },
     color: {
       get() {
-        const value = this.item.value
+        const value = this.entity.value
         if (typeof value === 'string' && /^#?[0-9a-f]{6}/i.test(value.trim())) {
           return value.startsWith('#') ? value : `#${value}`
         }
@@ -211,8 +196,33 @@ export default {
       },
       set(value) {
         // Пока меняем значение только локально, без запроса к API.
-        this.item.value = value
+        this.entity.value = value
+        console.log(`Value of ${this.entity.name}: ${value}`)
       }
+    }
+  },
+  mounted() {
+    if (!this.$refs.itemEl) return
+    const el = this.$refs.itemEl
+    // Без ResizeObserver хотя бы показываем контент с текущей высотой
+    if (typeof ResizeObserver === 'undefined') {
+      this.measuredHeight = Math.round(el.getBoundingClientRect().height)
+      return
+    }
+    this.resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      // borderBoxSize есть не во всех браузерах, contentRect — надёжный fallback
+      const height = entry?.borderBoxSize?.[0]?.blockSize ?? entry?.contentRect?.height ?? 0
+      this.measuredHeight = Math.round(height)
+    })
+    this.resizeObserver.observe(el)
+  },
+  beforeUnmount() {
+    this.resizeObserver?.disconnect()
+  },
+  methods: {
+    deleteSelected(id, entity_id) {
+      this.$emit('delete-item', {id, entity_id})
     }
   }
 }
@@ -225,7 +235,8 @@ export default {
     :style="itemStyle"
   >
     <VCard
-      class="widget-item overflow-visible d-flex flex-column align-items-center justify-center"
+      class="widget-item  d-flex flex-column align-items-center justify-center"
+      variant="tonal"
       :style="heightStyle"
     >
       <div class="widget-item__drag-handle">
@@ -237,7 +248,7 @@ export default {
       <VCardText class="d-flex flex-column justify-center align-center">
         <VIcon
           :size="40"
-          :icon="item.type_icon"
+          :icon="entity.type_icon"
           class="mb-4"
         />
         <VSwitch
@@ -281,12 +292,23 @@ export default {
         <span>
           {{ name }}
         </span>
+        <div class="position-absolute top-0 right-0">
+          <VBtn
+            color="default"
+            variant="plain"
+            density="comfortable"
+            icon="mdi-close"
+            size="small"
+            @click="deleteSelected(item.id,item.entity_id)"
+          />
+        </div>
       </VCardText>
       <VSheet
         color="transparent"
         class="abs-actions pa-1"
       >
         <VBtn
+          rounded="e-0"
           class="trigger"
           color="grey"
           variant="tonal"
@@ -301,6 +323,7 @@ export default {
         class="abs-actions-y pa-1"
       >
         <VBtn
+          rounded="b-0"
           class="trigger"
           color="grey"
           variant="tonal"
@@ -365,13 +388,13 @@ export default {
   }
 
   .abs-actions {
-    right: -14px;
+    right: -6px;
     top: 50%;
     margin-top: -20px;
   }
 
   .abs-actions-y {
-    bottom: -14px;
+    bottom: -6px;
     left: 50%;
     transform: translateX(-50%);
   }
@@ -404,5 +427,4 @@ export default {
 .widget-item__select {
   width: 100%;
 }
-
 </style>

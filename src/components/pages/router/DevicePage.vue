@@ -54,6 +54,23 @@ export default {
     },
     widgets() {
       return this.$store.getters['widgets/getWidgets']
+    },
+    widgetsWithSensors() {
+      return this.widgets.map(widget => {
+        return {
+          ...widget,
+          items: widget.items.map(item => {
+            return {
+              ...item,
+              ...{
+                entity: this.device.sensors.find(sensor => {
+                  return sensor.id === item.entity_id
+                })
+              }
+            }
+          })
+        }
+      })
     }
   },
   watch: {
@@ -100,7 +117,13 @@ export default {
     addWidget() {
       this.add = true
     },
-    onDeleteWidget() {
+    onDeleteWidget(widget) {
+      if (widget?.id > 0) {
+        console.log('Delete in db')
+      }
+      this.add = false
+    },
+    onCreateWidget(widget) {
       this.add = false
     }
   }
@@ -132,11 +155,12 @@ export default {
           type="DEVICE"
           :entity="device"
           @on-delete="onDeleteWidget"
+          @on-create="onCreateWidget"
         />
       </VRow>
-      <VRow v-if="widgets">
+      <VRow v-if="widgetsWithSensors">
         <WidgetCard
-          v-for="widget in widgets"
+          v-for="widget in widgetsWithSensors"
           :key="widget.id"
           type="DEVICE"
           :widget="widget"
