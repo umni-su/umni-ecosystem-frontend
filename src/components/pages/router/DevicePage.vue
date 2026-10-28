@@ -6,6 +6,8 @@ import DeviceActiveSensor from '../../chunks/device/DeviceActiveSensor.vue'
 import DeviceUptimeCard from '../../chunks/device/DeviceUptimeCard.vue'
 import PageActions from '../../chunks/PageActions.vue'
 import WidgetCard from '../../chunks/widgets/WidgetCard.vue'
+import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+import Draggable from 'vuedraggable'
 
 export default {
   name: 'DevicePage',
@@ -16,7 +18,8 @@ export default {
     DeviceActiveSensor,
     DeviceInfoSensorsCard,
     DeviceNetworkInfoCard,
-    DeviceInfoCard
+    DeviceInfoCard,
+    Draggable
   },
   props: {
     id: {
@@ -30,7 +33,8 @@ export default {
       cover: null,
       handler: null,
       deviceModel: undefined,
-      loading: false
+      loading: false,
+      widgetsOrder: []
     }
   },
   computed: {
@@ -56,21 +60,28 @@ export default {
       return this.$store.getters['widgets/getWidgets']
     },
     widgetsWithSensors() {
-      return this.widgets.map(widget => {
+      const list = this.widgetsOrder.length ? this.widgetsOrder : this.widgets
+      return list.map(widget => {
         return {
           ...widget,
-          items: widget.items.map(item => {
+          items: (widget.items || []).map(item => {
             return {
               ...item,
-              ...{
-                entity: this.device.sensors.find(sensor => {
-                  return sensor.id === item.entity_id
-                })
-              }
+              entity: this.device?.sensors?.find(sensor => {
+                return sensor.id === item.entity_id
+              })
             }
           })
         }
       })
+    },
+    widgetsList: {
+      get() {
+        return this.widgetsWithSensors
+      },
+      set(val) {
+        this.widgetsOrder = val
+      }
     }
   },
   watch: {
@@ -80,6 +91,18 @@ export default {
         if (newVal !== null && newVal !== undefined) {
           this.deviceModel = this.device
         }
+      }
+    },
+    widgets: {
+      deep: true,
+      immediate: true,
+      handler(val) {
+        if (!val || !val.length) {
+          this.widgetsOrder = []
+          return
+        }
+        if (this.widgetsOrder.length) return
+        this.widgetsOrder = JSON.parse(JSON.stringify(val))
       }
     }
   },
@@ -98,33 +121,50 @@ export default {
     async getDevice() {
       this.loading = true
       await Promise.all([
+        await this.getWidgets(),
         await this.$store.dispatch('devices/getDevice', this.id).finally(() => {
           this.loading = false
-        }),
-        setTimeout(async () => {
-          await this.getWidgets()
-        }, 500)
+        })
       ])
       this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
     },
     async getWidgets() {
-      if (this.device === null || this.device?.id === null) return false
+      if (this.id < 1) return false
       await this.$store.dispatch('widgets/getWidgets', {
-        entity_id: this.device.id,
+        entity_id: this.id,
         type: 'DEVICE'
       })
     },
     addWidget() {
       this.add = true
     },
-    onDeleteWidget(widget) {
+    async onDeleteWidget(widget) {
       if (widget?.id > 0) {
-        console.log('Delete in db')
+        const ok = await this.$refs.confirm.show({
+          title: this.$t('Delete widget'),
+          message: this.$t('Widget will be deleted'),
+          okText: this.$t('Delete'),
+          okIcon: 'mdi-trash-can'
+        })
+        if (ok) {
+          await this.$store.dispatch('widgets/deleteWidget', widget.id)
+          this.$store.commit('addNotification', createSuccessNotification(this.$t('Success')))
+        }
       }
       this.add = false
     },
     onCreateWidget(widget) {
       this.add = false
+    },
+    async onWidgetsSort() {
+      if (!this.widgetsOrder.length) return
+      const updates = this.widgetsOrder.map((widget, index) => {
+        return this.$store.dispatch('widgets/updateWidgetSort', {
+          id: widget.id,
+          sort_order: index
+        })
+      })
+      await Promise.allSettled(updates)
     }
   }
 }
@@ -158,15 +198,26 @@ export default {
           @on-create="onCreateWidget"
         />
       </VRow>
-      <VRow v-if="widgetsWithSensors">
-        <WidgetCard
-          v-for="widget in widgetsWithSensors"
-          :key="widget.id"
-          type="DEVICE"
-          :widget="widget"
-          :entity="device"
-          @on-delete="onDeleteWidget"
-        />
+      <VRow v-if="widgetsList.length">
+        <Draggable
+          v-model="widgetsList"
+          item-key="id"
+          tag="div"
+          class="d-flex flex-wrap w-100"
+          handle=".widget-drag-handle"
+          :animation="150"
+          @end="onWidgetsSort"
+        >
+          <template #item="{element}">
+            <WidgetCard
+              :key="element.id"
+              type="DEVICE"
+              :widget="element"
+              :entity="device"
+              @on-delete="onDeleteWidget"
+            />
+          </template>
+        </Draggable>
       </VRow>
       <VRow>
         <VCol

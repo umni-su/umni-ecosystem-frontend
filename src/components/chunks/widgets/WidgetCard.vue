@@ -178,6 +178,14 @@ export default {
           color="transparent"
         >
           <VBtn
+            icon="mdi-drag"
+            variant="tonal"
+            size="small"
+            density="comfortable"
+            class="mr-2 widget-drag-handle"
+            style="cursor: grab"
+          />
+          <VBtn
             v-if="!isNew"
             :icon="edit ? 'mdi-chevron-right' : 'mdi-pencil'"
             variant="tonal"
@@ -246,6 +254,7 @@ export default {
             v-if="type==='DEVICE'"
           >
             <WidgetDeviceCardItem
+              :edit="isNew || edit"
               :item="element"
               @delete-item="onDeleteSelected"
             />
