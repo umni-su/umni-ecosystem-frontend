@@ -6,12 +6,13 @@ import DeviceActiveSensor from '../../chunks/device/DeviceActiveSensor.vue'
 import DeviceUptimeCard from '../../chunks/device/DeviceUptimeCard.vue'
 import PageActions from '../../chunks/PageActions.vue'
 import WidgetCard from '../../chunks/widgets/WidgetCard.vue'
-import {createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
 import Draggable from 'vuedraggable'
+import ConfirmationDialog from '../../chunks/ConfirmationDialog.vue'
 
 export default {
   name: 'DevicePage',
   components: {
+    ConfirmationDialog,
     WidgetCard,
     PageActions,
     DeviceUptimeCard,
@@ -101,8 +102,24 @@ export default {
           this.widgetsOrder = []
           return
         }
-        if (this.widgetsOrder.length) return
-        this.widgetsOrder = JSON.parse(JSON.stringify(val))
+        const currentIds = this.widgetsOrder.map(w => w.id)
+        const newIds = val.map(w => w.id)
+        if (currentIds.length !== newIds.length) {
+          this.widgetsOrder = JSON.parse(JSON.stringify(val))
+          return
+        }
+        const same = currentIds.every((id, idx) => id === newIds[idx])
+        if (!same || !this.widgetsOrder.length) {
+          this.widgetsOrder = JSON.parse(JSON.stringify(val))
+          return
+        }
+        this.widgetsOrder = this.widgetsOrder.map(w => {
+          const fresh = val.find(v => v.id === w.id)
+          if (fresh) {
+            return JSON.parse(JSON.stringify(fresh))
+          }
+          return w
+        })
       }
     }
   },
@@ -129,7 +146,7 @@ export default {
       this.$store.commit('setTitle', this.$t('Device: {name}', {name: this.name}))
     },
     async getWidgets() {
-      if (this.id < 1) return false
+      if (!this.id) return false
       await this.$store.dispatch('widgets/getWidgets', {
         entity_id: this.id,
         type: 'DEVICE'
@@ -138,22 +155,7 @@ export default {
     addWidget() {
       this.add = true
     },
-    async onDeleteWidget(widget) {
-      if (widget?.id > 0) {
-        const ok = await this.$refs.confirm.show({
-          title: this.$t('Delete widget'),
-          message: this.$t('Widget will be deleted'),
-          okText: this.$t('Delete'),
-          okIcon: 'mdi-trash-can'
-        })
-        if (ok) {
-          await this.$store.dispatch('widgets/deleteWidget', widget.id)
-          this.$store.commit('addNotification', createSuccessNotification(this.$t('Success')))
-        }
-      }
-      this.add = false
-    },
-    onCreateWidget(widget) {
+    onCreateWidget() {
       this.add = false
     },
     async onWidgetsSort() {
@@ -194,31 +196,28 @@ export default {
         <WidgetCard
           type="DEVICE"
           :entity="device"
-          @on-delete="onDeleteWidget"
           @on-create="onCreateWidget"
         />
       </VRow>
-      <VRow v-if="widgetsList.length">
-        <Draggable
-          v-model="widgetsList"
-          item-key="id"
-          tag="div"
-          class="d-flex flex-wrap w-100"
-          handle=".widget-drag-handle"
-          :animation="150"
-          @end="onWidgetsSort"
-        >
-          <template #item="{element}">
-            <WidgetCard
-              :key="element.id"
-              type="DEVICE"
-              :widget="element"
-              :entity="device"
-              @on-delete="onDeleteWidget"
-            />
-          </template>
-        </Draggable>
-      </VRow>
+      <Draggable
+        v-if="widgetsList.length"
+        v-model="widgetsList"
+        item-key="id"
+        tag="div"
+        class="v-row v-row--density-default"
+        handle=".widget-drag-handle"
+        :animation="150"
+        @end="onWidgetsSort"
+      >
+        <template #item="{element}">
+          <WidgetCard
+            :key="element.id"
+            type="DEVICE"
+            :widget="element"
+            :entity="device"
+          />
+        </template>
+      </Draggable>
       <VRow>
         <VCol
           cols="12"
@@ -242,6 +241,7 @@ export default {
         </VCol>
       </VRow>
     </VContainer>
+
     <DeviceActiveSensor/>
   </VSheet>
 </template>

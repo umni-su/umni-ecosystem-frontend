@@ -9,6 +9,7 @@ import {
 } from '../../../js/composables/useSensor.js'
 import {useHorizontalResize, useVerticalResize} from '../../../js/composables/useResize.js'
 import {MASONRY_GAP, MASONRY_ROW} from '../../../js/composables/useMasonry.js'
+import ConfirmationDialog from '../ConfirmationDialog.vue'
 
 // Типы ui_component, для которых рисуем переключатель
 const TOGGLE_COMPONENTS = ['switch', 'lock', 'boolean']
@@ -21,14 +22,18 @@ function isTruthy(value) {
 
 export default {
   name: 'WidgetDeviceCardItem',
-  components: {ColorPicker},
+  components: {ConfirmationDialog, ColorPicker},
   props: {
     item: {
       type: Object,
       required: true
+    },
+    edit: {
+      type: Boolean,
+      default: false
     }
   },
-  emits: ['update:size', 'update:height', 'delete-item'],
+  emits: ['update:size', 'update:height', 'update:color', 'delete-item'],
   data() {
     const {smAndUp, mdAndUp} = useDisplay()
 
@@ -60,7 +65,9 @@ export default {
       changeWidth,
       changeHeight,
       measuredHeight: 0,
-      resizeObserver: null
+      resizeObserver: null,
+      itemColor: '#ffffff',
+      itemVariant: 'elevated'
     }
   },
   computed: {
@@ -210,6 +217,9 @@ export default {
     }
   },
   mounted() {
+    if (this.item?.options?.color) {
+      this.itemColor = this.item.options.color
+    }
     if (!this.$refs.itemEl) return
     const el = this.$refs.itemEl
     // Без ResizeObserver хотя бы показываем контент с текущей высотой
@@ -229,8 +239,16 @@ export default {
     this.resizeObserver?.disconnect()
   },
   methods: {
-    deleteSelected(id, entity_id) {
-      this.$emit('delete-item', {id, entity_id})
+    async deleteSelected(id, entity_id) {
+      const ok = await this.$refs.confirm.show({
+        title: this.$t('Delete widget item'),
+        message: this.$t('Widget item will be deleted'),
+        okText: this.$t('Delete'),
+        okIcon: 'mdi-trash-can'
+      })
+      if (ok) {
+        this.$emit('delete-item', {id, entity_id})
+      }
     }
   }
 }
@@ -243,11 +261,15 @@ export default {
     :style="itemStyle"
   >
     <VCard
+      :color="itemColor"
       class="widget-item  d-flex flex-column align-items-center justify-center"
-      variant="tonal"
+      :variant="itemVariant"
       :style="heightStyle"
     >
-      <div class="widget-item__drag-handle">
+      <div
+        v-if="edit"
+        class="widget-item__drag-handle"
+      >
         <VIcon
           icon="mdi-drag"
           size="18"
@@ -259,6 +281,7 @@ export default {
           :icon="entity.type_icon"
           class="mb-4"
         />
+
         <VSwitch
           v-if="showToggle"
           v-model="checked"
@@ -300,7 +323,14 @@ export default {
         <span>
           {{ name }}
         </span>
-        <div class="position-absolute top-0 right-0">
+        <div
+          v-if="edit"
+          class="position-absolute top-0 right-0"
+        >
+          <ColorPicker
+            v-model="itemColor"
+            @update:model-value="$emit('update:color', $event)"
+          />
           <VBtn
             color="default"
             variant="plain"
@@ -312,6 +342,7 @@ export default {
         </div>
       </VCardText>
       <VSheet
+        v-if="edit"
         color="transparent"
         class="abs-actions pa-1"
       >
@@ -327,6 +358,7 @@ export default {
         />
       </VSheet>
       <VSheet
+        v-if="edit"
         color="transparent"
         class="abs-actions-y pa-1"
       >
@@ -342,6 +374,7 @@ export default {
         />
       </VSheet>
     </VCard>
+    <ConfirmationDialog ref="confirm"/>
   </div>
 </template>
 
@@ -355,8 +388,6 @@ export default {
 
 .widget-item {
   .widget-item__drag-handle {
-    opacity: 0;
-    transition: opacity 0.2s ease;
     position: absolute;
     left: 4px;
     top: 4px;
@@ -371,10 +402,6 @@ export default {
     background: rgba(var(--v-theme-surface), 0.85);
     cursor: grab;
     touch-action: none;
-  }
-
-  &:hover .widget-item__drag-handle {
-    opacity: 1;
   }
 
   .widget-item__drag-handle:active {

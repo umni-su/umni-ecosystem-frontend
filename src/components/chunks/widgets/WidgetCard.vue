@@ -6,10 +6,12 @@ import WidgetDeviceCardItem from './WidgetDeviceCardItem.vue'
 import {useHorizontalResize} from '../../../js/composables/useResize.js'
 import {MASONRY_GAP, MASONRY_ROW} from '../../../js/composables/useMasonry.js'
 import {createErrorNotification, createSuccessNotification} from '../../../js/helpers/notificationHelper.js'
+import ConfirmationDialog from '../ConfirmationDialog.vue'
 
 export default {
   name: 'WidgetCard',
   components: {
+    ConfirmationDialog,
     WidgetDeviceCardItem,
     DeviceSensorSelect,
     ModalDialog,
@@ -152,8 +154,28 @@ export default {
       })
       if (res) {
         this.$store.commit('addNotification', createSuccessNotification(this.$t('Saved')))
+        this.edit = false
       }
       this.$emit('on-create', res)
+    },
+    async onDeleteWidget() {
+      if (this.widget?.id > 0) {
+        const ok = await this.$refs.confirm.show({
+          title: this.$t('Delete widget'),
+          message: this.$t('Widget will be deleted'),
+          okText: this.$t('Delete'),
+          okIcon: 'mdi-trash-can'
+        })
+        if (ok) {
+          await this.$store.dispatch('widgets/deleteWidget', this.widget.id)
+          this.$store.commit('addNotification', createSuccessNotification(this.$t('Success')))
+        }
+      }
+      this.add = false
+      this.$emit('on-delete', this.widget)
+    },
+    onUpdateColor(item, color) {
+      item.options.color = color
     }
   }
 }
@@ -163,33 +185,43 @@ export default {
   <VCol :cols="size">
     <VCard
       min-height="100"
-      :variant="isNew || edit ? 'flat' : 'elevated'"
-      :elevation="isNew || edit ? 2 : 0"
-      color="default"
+      :variant="isNew || edit ? 'flat' : 'text'"
       class="widget-card"
-      :class="[{'border-dashed  border-md': isNew || edit}, isNew || edit ? 'pa-4' : 'pa-4']"
+      :class="[{'border-dashed  border-md': isNew || edit}, isNew || edit ? 'pa-4' : 'pa-4 mx-n4']"
     >
       <VCardText class="pa-0">
-        <div class="text-body-large mb-2 font-weight-bold opacity-70">
-          {{ widgetData.title }}
+        <VTextField
+          v-if="isNew || edit"
+          v-model="widgetData.title"
+          variant="underlined"
+          single-line
+          class="mb-2 mt-n1"
+        />
+        <div
+          v-else
+          class="text-body-large mb-3 mt-n1 font-weight-bold opacity-70 d-flex align-center justify-start"
+        >
+          <VBtn
+            icon="mdi-drag"
+            variant="tonal"
+            size="small"
+            color="default"
+            density="comfortable"
+            class="mr-2 widget-drag-handle"
+            style="cursor: grab"
+          />
+
+          <span class="d-inline-block">{{ widgetData.title }}</span>
         </div>
         <VSheet
           class="text-right mb-2 position-absolute top-0 right-0 ma-2"
           color="transparent"
         >
           <VBtn
-            icon="mdi-drag"
-            variant="tonal"
-            size="small"
-            density="comfortable"
-            class="mr-2 widget-drag-handle"
-            style="cursor: grab"
-          />
-          <VBtn
             v-if="!isNew"
             :icon="edit ? 'mdi-chevron-right' : 'mdi-pencil'"
             variant="tonal"
-            color="grey"
+            color="default"
             size="small"
             class="mr-2"
             density="comfortable"
@@ -203,7 +235,7 @@ export default {
               <VBtn
                 v-tooltip="$t('Add widget item')"
                 v-bind="props"
-                color="grey"
+                color="default"
                 variant="tonal"
                 icon="mdi-plus"
                 density="comfortable"
@@ -230,13 +262,13 @@ export default {
           />
           <VBtn
             v-if="isNew || edit"
-            icon="mdi-close"
+            icon="mdi-trash-can"
             variant="tonal"
             size="small"
             color="error"
             density="comfortable"
             class="ml-2"
-            @click="$emit('on-delete', this.widget)"
+            @click="onDeleteWidget"
           />
         </VSheet>
         <Draggable
@@ -256,6 +288,7 @@ export default {
             <WidgetDeviceCardItem
               :edit="isNew || edit"
               :item="element"
+              @update:color="onUpdateColor(element,$event)"
               @delete-item="onDeleteSelected"
             />
           </template>
@@ -265,7 +298,8 @@ export default {
           class="abs-actions pa-1"
         >
           <VBtn
-            color="grey"
+            v-if="edit || isNew"
+            color="default"
             variant="tonal"
             icon="mdi-arrow-split-vertical"
             size="small"
@@ -275,7 +309,7 @@ export default {
           />
         </VSheet>
       </VCardText>
-
+      <ConfirmationDialog ref="confirm"/>
     </VCard>
   </VCol>
 </template>
