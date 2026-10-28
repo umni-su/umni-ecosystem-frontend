@@ -92,7 +92,8 @@ export default {
     // а не съезжали из-за добавленного вертикального отступа.
     rowSpan() {
       if (!this.ready) return 1
-      return Math.max(1, Math.ceil((this.contentHeight + MASONRY_GAP) / MASONRY_ROW))
+      const rows = this.contentHeight / MASONRY_ROW
+      return Math.max(1, Math.ceil(rows - 0.01))
     },
     itemStyle() {
       const style = {
@@ -222,15 +223,9 @@ export default {
     }
     if (!this.$refs.itemEl) return
     const el = this.$refs.itemEl
-    // Без ResizeObserver хотя бы показываем контент с текущей высотой
-    if (typeof ResizeObserver === 'undefined') {
-      this.measuredHeight = Math.round(el.getBoundingClientRect().height)
-      return
-    }
     this.resizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0]
-      // borderBoxSize есть не во всех браузерах, contentRect — надёжный fallback
-      const height = entry?.borderBoxSize?.[0]?.blockSize ?? entry?.contentRect?.height ?? 0
+      const height = entry?.contentRect?.height ?? entry?.borderBoxSize?.[0]?.blockSize ?? el.getBoundingClientRect().height ?? 0
       this.measuredHeight = Math.round(height)
     })
     this.resizeObserver.observe(el)

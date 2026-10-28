@@ -197,6 +197,7 @@ export default {
           type="DEVICE"
           :entity="device"
           @on-create="onCreateWidget"
+          @on-delete="add = false"
         />
       </VRow>
       <Draggable
