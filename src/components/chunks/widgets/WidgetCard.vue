@@ -171,7 +171,7 @@ export default {
           this.$store.commit('addNotification', createSuccessNotification(this.$t('Success')))
         }
       }
-      this.add = false
+      this.edit = false
       this.$emit('on-delete', this.widget)
     },
     onUpdateColor(item, color) {
@@ -196,21 +196,23 @@ export default {
           variant="underlined"
           single-line
           class="mb-2 mt-n1"
-        />
+        >
+          <template #prepend>
+            <VBtn
+              icon="mdi-drag"
+              variant="tonal"
+              size="small"
+              color="default"
+              density="comfortable"
+              class="mr-2 widget-drag-handle"
+              style="cursor: grab"
+            />
+          </template>
+        </VTextField>
         <div
           v-else
           class="text-body-large mb-3 mt-n1 font-weight-bold opacity-70 d-flex align-center justify-start"
         >
-          <VBtn
-            icon="mdi-drag"
-            variant="tonal"
-            size="small"
-            color="default"
-            density="comfortable"
-            class="mr-2 widget-drag-handle"
-            style="cursor: grab"
-          />
-
           <span class="d-inline-block">{{ widgetData.title }}</span>
         </div>
         <VSheet

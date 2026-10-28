@@ -92,8 +92,7 @@ export default {
     // а не съезжали из-за добавленного вертикального отступа.
     rowSpan() {
       if (!this.ready) return 1
-      const rows = this.contentHeight / MASONRY_ROW
-      return Math.max(1, Math.ceil(rows - 0.01))
+      return Math.max(1, Math.ceil((this.contentHeight + MASONRY_GAP) / MASONRY_ROW))
     },
     itemStyle() {
       const style = {
@@ -225,8 +224,8 @@ export default {
     const el = this.$refs.itemEl
     this.resizeObserver = new ResizeObserver((entries) => {
       const entry = entries[0]
-      const height = entry?.contentRect?.height ?? entry?.borderBoxSize?.[0]?.blockSize ?? el.getBoundingClientRect().height ?? 0
-      this.measuredHeight = Math.round(height)
+      const height = entry?.contentRect?.height ?? el.getBoundingClientRect().height ?? 0
+      this.measuredHeight = height
     })
     this.resizeObserver.observe(el)
   },
